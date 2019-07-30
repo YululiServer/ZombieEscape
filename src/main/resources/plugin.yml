@@ -1,0 +1,42 @@
+name: ZombieEscape
+main: xyz.acrylicstyle.zombieescape.ZombieEscape
+version: 0.0.1
+
+commands:
+  zombieescape:
+    description: "Zombie Escape"
+    usage: /<command>
+  setsponsor:
+    description: "Add a new sponsored player."
+    usage: /<command> <player>
+    aliases: ["sponsor"]
+    permission: zombieescape.setsponsor
+  removesponsor:
+    description: "Remove a sponsored player."
+    usage: /<command> <player>
+    permission: zombieescape.removesponsor
+  setspawn:
+    description: "Sets spawn of zombie/player."
+    usage: /<command> <zombie/player> <0, 1, 2, 3, ...>
+    permission: zombieescape.setspawn
+  removespawn:
+    description: "Remove spawn."
+    usage: /<command> <zombie/player> <0, 1, 2, 3, ...> or /<command> world
+    aliases: ["unsetspawn", "delspawn", "deletespawn"]
+    permission: zombieescape.removespawn
+  setcp:
+    description: "Sets checkpoint in-game. Recommended command block."
+    usage: /<command> <0, 1, 2, 3, ...>
+    aliases: ["cp", "checkpoint"]
+    permission: zombieescape.setcp
+  suicide:
+    description: "Kills yourself."
+    usage: /<command>
+  startgame:
+    description: "Starts game."
+    usage: /<command>
+    permission: zombieescape.startgame
+  endgame:
+    description: "Ends ongoing game."
+    usage: /<command>
+    permission: zombieescape.endgame
