@@ -22,6 +22,7 @@ public class ZombieEscapeGameUtil {
 				return true;
 			}
 			((Player) sender).setHealth(0.0);
+			if (args.length == 1) return true;
 			sender.sendMessage(ChatColor.DARK_RED + "残酷な世界よ、さようなら。");
 			return true;
 		}

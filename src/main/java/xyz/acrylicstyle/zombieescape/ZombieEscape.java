@@ -2,10 +2,12 @@
 package xyz.acrylicstyle.zombieescape;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
@@ -27,6 +29,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -50,6 +53,12 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
 import org.bukkit.scoreboard.Team;
 
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.ProtocolManager;
+import com.comphenix.protocol.events.PacketContainer;
+import com.comphenix.protocol.wrappers.BlockPosition;
+
 import xyz.acrylicstyle.zombieescape.commands.Sponsor;
 import xyz.acrylicstyle.zombieescape.commands.ZombieEscapeConfig;
 import xyz.acrylicstyle.zombieescape.commands.ZombieEscapeGameUtil;
@@ -64,6 +73,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	public static HashMap<UUID, String> hashMapLastScore8 = new HashMap<UUID, String>();
 	public static HashMap<Location, Integer> hashMapBlockState = new HashMap<Location, Integer>();
 	public static ScoreboardManager manager = null;
+	public static ProtocolManager protocol = null;
 	public static int zombies = 0;
 	public static int players = 0;
 	public static int timesLeft = 180;
@@ -75,9 +85,11 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	public static int gameTime = 1800; // 30 minutes
 	public static int playedTime = 0;
 	public static int checkpoint = 0;
+	public static int fireworked = 0;
 
 	@Override
 	public void onEnable() {
+		protocol = ProtocolLibrary.getProtocolManager();
 		try {
 			config = new ConfigProvider("./plugins/ZombieEscape/config.yml");
 		} catch (IOException | InvalidConfigurationException e1) {
@@ -143,6 +155,16 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 
 	@EventHandler
 	public void onPlayerJoin(final PlayerJoinEvent event) {
+		new BukkitRunnable() {
+			public void run() {
+				for (Player player : Bukkit.getOnlinePlayers()) {
+					if (player.getHealth() <= 0) {
+						player.setHealth(0.0);
+					}
+					if (player.isDead()) player.spigot().respawn();
+				}
+			}
+		}.runTaskTimer(this, 0, 1000);
 		if (!settingsCheck) event.getPlayer().sendMessage(ChatColor.RED + "設定がまだ完了してない/エラーが発生したため、ゲームを開始できません。");
 		hashMapLastScore4.put(event.getPlayer().getUniqueId(), "");
 		hashMapLastScore8.put(event.getPlayer().getUniqueId(), "");
@@ -357,8 +379,14 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		}.runTaskLater(this, 1000);
 		if (players == 0 && gameStarted) {
 			for (Player player : Bukkit.getOnlinePlayers()) {
-				player.playSound(player.getLocation(), Sound.FIREWORK_LAUNCH, 100, 1);
-				player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + "ゾンビチームの勝ち！", "");
+				new BukkitRunnable() {
+					public void run() {
+						if (fireworked == 20) this.cancel();
+						player.playSound(player.getLocation(), Sound.FIREWORK_LAUNCH, 100, 1);
+						player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + "ゾンビチームの勝ち！", "");
+						fireworked++;
+					}
+				}.runTaskTimer(this, 0, 250);
 			}
 			Bukkit.broadcastMessage("" + ChatColor.GREEN + ChatColor.BOLD + "ゾンビチームの勝ち！");
 			Bukkit.broadcastMessage(ChatColor.GRAY + "このサーバーはあと15秒でシャットダウンします。");
@@ -401,7 +429,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	@EventHandler
 	public void onEntityDamage(EntityDamageEvent event) {
 		if (event.getEntityType() != EntityType.PLAYER) return;
-		if (((Player)event.getEntity()).getHealth() <= 0) return;
 		if (!gameStarted) event.setCancelled(true);
 		if (event.getCause() == DamageCause.FALL) event.setCancelled(true);
 	}
@@ -428,10 +455,63 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 
 	@EventHandler
 	public void onProjectileHit(ProjectileHitEvent event) {
-		Block block = event.getEntity().getWorld().getBlockAt(event.getEntity().getLocation());
+		Location location = new Location(
+				event.getEntity().getLocation().getWorld(),
+				Math.nextUp(event.getEntity().getLocation().getX()),
+				Math.nextUp(event.getEntity().getLocation().getY()),
+				Math.nextUp(event.getEntity().getLocation().getZ()+0.6));
+		Bukkit.getLogger().info("[DEBUG] Location: " + location.getX() + ", " + location.getY() + ", " + location.getZ());
+		Block block = event.getEntity().getWorld().getBlockAt(location);
 		if (block == null) return;
-		Integer state = hashMapBlockState.get(block.getLocation());
-		if (state == null) hashMapBlockState.put(block.getLocation(), 0);
+		if (block.getType() == Material.DIRT || block.getType() == Material.GRASS || block.getType() == Material.WOOD) {
+			Integer state = hashMapBlockState.get(block.getLocation()) != null ? hashMapBlockState.get(block.getLocation()) : 0;
+			if (state >= 3) {
+				block.setType(Material.AIR);
+				hashMapBlockState.remove(block.getLocation());
+				PacketContainer packet1 = protocol.createPacket(PacketType.Play.Server.BLOCK_BREAK_ANIMATION);
+				packet1.getBlockPositionModifier().write(0, new BlockPosition(block.getX(), block.getY()-1, block.getZ()));
+				packet1.getIntegers().write(0, new Random().nextInt(2000));
+				packet1.getIntegers().write(1, 0); // remove animation
+				for (Player player : Bukkit.getOnlinePlayers()) {
+					try {
+						protocol.sendServerPacket(player, packet1);
+					} catch (InvocationTargetException e) {
+						e.printStackTrace();
+					}
+				}
+				return;
+			}
+			hashMapBlockState.put(block.getLocation(), state+1);
+			PacketContainer packet1 = protocol.createPacket(PacketType.Play.Server.BLOCK_BREAK_ANIMATION);
+			packet1.getBlockPositionModifier().write(0, new BlockPosition(block.getX(), block.getY(), block.getZ()));
+			packet1.getIntegers().write(0, new Random().nextInt(2000));
+			packet1.getIntegers().write(1, (state+1)*3);
+			for (Player player : Bukkit.getOnlinePlayers()) {
+				try {
+					protocol.sendServerPacket(player, packet1);
+				} catch (InvocationTargetException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	@EventHandler
+	public void onBlockBreak(BlockBreakEvent event) {
+		Block block = event.getBlock();
+		if (block == null) return;
+		hashMapBlockState.remove(block.getLocation());
+		PacketContainer packet1 = protocol.createPacket(PacketType.Play.Server.BLOCK_BREAK_ANIMATION);
+		packet1.getBlockPositionModifier().write(0, new BlockPosition(block.getX(), block.getY(), block.getZ()));
+		packet1.getIntegers().write(0, new Random().nextInt(2000));
+		packet1.getIntegers().write(1, 0); // remove animation
+		for (Player player : Bukkit.getOnlinePlayers()) {
+			try {
+				protocol.sendServerPacket(player, packet1);
+			} catch (InvocationTargetException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	@EventHandler(priority=EventPriority.LOWEST)

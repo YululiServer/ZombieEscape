@@ -1,6 +1,7 @@
 name: ZombieEscape
 main: xyz.acrylicstyle.zombieescape.ZombieEscape
 version: 0.0.1
+depend: [ProtocolLib]
 
 commands:
   zombieescape:
