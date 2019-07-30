@@ -16,7 +16,7 @@ public class ConfigProvider extends YamlConfiguration {
 	public ConfigProvider(String path) throws FileNotFoundException, IOException, InvalidConfigurationException {
 		this.path = path;
 		this.file = new File(this.path);
-		if (!this.file.exists()) this.save(this.path);
+		if (!this.file.exists()) this.file.createNewFile();
 		this.load(this.file);
 	}
 
@@ -34,6 +34,7 @@ public class ConfigProvider extends YamlConfiguration {
 	}
 
 	public void reload() throws IOException, InvalidConfigurationException {
+		if (!this.file.exists()) this.file.createNewFile();
 		this.load(this.file);
 	}
 
