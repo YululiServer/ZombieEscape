@@ -91,4 +91,21 @@ public class ZombieEscapeGameUtil {
 			return true;
 		}
 	}
+
+	public final class Team implements CommandExecutor {
+		@Override
+		public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+			if (!(sender instanceof Player)) {
+				sender.sendMessage(ChatColor.RED + "This command must be run from in-game.");
+				return true;
+			}
+			if (args.length == 0) {
+				sender.sendMessage(ChatColor.RED + "使用法: /team <zombie/player>");
+			}
+			if (args[0].equalsIgnoreCase("zombie") || args[0].equalsIgnoreCase("player")) {
+				ZombieEscape.hashMapTeam.put(((Player)sender).getUniqueId(), args[0]);
+			} else sender.sendMessage(ChatColor.RED + "使用法: /team <zombie/player>");
+			return true;
+		}
+	}
 }

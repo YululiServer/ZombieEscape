@@ -41,3 +41,13 @@ commands:
     description: "Ends ongoing game."
     usage: /<command>
     permission: zombieescape.endgame
+  check:
+    description: "Check configuration."
+    usage: /<command>
+    permission: zombieescape.check
+    aliases: ["recheck"]
+  team:
+    description: "Select team."
+    usage: /<command> <zombie/player>
+    permission: zombieescape.team
+    aliases: ["selectclass", "selectteam", "class"]
