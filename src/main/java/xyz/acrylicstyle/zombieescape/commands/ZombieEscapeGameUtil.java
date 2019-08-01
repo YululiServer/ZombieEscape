@@ -94,15 +94,15 @@ public class ZombieEscapeGameUtil {
 			}
 			Player nearestPlayer = null;
 			if (sender instanceof BlockCommandSender) {
-				nearestPlayer = ZombieEscape.targetP(((BlockCommandSender)sender).getBlock().getLocation());
+				nearestPlayer = ZombieEscape.targetPFindPlayers(((BlockCommandSender)sender).getBlock().getLocation());
 			} else if (sender instanceof Player) {
-				nearestPlayer = ZombieEscape.targetP(((Player)sender).getLocation());
+				nearestPlayer = ZombieEscape.targetPFindPlayers(((Player)sender).getLocation());
 			} else {
 				sender.sendMessage(ChatColor.RED + "不明なタイプです: " + sender.toString() + ", Name: " + sender.getName());
 				return true;
 			}
 			ZombieEscape.gameEnded = true;
-			String team = ZombieEscape.hashMapTeam.get(nearestPlayer.getUniqueId()) == "zombie" ? "ゾンビ" : "プレイヤー";
+			String team = nearestPlayer == null ? "ゾンビ" : "プレイヤー";
 			for (Player player : Bukkit.getOnlinePlayers()) {
 				player.playSound(player.getLocation(), Sound.FIREWORK_LAUNCH, 100, 1);
 				player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + team + "チームの勝ち！", "");
@@ -126,6 +126,29 @@ public class ZombieEscapeGameUtil {
 		public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 			ZombieEscape.checkConfig();
 			sender.sendMessage(ChatColor.GREEN + "設定を再確認しました。結果は " + ZombieEscape.settingsCheck + " です。");
+			return true;
+		}
+	}
+
+	public final class SetStatus implements CommandExecutor {
+		@Override
+		public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+			if (args.length != 2) {
+				sender.sendMessage(ChatColor.RED + "引数が2つ必要です。");
+			}
+			if (args[0].equalsIgnoreCase("gameEnded")) {
+				ZombieEscape.gameEnded = Boolean.getBoolean(args[1]);
+			} else if (args[0].equalsIgnoreCase("gameStarted")) {
+				ZombieEscape.gameStarted = Boolean.getBoolean(args[1]);
+			} else if (args[0].equalsIgnoreCase("gameTime")) {
+				ZombieEscape.gameTime = Integer.parseInt(args[1]);
+			} else if (args[0].equalsIgnoreCase("playedTime")) {
+				ZombieEscape.playedTime = Integer.parseInt(args[1]);
+			} else if (args[0].equalsIgnoreCase("timesLeft")) {
+				ZombieEscape.timesLeft = Integer.parseInt(args[1]);
+			} else {
+				sender.sendMessage(ChatColor.GRAY + "?????? [gameEnded, gameStarted, gameTime, playedTime, timesLeft]");
+			}
 			return true;
 		}
 	}

@@ -103,6 +103,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	public static int checkpoint = 0;
 	public static int fireworked = 0;
 	public static boolean gameEnded = false;
+	public static Map<String, Object> locationWall = null;
 
 	@Override
 	public void onEnable() {
@@ -139,6 +140,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			Bukkit.getPluginCommand("startgame").setExecutor(zegu.new StartGame());
 			Bukkit.getPluginCommand("endgame").setExecutor(zegu.new EndGame());
 			Bukkit.getPluginCommand("check").setExecutor(zegu.new CheckConfig());
+			Bukkit.getPluginCommand("setstatus").setExecutor(zegu.new SetStatus());
 			Bukkit.getPluginCommand("zombieescape").setExecutor(new CommandExecutor() {
 				@Override
 				public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -157,6 +159,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		teams.put("player", manager.getNewScoreboard().registerNewTeam("player"));
 		Bukkit.getPluginManager().registerEvents(this, this);
 		checkConfig();
+		locationWall = Config.getConfigSectionValue(config.get("locationWall", new HashMap<String, Object>()), true);
 		Bukkit.getLogger().info("[ZombieEscape] Enabled Zombie Escape");
 	}
 
@@ -185,35 +188,47 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		event.getPlayer().teleport(event.getPlayer().getWorld().getSpawnLocation());
 		hashMapTeam.put(event.getPlayer().getUniqueId(), "player");
 		lockActionBar.put(event.getPlayer().getUniqueId(), false);
+		new BukkitRunnable() {
+			public void run() {
+				ZombieEscape.config.reloadWithoutException();
+				locationWall = Config.getConfigSectionValue(config.get("locationWall", new HashMap<String, Object>()), true);
+			}
+		}.runTaskTimer(this, 6000, 6000);
 		/*
 		new BukkitRunnable() {
 			public void run() {
 				for (Player player : Bukkit.getOnlinePlayers()) {
 					Set<Material> set = new HashSet<Material>();
 					set.add(Material.AIR);
-					Block block = ((Player) player).getTargetBlock(set, 4);
-					if (block == null || !(block.getType() == Material.AIR)) {
+					Block block = player.getTargetBlock(set, 4);
+					if (block == null) {
 						lockActionBar.put(player.getUniqueId(), false);
 						continue;
 					}
-					int durability = Constants.materialDurability.getOrDefault(block.getType(), 5);
-					int state = hashMapBlockState.get(block.getLocation()) != null ? hashMapBlockState.get(block.getLocation()) : 0;
-					ActionBar.setActionBarWithoutException(player, "ブロック耐久力: " + state + "/" + durability);
+					String location = block.getLocation().getBlockX() + "," + block.getLocation().getBlockY() + "," + block.getLocation().getBlockZ();
+					Map<String, Object> locationWall = Config.getConfigSectionValue(config2.get("locationWall", new HashMap<String, Object>()), true);
+					String wall = (String) locationWall.getOrDefault(location, null);
+					if (wall == null) {
+						lockActionBar.put(player.getUniqueId(), false);
+						continue;
+					}
+					Integer state = hashMapBlockState.get(wall) != null ? hashMapBlockState.get(wall) : 0;
+					ActionBar.setActionBarWithoutException(player, ChatColor.GREEN + "壁の耐久力: " + state + "/" + Constants.materialDurability.get(block.getType()));
 					lockActionBar.put(player.getUniqueId(), true);
 				}
 			}
-		}.runTaskTimer(this, 0, 10);
+		}.runTaskTimer(this, 0, 20);
 		*/
 		new BukkitRunnable() {
 			public void run() {
 				for (Player player : Bukkit.getOnlinePlayers()) {
-					//if (lockActionBar.getOrDefault(player.getUniqueId(), false)) continue;
+					if (lockActionBar.getOrDefault(player.getUniqueId(), false)) continue;
 					int maxHealth = (int) player.getMaxHealth();
 					int health = (int) player.getHealth();
 					ActionBar.setActionBarWithoutException(player, "" + ChatColor.RED + health + "/" + maxHealth + "❤");
 				}
 			}
-		}.runTaskTimer(this, 0, 5);
+		}.runTaskTimerAsynchronously(this, 0, 20);
 		new BukkitRunnable() {
 			public void run() {
 				for (Player player : Bukkit.getOnlinePlayers()) {
@@ -235,7 +250,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 					}
 				}
 			}
-		}.runTaskTimer(this, 40, 40);
+		}.runTaskTimer(this, 200, 200);
 		Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "effect " + event.getPlayer().getName() + " clear");
 		hashMapOriginZombie.put(event.getPlayer().getUniqueId(), false);
 		if (!settingsCheck) {
@@ -401,7 +416,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 										item.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 100);
 										player.getInventory().setItem(0, item);
 										Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "give " + player.getName() + " minecraft:stone_axe 1 0 {CanDestroy:[\"minecraft:grass\",\"minecraft:planks\",\"minecraft:dirt\"],HideFlags:1,Unbreakable:1,display:{Name:\"錆びついた斧\"},ench:[{id:32,lvl:10}]}");
-										config.reloadWithoutException();
 										String[] spawnLists = Arrays.asList(config.getList("spawnPoints.zombie", new ArrayList<String>()).toArray(new String[0])).get(0).split(",");
 										Location location = new Location(Bukkit.getWorld(config.getString("spawnPoints.world")), Double.parseDouble(spawnLists[0]), Double.parseDouble(spawnLists[1]), Double.parseDouble(spawnLists[2]));
 										if (!player.teleport(location)) {
@@ -415,7 +429,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 									public void run() {
 										Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "shot give " + player.getName() + " ak-47");
 										player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + "GO!", ChatColor.YELLOW + "目標: ゾンビから逃げ、ゴールに到達する");
-										config.reloadWithoutException();
 										String[] spawnLists = Arrays.asList(config.getList("spawnPoints.player", new ArrayList<String>()).toArray(new String[0])).get(0).split(",");
 										Location location = new Location(Bukkit.getWorld(config.getString("spawnPoints.world")), Double.parseDouble(spawnLists[0]), Double.parseDouble(spawnLists[1]), Double.parseDouble(spawnLists[2]));
 										if (!player.teleport(location)) {
@@ -520,7 +533,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 
 	@EventHandler
 	public void onPlayerRespawn(PlayerRespawnEvent event) {
-		config.reloadWithoutException();
 		String[] spawnLists = Arrays.asList(config.getList("spawnPoints.zombie", new ArrayList<String>()).toArray(new String[0])).get(checkpoint).split(",");
 		Location location = new Location(Bukkit.getWorld(config.getString("spawnPoints.world")), Double.parseDouble(spawnLists[0]), Double.parseDouble(spawnLists[1]), Double.parseDouble(spawnLists[2]));
 		event.setRespawnLocation(location);
@@ -532,6 +544,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		event.getPlayer().getInventory().setBoots(createLeatherItemStack(Material.LEATHER_BOOTS, 0, 100, 0));
 		event.getPlayer().setMaxHealth(200);
 		event.getPlayer().setHealth(200);
+		event.getPlayer().setHealthScale(40);
 		new BukkitRunnable() {
 			public void run() {
 				event.getPlayer().addPotionEffect(PotionEffectType.HUNGER.createEffect(100000, 0));
@@ -705,15 +718,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		int durability = Constants.materialDurability.getOrDefault(block.getType(), 5);
 		if (block.getType() == Material.DIRT || block.getType() == Material.GRASS || block.getType() == Material.WOOD) {
 			String location = block.getLocation().getBlockX() + "," + block.getLocation().getBlockY() + "," + block.getLocation().getBlockZ();
-			ConfigProvider config;
-			try {
-				config = new ConfigProvider("./plugins/ZombieEscape/config.yml");
-			} catch (IOException | InvalidConfigurationException e1) {
-				Bukkit.getLogger().severe("Error while loading config!");
-				e1.printStackTrace();
-				return;
-			}
-			Map<String, Object> locationWall = Config.getConfigSectionValue(config.get("locationWall", new HashMap<String, Object>()), true);
 			String wall = (String) locationWall.getOrDefault(location, null);
 			Integer state = hashMapBlockState.get(wall) != null ? hashMapBlockState.get(wall) : 0;
 			if (state >= durability) {
@@ -763,15 +767,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		Block block = event.getBlock();
 		if (block == null) return;
 		String location = block.getLocation().getBlockX() + "," + block.getLocation().getBlockY() + "," + block.getLocation().getBlockZ();
-		ConfigProvider config;
-		try {
-			config = new ConfigProvider("./plugins/ZombieEscape/config.yml");
-		} catch (IOException | InvalidConfigurationException e1) {
-			Bukkit.getLogger().severe("Error while loading config!");
-			e1.printStackTrace();
-			return;
-		}
-		Map<String, Object> locationWall = Config.getConfigSectionValue(config.get("locationWall", new HashMap<String, Object>()), true);
 		String wall = (String) locationWall.getOrDefault(location, null);
 		hashMapBlockState.remove(wall);
 		PacketContainer packet1 = protocol.createPacket(PacketType.Play.Server.BLOCK_BREAK_ANIMATION);
@@ -798,7 +793,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			return;
 		}
 		try {
-			ConfigProvider config = new ConfigProvider("./plugins/ZombieEscape/config.yml");
 			List<String> sponsors = Arrays.asList(config.getList("sponsors", new ArrayList<String>()).toArray(new String[0]));
 			if (sponsors.contains(event.getPlayer().getUniqueId().toString()) == true) {
 				event.allow();
@@ -885,15 +879,30 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	}
 
 	public static Player targetP(Location loc){
-	     Player nearestPlayer = null;
-	     double lastDistance = Double.MAX_VALUE;
-	     for(Player p : loc.getWorld().getPlayers()){
-	          double distanceSqrd = loc.distanceSquared(p.getLocation());
-	          if(distanceSqrd < lastDistance){
-	               lastDistance = distanceSqrd;
-	               nearestPlayer = p;
-	          }
-	     }
-	     return nearestPlayer;
+		Player nearestPlayer = null;
+		double lastDistance = Double.MAX_VALUE;
+		for(Player p : loc.getWorld().getPlayers()){
+			double distanceSqrd = loc.distanceSquared(p.getLocation());
+			if(distanceSqrd < lastDistance){
+				lastDistance = distanceSqrd;
+				nearestPlayer = p;
+			}
+		}
+		return nearestPlayer;
+	}
+
+	public static Player targetPFindPlayers(Location loc){
+		Player nearestPlayer = null;
+		double lastDistance = Double.MAX_VALUE;
+		for(Player p : loc.getWorld().getPlayers()){
+			if (!hashMapTeam.get(p.getUniqueId()).equalsIgnoreCase("player")) continue;
+			double distanceSqrd = loc.distanceSquared(p.getLocation());
+			if (distanceSqrd > 7) continue;
+			if(distanceSqrd < lastDistance){
+				lastDistance = distanceSqrd;
+				nearestPlayer = p;
+			}
+		}
+		return nearestPlayer;
 	}
 }

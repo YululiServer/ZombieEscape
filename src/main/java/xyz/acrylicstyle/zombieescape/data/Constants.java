@@ -13,7 +13,7 @@ public class Constants {
 	static {
 		materialDurability.put(Material.DIRT, 30);
 		materialDurability.put(Material.GRASS, 30);
-		materialDurability.put(Material.WOOD, 30);
+		materialDurability.put(Material.WOOD, 100);
 		materialDurability.put(Material.BEDROCK, 50000000);
 		materialDurability.put(Material.COMMAND, 50000000);
 	}
