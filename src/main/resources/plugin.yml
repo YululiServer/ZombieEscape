@@ -46,8 +46,13 @@ commands:
     usage: /<command>
     permission: zombieescape.check
     aliases: ["recheck"]
-  team:
-    description: "Select team."
-    usage: /<command> <zombie/player>
-    permission: zombieescape.team
-    aliases: ["selectclass", "selectteam", "class"]
+  addwall:
+    description: "Add a wall."
+    usage: /<command>
+    permission: zombieescape.addwall
+    aliases: ["putwall"]
+  deletewall:
+    description: "Deletes a wall"
+    usage: /<command>
+    permission: zombieescape.deletewall
+    aliases: ["removewall"]

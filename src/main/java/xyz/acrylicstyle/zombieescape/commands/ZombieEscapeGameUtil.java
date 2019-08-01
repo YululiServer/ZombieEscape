@@ -6,9 +6,11 @@ import java.util.TimerTask;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
+import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 import xyz.acrylicstyle.zombieescape.ZombieEscape;
@@ -21,9 +23,16 @@ public class ZombieEscapeGameUtil {
 				sender.sendMessage(ChatColor.RED + "This command must be run from in-game.");
 				return true;
 			}
-			((Player) sender).setHealth(0.0);
-			if (args.length == 1) return true;
-			sender.sendMessage(ChatColor.DARK_RED + "残酷な世界よ、さようなら。");
+			if (!ZombieEscape.gameStarted) {
+				sender.sendMessage(ChatColor.RED + "まだゲームは開始されていません！");
+				return true;
+			}
+			if (ZombieEscape.gameStarted && ZombieEscape.playedTime < 10) {
+				sender.sendMessage(ChatColor.RED + "まだこのコマンドは使用できません！");
+				return true;
+			}
+			sender.sendMessage(ChatColor.RED + "このコマンドは無効化されています。");
+			//((Player) sender).setHealth(0.0);
 			return true;
 		}
 	}
@@ -35,8 +44,22 @@ public class ZombieEscapeGameUtil {
 				sender.sendMessage(ChatColor.RED + "使用法: /setcp <0, 1, 2, 3, ...>");
 				return true;
 			}
+			Player nearestPlayer = null;
+			if (sender instanceof BlockCommandSender) {
+				nearestPlayer = ZombieEscape.targetP(((BlockCommandSender)sender).getBlock().getLocation());
+			} else if (sender instanceof Player) {
+				nearestPlayer = ZombieEscape.targetP(((Player)sender).getLocation());
+			} else {
+				sender.sendMessage(ChatColor.RED + "不明なタイプです: " + sender.toString() + ", Name: " + sender.getName());
+				return false;
+			}
+			if (ZombieEscape.hashMapTeam.get(nearestPlayer.getUniqueId()) != "zombie" || (sender instanceof Player && ((Player)sender).isOp())) {
+				sender.sendMessage(ChatColor.RED + "チェックポイントはゾンビのみが作動できます。");
+				return false;
+			}
 			ZombieEscape.checkpoint = Integer.parseInt(args[0]);
 			sender.sendMessage(ChatColor.GREEN + "チェックポイントを " + args[0] + " に設定しました。");
+			Bukkit.broadcastMessage(ChatColor.GREEN + "チェックポイント" + args[0] + "を通過しました。");
 			return true;
 		}
 	}
@@ -61,15 +84,30 @@ public class ZombieEscapeGameUtil {
 		@SuppressWarnings("deprecation")
 		@Override
 		public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+			if (sender instanceof ConsoleCommandSender) {
+				sender.sendMessage(ChatColor.RED + "This command must be used in-game.");
+				return true;
+			}
 			if (!ZombieEscape.gameStarted) {
 				sender.sendMessage(ChatColor.RED + "ゲームはまだ開始されていません！");
 				return true;
 			}
+			Player nearestPlayer = null;
+			if (sender instanceof BlockCommandSender) {
+				nearestPlayer = ZombieEscape.targetP(((BlockCommandSender)sender).getBlock().getLocation());
+			} else if (sender instanceof Player) {
+				nearestPlayer = ZombieEscape.targetP(((Player)sender).getLocation());
+			} else {
+				sender.sendMessage(ChatColor.RED + "不明なタイプです: " + sender.toString() + ", Name: " + sender.getName());
+				return true;
+			}
+			ZombieEscape.gameEnded = true;
+			String team = ZombieEscape.hashMapTeam.get(nearestPlayer.getUniqueId()) == "zombie" ? "ゾンビ" : "プレイヤー";
 			for (Player player : Bukkit.getOnlinePlayers()) {
 				player.playSound(player.getLocation(), Sound.FIREWORK_LAUNCH, 100, 1);
-				player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + "プレイヤーチームの勝ち！", "");
+				player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + team + "チームの勝ち！", "");
 			}
-			Bukkit.broadcastMessage("" + ChatColor.GREEN + ChatColor.BOLD + "プレイヤーチームの勝ち！");
+			Bukkit.broadcastMessage("" + ChatColor.GREEN + ChatColor.BOLD + team + "チームの勝ち！");
 			Bukkit.broadcastMessage(ChatColor.GRAY + "このサーバーはあと15秒でシャットダウンします。");
 			TimerTask task = new TimerTask() {
 				public void run() {
@@ -88,23 +126,6 @@ public class ZombieEscapeGameUtil {
 		public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 			ZombieEscape.checkConfig();
 			sender.sendMessage(ChatColor.GREEN + "設定を再確認しました。結果は " + ZombieEscape.settingsCheck + " です。");
-			return true;
-		}
-	}
-
-	public final class Team implements CommandExecutor {
-		@Override
-		public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-			if (!(sender instanceof Player)) {
-				sender.sendMessage(ChatColor.RED + "This command must be run from in-game.");
-				return true;
-			}
-			if (args.length == 0) {
-				sender.sendMessage(ChatColor.RED + "使用法: /team <zombie/player>");
-			}
-			if (args[0].equalsIgnoreCase("zombie") || args[0].equalsIgnoreCase("player")) {
-				ZombieEscape.hashMapTeam.put(((Player)sender).getUniqueId(), args[0]);
-			} else sender.sendMessage(ChatColor.RED + "使用法: /team <zombie/player>");
 			return true;
 		}
 	}

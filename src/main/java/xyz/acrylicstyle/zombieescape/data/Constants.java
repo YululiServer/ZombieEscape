@@ -11,9 +11,9 @@ public class Constants {
 	public static HashMap<Material, Integer> materialDurability = new HashMap<Material, Integer>();
 
 	static {
-		materialDurability.put(Material.DIRT, 3);
-		materialDurability.put(Material.GRASS, 3);
-		materialDurability.put(Material.WOOD, 3);
+		materialDurability.put(Material.DIRT, 30);
+		materialDurability.put(Material.GRASS, 30);
+		materialDurability.put(Material.WOOD, 30);
 		materialDurability.put(Material.BEDROCK, 50000000);
 		materialDurability.put(Material.COMMAND, 50000000);
 	}
