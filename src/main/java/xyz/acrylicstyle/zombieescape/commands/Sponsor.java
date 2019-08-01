@@ -13,7 +13,7 @@ import org.bukkit.configuration.InvalidConfigurationException;
 import org.json.simple.parser.ParseException;
 
 import net.md_5.bungee.api.ChatColor;
-import xyz.acrylicstyle.zombieescape.providers.ConfigProvider;
+import xyz.acrylicstyle.tomeito_core.providers.ConfigProvider;
 import xyz.acrylicstyle.zombieescape.utils.PlayerUtils;
 
 public final class Sponsor {

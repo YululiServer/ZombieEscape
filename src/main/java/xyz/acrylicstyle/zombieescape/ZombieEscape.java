@@ -67,13 +67,12 @@ import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.BlockPosition;
 
+import xyz.acrylicstyle.tomeito_core.providers.ConfigProvider;
 import xyz.acrylicstyle.zombieescape.commands.Sponsor;
 import xyz.acrylicstyle.zombieescape.commands.ZombieEscapeConfig;
 import xyz.acrylicstyle.zombieescape.commands.ZombieEscapeGameUtil;
-import xyz.acrylicstyle.zombieescape.config.Config;
 import xyz.acrylicstyle.zombieescape.data.Constants;
 import xyz.acrylicstyle.zombieescape.effects.ActionBar;
-import xyz.acrylicstyle.zombieescape.providers.ConfigProvider;
 
 public class ZombieEscape extends JavaPlugin implements Listener {
 	public final static int mininumPlayers = 2;
@@ -159,7 +158,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		teams.put("player", manager.getNewScoreboard().registerNewTeam("player"));
 		Bukkit.getPluginManager().registerEvents(this, this);
 		checkConfig();
-		locationWall = Config.getConfigSectionValue(config.get("locationWall", new HashMap<String, Object>()), true);
+		locationWall = ConfigProvider.getConfigSectionValue(config.get("locationWall", new HashMap<String, Object>()), true);
 		Bukkit.getLogger().info("[ZombieEscape] Enabled Zombie Escape");
 	}
 
@@ -191,7 +190,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		new BukkitRunnable() {
 			public void run() {
 				ZombieEscape.config.reloadWithoutException();
-				locationWall = Config.getConfigSectionValue(config.get("locationWall", new HashMap<String, Object>()), true);
+				locationWall = ConfigProvider.getConfigSectionValue(config.get("locationWall", new HashMap<String, Object>()), true);
 			}
 		}.runTaskTimer(this, 6000, 6000);
 		/*

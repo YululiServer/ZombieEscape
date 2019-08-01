@@ -48,6 +48,10 @@
       <id>spigot-repo</id>
       <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
     </repository>
+    <repository>
+      <id>acrylicstyle-repo</id>
+      <url>https://ci.acrylicstyle.xyz/job/TomeitoLib/ws/</url>
+    </repository>
   </repositories>
   <dependencies>
     <dependency>
@@ -78,6 +82,11 @@
       <artifactId>bukkit</artifactId>
       <version>1.8.8-R0.1-SNAPSHOT</version>
       <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>xyz.acrylicstyle</groupId>
+      <artifactId>tomeito_core</artifactId>
+      <version>11</version>
     </dependency>
   </dependencies>
 </project>

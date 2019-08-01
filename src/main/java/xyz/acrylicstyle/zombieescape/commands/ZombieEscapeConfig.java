@@ -14,9 +14,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
 
+import xyz.acrylicstyle.tomeito_core.providers.ConfigProvider;
 import xyz.acrylicstyle.zombieescape.ZombieEscape;
-import xyz.acrylicstyle.zombieescape.config.Config;
-import xyz.acrylicstyle.zombieescape.providers.ConfigProvider;
 
 public class ZombieEscapeConfig {
 	public final class SetSpawn implements CommandExecutor {
@@ -110,7 +109,7 @@ public class ZombieEscapeConfig {
 				List<String> walls = config.getStringList("wallLocation." + args[0]);
 				walls.add(location);
 				config.set("wallLocation." + args[0], walls);
-				Map<String, Object> locationWall = Config.getConfigSectionValue(config.get("locationWall", new HashMap<String, Object>()), true);
+				Map<String, Object> locationWall = ConfigProvider.getConfigSectionValue(config.get("locationWall", new HashMap<String, Object>()), true);
 				locationWall.put(location, args[0]);
 				config.setThenSave("locationWall", locationWall);
 			} catch (IOException | InvalidConfigurationException e) {
@@ -139,7 +138,7 @@ public class ZombieEscapeConfig {
 				ConfigProvider config = new ConfigProvider("./plugins/ZombieEscape/config.yml");
 				config.setThenSave("wallLocation." + args[0], null);
 				// Location, Wallname
-				Map<String, Object> locationWall = Config.getConfigSectionValue(config.get("locationWall", new HashMap<String, Object>()), true);
+				Map<String, Object> locationWall = ConfigProvider.getConfigSectionValue(config.get("locationWall", new HashMap<String, Object>()), true);
 				locationWall.forEach((location, wall) -> {
 					if (wall.toString() == args[0]) locationWall.remove(location);
 				});

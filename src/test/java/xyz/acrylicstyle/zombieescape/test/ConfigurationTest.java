@@ -7,7 +7,7 @@ import org.bukkit.configuration.InvalidConfigurationException;
 import org.junit.Assert;
 import org.junit.Test;
 
-import xyz.acrylicstyle.zombieescape.providers.ConfigProvider;
+import xyz.acrylicstyle.tomeito_core.providers.ConfigProvider;
 
 public class ConfigurationTest {
 	@Test
