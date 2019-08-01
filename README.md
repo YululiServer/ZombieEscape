@@ -1,22 +1,5 @@
 # Zombie Escape
 
-## Using maven
-```xml
-<repositories>
-  <repository>
-    <id>acrylicstyle-repo</id>
-    <url>https://ci.acrylicstyle.xyz/job/TomeitoLib/ws/</url>
-  </repository>
-</repositories>
-</dependencies>
-  <dependency>
-    <groupId>xyz.acrylicstyle</groupId>
-    <artifactId>tomeito_core</artifactId>
-    <version>11</version>
-  </dependency>
-</dependencies>
-```
-
 ## Depending plugin
 - ProtocolLib
 - [TomeitoLib](https://ci.acrylicstyle.xyz/job/TomeitoLib/11/artifact/TomeitoLib.jar)
