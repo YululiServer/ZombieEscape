@@ -10,6 +10,10 @@
       <email>me@acrylicstyle.xyz</email>
     </developer>
   </developers>
+  <properties>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+  </properties>
   <build>
     <plugins>
       <plugin>
@@ -36,10 +40,6 @@
             </configuration>
           </execution>
         </executions>
-        <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
-        </configuration>
       </plugin>
     </plugins>
   </build>
