@@ -295,14 +295,14 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				event.getPlayer().sendMessage(ChatColor.YELLOW + "チャットはデフォルトで" + ChatColor.AQUA + "[チーム]" + ChatColor.YELLOW + "チャットです。");
 				event.getPlayer().sendMessage(ChatColor.YELLOW + "'!'をチャットの先頭につけると" + ChatColor.RED + "[All]" + ChatColor.YELLOW + "(全体)チャットになります。");
 				event.getPlayer().sendMessage(ChatColor.BLUE + "--------------------------------------------------");
+				if (gameStarted) {
+					event.getPlayer().sendMessage(ChatColor.RED + "ゲームはすでに開始しています！");
+					event.getPlayer().setGameMode(GameMode.SPECTATOR);
+					event.getPlayer().setPlayerListName(ChatColor.WHITE + event.getPlayer().getName());
+					return;
+				}
 			}
 		}.runTaskLater(this, 40);
-		if (gameStarted) {
-			event.getPlayer().sendMessage(ChatColor.RED + "ゲームはすでに開始しています！");
-			event.getPlayer().setGameMode(GameMode.SPECTATOR);
-			event.getPlayer().setPlayerListName(ChatColor.WHITE + event.getPlayer().getName());
-			return;
-		}
 		if (timerStarted) return;
 		timerStarted = true;
 		new BukkitRunnable() {
