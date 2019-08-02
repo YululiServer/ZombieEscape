@@ -795,6 +795,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 
 	@EventHandler(priority=EventPriority.LOWEST)
 	public void onPlayerLogin(PlayerLoginEvent event) {
+		config.reloadWithoutException();
 		if (gameEnded) {
 			event.disallow(Result.KICK_OTHER, ChatColor.RED + "ゲームはすでに終了しています！約30秒後に参加しなおしてください。");
 			return;
