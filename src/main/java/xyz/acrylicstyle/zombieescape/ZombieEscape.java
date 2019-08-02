@@ -218,7 +218,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			}
 		}.runTaskTimer(this, 0, 20);
 		*/
-		new BukkitRunnable() {
+		BukkitRunnable healthBar = new BukkitRunnable() {
 			public void run() {
 				for (Player player : Bukkit.getOnlinePlayers()) {
 					if (lockActionBar.getOrDefault(player.getUniqueId(), false)) continue;
@@ -230,7 +230,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 					scoreboard.resetScores(lastScore4);
 				}
 			}
-		}.runTaskTimerAsynchronously(this, 0, 20);
+		};
 		new BukkitRunnable() {
 			public void run() {
 				for (Player player : Bukkit.getOnlinePlayers()) {
@@ -306,6 +306,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				}
 			}
 		}.runTaskLater(this, 40);
+		healthBar.runTaskTimer(this, 0, 20);
 		if (timerStarted) return;
 		timerStarted = true;
 		new BukkitRunnable() {
