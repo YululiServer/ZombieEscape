@@ -310,9 +310,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			@SuppressWarnings("deprecation") // player#sendTitle, i can't find non-deprecated methods in 1.8.8.
 			public void run() {
 				for (final Player player : Bukkit.getOnlinePlayers()) {
-					String lastScore4 = hashMapLastScore4.get(player.getUniqueId());
-					Scoreboard scoreboard = hashMapScoreboard.get(player.getUniqueId());
-					scoreboard.resetScores(lastScore4);
+					hashMapScoreboard.get(player.getUniqueId()).resetScores(hashMapLastScore4.get(player.getUniqueId()));
 				}
 				final String zombieMessage = ChatColor.GREEN + "    チーム: " + ChatColor.DARK_GREEN + "ゾンビ";
 				final String playerMessage = ChatColor.GREEN + "    チーム: " + ChatColor.AQUA + "プレイヤー";
@@ -482,10 +480,10 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 						String lastScore4 = hashMapLastScore4.get(event.getPlayer().getUniqueId());
 						scoreboard.resetScores(lastScore4);
 						lastScore4 = ChatColor.GREEN + "    " + Math.round(Math.nextDown(playedTime/60)) + ":" + leftSecondPlayed + " / " + Math.round(Math.nextDown(gameTime/60)) + ":" + leftSecond;
+						hashMapLastScore4.put(player.getUniqueId(), lastScore4);
 						Score score4 = objective3.getScore(lastScore4);
 						score4.setScore(4);
-						hashMapLastScore4.put(event.getPlayer().getUniqueId(), lastScore4);
-						player.setScoreboard(hashMapScoreboard.get(player.getUniqueId()));
+						player.setScoreboard(scoreboard);
 					}
 					playedTime++;
 				}
