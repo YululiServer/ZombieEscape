@@ -473,12 +473,13 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 						if (leftSecondPlayed.length() == 1) leftSecondPlayed = "0" + leftSecondPlayed;
 						String leftSecond = Integer.toString(gameTime % 60);
 						if (leftSecond.length() == 1) leftSecond = "0" + leftSecond;
-						scoreboard.resetScores(hashMapLastScore4.get(event.getPlayer().getUniqueId()));
-						String score4s = ChatColor.GREEN + "    " + Math.round(Math.nextDown(playedTime/60)) + ":" + leftSecondPlayed + " / " + Math.round(Math.nextDown(gameTime/60)) + ":" + leftSecond;
-						Score score4 = objective3.getScore(score4s);
+						String lastScore4 = hashMapLastScore4.get(event.getPlayer().getUniqueId());
+						scoreboard.resetScores(lastScore4);
+						lastScore4 = ChatColor.GREEN + "    " + Math.round(Math.nextDown(playedTime/60)) + ":" + leftSecondPlayed + " / " + Math.round(Math.nextDown(gameTime/60)) + ":" + leftSecond;
+						Score score4 = objective3.getScore(lastScore4);
 						score4.setScore(4);
+						hashMapLastScore4.put(event.getPlayer().getUniqueId(), lastScore4);
 						player.setScoreboard(hashMapScoreboard.get(player.getUniqueId()));
-						hashMapLastScore4.put(event.getPlayer().getUniqueId(), score4s);
 					}
 					playedTime++;
 				}
@@ -674,10 +675,10 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			timesLeft = 180;
 		}
 		if (hashMapTeam.get(event.getPlayer().getUniqueId()) == "zombie") zombies--; else players--;
-		if (zombies < 0) throw new IllegalStateException("Zombie count is should be 0 or more.");
-		if (players < 0) throw new IllegalStateException("Player count is should be 0 or more.");
+		if (gameStarted && zombies < 0) throw new IllegalStateException("Zombie count is should be 0 or more.");
+		if (gameStarted && players < 0) throw new IllegalStateException("Player count is should be 0 or more.");
 		hashMapTeam.remove(event.getPlayer().getUniqueId());
-		if (zombies == 0 || players == 0) {
+		if (gameStarted && (zombies == 0 || players == 0)) {
 			String team = zombies == 0 ? "プレイヤー" : "ゾンビ";
 			for (Player player : Bukkit.getOnlinePlayers()) {
 				player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + "ゾンビチームの勝ち！", "");
