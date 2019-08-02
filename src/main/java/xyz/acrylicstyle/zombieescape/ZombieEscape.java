@@ -52,6 +52,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.DisplaySlot;
@@ -78,6 +79,7 @@ import xyz.acrylicstyle.zombieescape.effects.ActionBar;
 public class ZombieEscape extends JavaPlugin implements Listener {
 	public final static int mininumPlayers = 2;
 	public static ConfigProvider config = null;
+	public static ConfigProvider mapConfig = null;
 	public static HashMap<UUID, Scoreboard> hashMapScoreboard = new HashMap<UUID, Scoreboard>();
 	public static HashMap<UUID, String> hashMapTeam = new HashMap<UUID, String>();
 	public static HashMap<UUID, String> hashMapLastScore4 = new HashMap<UUID, String>();
@@ -88,6 +90,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	 */
 	public static HashMap<UUID, Boolean> hashMapOriginZombie = new HashMap<UUID, Boolean>();
 	public static HashMap<UUID, Boolean> lockActionBar = new HashMap<UUID, Boolean>();
+	public static String mapName = null;
 	public static ScoreboardManager manager = null;
 	public static ProtocolManager protocol = null;
 	public static int zombies = 0;
@@ -110,9 +113,18 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		protocol = ProtocolLibrary.getProtocolManager();
 		try {
 			config = new ConfigProvider("./plugins/ZombieEscape/config.yml");
+			mapName = config.getString("map", "world");
+			mapConfig = new ConfigProvider("./plugins/ZombieEscape/maps/" + mapName + ".yml");
 		} catch (IOException | InvalidConfigurationException e1) {
 			e1.printStackTrace();
+			e1.getCause().printStackTrace();
 			Bukkit.getLogger().severe("[ZombieEscape] Failed to load config, disabling plugin.");
+			Bukkit.getPluginManager().disablePlugin(this);
+			return;
+		}
+		if (Bukkit.getWorld(mapConfig.getString("spawnPoints.world", "world")) == null) {
+			Log.severe("Failed to load world(probably does not exist), disabling plugin.");
+			Log.severe("Tried to load world: " + mapConfig.getString("spawnPoints.world", "world"));
 			Bukkit.getPluginManager().disablePlugin(this);
 			return;
 		}
@@ -135,6 +147,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			Bukkit.getPluginCommand("removespawn").setExecutor(zec.new RemoveSpawn());
 			Bukkit.getPluginCommand("addwall").setExecutor(zec.new AddWall());
 			Bukkit.getPluginCommand("deletewall").setExecutor(zec.new DeleteWall());
+			Bukkit.getPluginCommand("setmapname").setExecutor(zec.new SetMapName());
 			Bukkit.getPluginCommand("suicide").setExecutor(zegu.new Suicide());
 			Bukkit.getPluginCommand("setcp").setExecutor(zegu.new SetCheckpoint());
 			Bukkit.getPluginCommand("startgame").setExecutor(zegu.new StartGame());
@@ -159,7 +172,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		teams.put("player", manager.getNewScoreboard().registerNewTeam("player"));
 		Bukkit.getPluginManager().registerEvents(this, this);
 		checkConfig();
-		locationWall = ConfigProvider.getConfigSectionValue(config.get("locationWall", new HashMap<String, Object>()), true);
+		locationWall = ConfigProvider.getConfigSectionValue(mapConfig.get("locationWall", new HashMap<String, Object>()), true);
 		Bukkit.getLogger().info("[ZombieEscape] Enabled Zombie Escape");
 	}
 
@@ -169,13 +182,12 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	 */
 	public static void checkConfig() {
 		config.reloadWithoutException();
-		if (config.getList("spawnPoints.zombie") != null // check if zombie spawn points exists
-				&& config.getList("spawnPoints.zombie").size() != 0 // check if zombie spawn points are *actually* exists(0 isn't exist)
-				&& config.getList("spawnPoints.player") != null // check if player spawn points exists
-				&& config.getList("spawnPoints.player").size() != 0
-				&& config.getString("spawnPoints.world") != null // check if spawn world is set
-				&& Bukkit.getWorld(config.getString("spawnPoints.world")) != null
-				&& config.get("locationWall") != null) settingsCheck = true; // if it's null, ProjectileHitEvent won't work!
+		mapConfig.reloadWithoutException();
+		if (mapConfig.getList("spawnPoints.zombie") != null // check if zombie spawn points exists
+				&& mapConfig.getList("spawnPoints.zombie").size() != 0 // check if zombie spawn points are *actually* exists(0 isn't exist)
+				&& mapConfig.getList("spawnPoints.player") != null // check if player spawn points exists
+				&& mapConfig.getList("spawnPoints.player").size() != 0
+				&& mapConfig.get("locationWall") != null) settingsCheck = true; // if it's null, ProjectileHitEvent won't work!
 		else settingsCheck = false;
 	}
 
@@ -185,13 +197,15 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 
 	@EventHandler
 	public void onPlayerJoin(final PlayerJoinEvent event) {
-		event.getPlayer().teleport(event.getPlayer().getWorld().getSpawnLocation());
+		World world = Bukkit.getWorld(mapConfig.getString("spawnPoints.world", "world"));
+		event.getPlayer().teleport(world.getSpawnLocation());
 		hashMapTeam.put(event.getPlayer().getUniqueId(), "player");
 		lockActionBar.put(event.getPlayer().getUniqueId(), false);
 		new BukkitRunnable() {
 			public void run() {
 				ZombieEscape.config.reloadWithoutException();
-				locationWall = ConfigProvider.getConfigSectionValue(config.get("locationWall", new HashMap<String, Object>()), true);
+				ZombieEscape.mapConfig.reloadWithoutException();
+				locationWall = ConfigProvider.getConfigSectionValue(mapConfig.get("locationWall", new HashMap<String, Object>()), true);
 			}
 		}.runTaskTimer(this, 6000, 6000);
 		/*
@@ -233,11 +247,11 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			public void run() {
 				for (Player player : Bukkit.getOnlinePlayers()) {
 					if (player.isDead()) player.spigot().respawn();
-					player.addPotionEffect(PotionEffectType.SATURATION.createEffect(100000, 1));
+					player.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 1, false, false));
 					if (hashMapTeam.get(player.getUniqueId()) == "zombie") {
-						player.addPotionEffect(PotionEffectType.SPEED.createEffect(100000, 1));
-						player.addPotionEffect(PotionEffectType.JUMP.createEffect(100000, 0));
-						player.addPotionEffect(PotionEffectType.INCREASE_DAMAGE.createEffect(100000, 100));
+						player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100000, 1, false, false));
+						player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 100000, 0, false, false));
+						player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 100000, 100, false, false));
 						player.getInventory().setHelmet(createLeatherItemStack(Material.LEATHER_HELMET, 0, 100, 0));
 						player.getInventory().setChestplate(createLeatherItemStack(Material.LEATHER_CHESTPLATE, 0, 100, 0));
 						player.getInventory().setLeggings(createLeatherItemStack(Material.LEATHER_LEGGINGS, 0, 100, 0));
@@ -274,6 +288,10 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		score7.setScore(7);
 		Score score5 = objective.getScore("  ");
 		score5.setScore(5);
+		Score score3 = objective.getScore("   ");
+		score3.setScore(3);
+		Score score2 = objective.getScore("マップ: " + mapConfig.getString("mapname", "???"));
+		score2.setScore(2);
 		objective.setDisplaySlot(DisplaySlot.SIDEBAR);
 		objective.setDisplayName(""+ChatColor.GREEN + ChatColor.BOLD + "Zombie Escape");
 		if (Bukkit.getOnlinePlayers().size() >= 2) hasEnoughPlayers = true; else {
@@ -363,9 +381,9 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 								player.getInventory().setChestplate(createLeatherItemStack(Material.LEATHER_CHESTPLATE, 0, 100, 0));
 								player.getInventory().setLeggings(createLeatherItemStack(Material.LEATHER_LEGGINGS, 0, 100, 0));
 								player.getInventory().setBoots(createLeatherItemStack(Material.LEATHER_BOOTS, 0, 100, 0));
-								player.addPotionEffect(PotionEffectType.SPEED.createEffect(100000, 1));
-								player.addPotionEffect(PotionEffectType.JUMP.createEffect(100000, 0));
-								player.addPotionEffect(PotionEffectType.INCREASE_DAMAGE.createEffect(100000, 100));
+								player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100000, 1, false, false));
+								player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 100000, 0, false, false));
+								player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 100000, 100, false, false));
 								player.setPlayerListName(ChatColor.DARK_GREEN + player.getName());
 							} else if ((((int) Math.round(Bukkit.getOnlinePlayers().size() / 10) - zombies) >= 0) == false) {
 								players = players+1;
@@ -420,8 +438,8 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 										item.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 100);
 										player.getInventory().setItem(0, item);
 										Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "give " + player.getName() + " minecraft:stone_axe 1 0 {CanDestroy:[\"minecraft:grass\",\"minecraft:planks\",\"minecraft:dirt\"],HideFlags:1,Unbreakable:1,display:{Name:\"錆びついた斧\"},ench:[{id:32,lvl:10}]}");
-										String[] spawnLists = Arrays.asList(config.getList("spawnPoints.zombie", new ArrayList<String>()).toArray(new String[0])).get(0).split(",");
-										Location location = new Location(Bukkit.getWorld(config.getString("spawnPoints.world")), Double.parseDouble(spawnLists[0]), Double.parseDouble(spawnLists[1]), Double.parseDouble(spawnLists[2]));
+										String[] spawnLists = Arrays.asList(mapConfig.getList("spawnPoints.zombie", new ArrayList<String>()).toArray(new String[0])).get(0).split(",");
+										Location location = new Location(Bukkit.getWorld(mapConfig.getString("spawnPoints.world")), Double.parseDouble(spawnLists[0]), Double.parseDouble(spawnLists[1]), Double.parseDouble(spawnLists[2]));
 										if (!player.teleport(location)) {
 											player.sendMessage(ChatColor.RED + "ワープに失敗しました。");
 											return;
@@ -433,8 +451,8 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 									public void run() {
 										Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "shot give " + player.getName() + " ak-47");
 										player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + "GO!", ChatColor.YELLOW + "目標: ゾンビから逃げ、ゾンビよりも先にゴールに到達する");
-										String[] spawnLists = Arrays.asList(config.getList("spawnPoints.player", new ArrayList<String>()).toArray(new String[0])).get(0).split(",");
-										Location location = new Location(Bukkit.getWorld(config.getString("spawnPoints.world")), Double.parseDouble(spawnLists[0]), Double.parseDouble(spawnLists[1]), Double.parseDouble(spawnLists[2]));
+										String[] spawnLists = Arrays.asList(mapConfig.getList("spawnPoints.player", new ArrayList<String>()).toArray(new String[0])).get(0).split(",");
+										Location location = new Location(Bukkit.getWorld(mapConfig.getString("spawnPoints.world")), Double.parseDouble(spawnLists[0]), Double.parseDouble(spawnLists[1]), Double.parseDouble(spawnLists[2]));
 										if (!player.teleport(location)) {
 											player.sendMessage(ChatColor.RED + "ワープに失敗しました。");
 											return;
@@ -494,8 +512,8 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 
 	@EventHandler
 	public void onPlayerRespawn(PlayerRespawnEvent event) {
-		String[] spawnLists = Arrays.asList(config.getList("spawnPoints.zombie", new ArrayList<String>()).toArray(new String[0])).get(checkpoint).split(",");
-		Location location = new Location(Bukkit.getWorld(config.getString("spawnPoints.world")), Double.parseDouble(spawnLists[0]), Double.parseDouble(spawnLists[1]), Double.parseDouble(spawnLists[2]));
+		String[] spawnLists = Arrays.asList(mapConfig.getList("spawnPoints.zombie", new ArrayList<String>()).toArray(new String[0])).get(checkpoint).split(",");
+		Location location = new Location(Bukkit.getWorld(mapConfig.getString("spawnPoints.world")), Double.parseDouble(spawnLists[0]), Double.parseDouble(spawnLists[1]), Double.parseDouble(spawnLists[2]));
 		event.setRespawnLocation(location);
 		event.getPlayer().setGameMode(GameMode.ADVENTURE);
 		event.getPlayer().setPlayerListName(ChatColor.DARK_GREEN + event.getPlayer().getName());
@@ -508,11 +526,11 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		event.getPlayer().setHealthScale(40);
 		new BukkitRunnable() {
 			public void run() {
-				event.getPlayer().addPotionEffect(PotionEffectType.HUNGER.createEffect(100000, 0));
-				event.getPlayer().addPotionEffect(PotionEffectType.SATURATION.createEffect(100000, 1));
-				event.getPlayer().addPotionEffect(PotionEffectType.INCREASE_DAMAGE.createEffect(100000, 100));
-				event.getPlayer().addPotionEffect(PotionEffectType.SPEED.createEffect(100000, 1));
-				event.getPlayer().addPotionEffect(PotionEffectType.JUMP.createEffect(100000, 0));
+				event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, 100000, 0, false, false));
+				event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 1, false, false));
+				event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 100000, 100, false, false));
+				event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100000, 1, false, false));
+				event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 100000, 0, false, false));
 				ItemStack item = new ItemStack(Material.IRON_SWORD);
 				ItemMeta meta = item.getItemMeta();
 				meta.setDisplayName("" + ChatColor.RESET + ChatColor.WHITE + "ナイフ");
@@ -629,7 +647,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			String wall = (String) locationWall.getOrDefault(location, null);
 			Integer state = hashMapBlockState.get(wall) != null ? hashMapBlockState.get(wall) : 0;
 			if (state >= durability) {
-				config.getStringList("wallLocation." + wall).forEach(blocation -> {
+				mapConfig.getStringList("wallLocation." + wall).forEach(blocation -> {
 					String[] blocationArray = blocation.split(",");
 					Block ablock = event.getEntity().getWorld().getBlockAt(Integer.parseInt(blocationArray[0]), Integer.parseInt(blocationArray[1]), Integer.parseInt(blocationArray[2]));
 					ablock.setType(Material.AIR);

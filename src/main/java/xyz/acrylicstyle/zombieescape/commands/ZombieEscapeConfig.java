@@ -1,5 +1,6 @@
 package xyz.acrylicstyle.zombieescape.commands;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,7 +40,7 @@ public class ZombieEscapeConfig {
 					sender.sendMessage(ChatColor.RED + "使用法: /setspawn <zombie/player> <0, 1, 2, 3, ...> or /setspawn <world>");
 					return true;
 				}
-				ConfigProvider config = ConfigProvider.initWithoutException("./plugins/ZombieEscape/config.yml");
+				ConfigProvider config = ConfigProvider.initWithoutException("./plugins/ZombieEscape/maps/" + ZombieEscape.mapName + ".yml");
 				List<String> spawns = new ArrayList<String>();
 				spawns.addAll(Arrays.asList(config.getList("spawnPoints.zombie", new ArrayList<String>()).toArray(new String[0])));
 				spawns.add(Integer.parseInt(args[1]), ps.getLocation().getX() + "," + ps.getLocation().getY() + "," + ps.getLocation().getZ());
@@ -55,7 +56,7 @@ public class ZombieEscapeConfig {
 					sender.sendMessage(ChatColor.RED + "使用法: /setspawn <zombie/player> <0, 1, 2, 3, ...> or /setspawn <world>");
 					return true;
 				}
-				ConfigProvider config = ConfigProvider.initWithoutException("./plugins/ZombieEscape/config.yml");
+				ConfigProvider config = ConfigProvider.initWithoutException("./plugins/ZombieEscape/maps/" + ZombieEscape.mapName + ".yml");
 				List<String> spawns = new ArrayList<String>();
 				spawns.addAll(Arrays.asList(config.getList("spawnPoints.player", new ArrayList<String>()).toArray(new String[0])));
 				spawns.add(Integer.parseInt(args[1]), ps.getLocation().getX() + "," + ps.getLocation().getY() + "," + ps.getLocation().getZ());
@@ -67,7 +68,7 @@ public class ZombieEscapeConfig {
 					return true;
 				}
 			} else if (args[0].equalsIgnoreCase("world")) {
-				ConfigProvider config = ConfigProvider.initWithoutException("./plugins/ZombieEscape/config.yml");
+				ConfigProvider config = ConfigProvider.initWithoutException("./plugins/ZombieEscape/maps/" + ZombieEscape.mapName + ".yml");
 				try {
 					config.setThenSave("spawnPoints.world", ps.getWorld().getName());
 				} catch (IOException e) {
@@ -77,6 +78,26 @@ public class ZombieEscapeConfig {
 				}
 			} else {
 				sender.sendMessage(ChatColor.RED + "使用法: /setspawn <zombie/player> <0, 1, 2, 3, ...> or /setspawn <world>");
+				return true;
+			}
+			ZombieEscape.checkConfig();
+			sender.sendMessage(ChatColor.GREEN + "設定を保存しました。");
+			return true;
+		}
+	}
+
+	public final class SetMapName implements CommandExecutor {
+		@Override
+		public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+			if (args.length == 0) {
+				sender.sendMessage(ChatColor.RED + "使用法: /setmapname <マップ名>");
+				return true;
+			}
+			try {
+				ConfigProvider.setThenSave("mapname", args[0], new File("./plugins/ZombieEscape/maps/" + ZombieEscape.mapName + ".yml"));
+			} catch (IOException | InvalidConfigurationException e) {
+				e.printStackTrace();
+				sender.sendMessage(ChatColor.RED + "設定の保存中にエラーが発生しました。");
 				return true;
 			}
 			ZombieEscape.checkConfig();
@@ -108,7 +129,7 @@ public class ZombieEscapeConfig {
 			int z = block.getLocation().getBlockZ();
 			try {
 				String location = x + "," + y + "," + z;
-				ConfigProvider config = new ConfigProvider("./plugins/ZombieEscape/config.yml");
+				ConfigProvider config = new ConfigProvider("./plugins/ZombieEscape/maps/" + ZombieEscape.mapName + ".yml");
 				List<String> walls = config.getStringList("wallLocation." + args[0]);
 				walls.add(location);
 				config.set("wallLocation." + args[0], walls);
@@ -138,7 +159,7 @@ public class ZombieEscapeConfig {
 				return true;
 			}
 			try {
-				ConfigProvider config = new ConfigProvider("./plugins/ZombieEscape/config.yml");
+				ConfigProvider config = new ConfigProvider("./plugins/ZombieEscape/maps/" + ZombieEscape.mapName + ".yml");
 				config.setThenSave("wallLocation." + args[0], null);
 				// Location, Wallname
 				Map<String, Object> locationWall = ConfigProvider.getConfigSectionValue(config.get("locationWall", new HashMap<String, Object>()), true);
@@ -172,7 +193,7 @@ public class ZombieEscapeConfig {
 					sender.sendMessage(ChatColor.RED + "使用法: /removespawn <zombie/player> <0, 1, 2, 3, ...> or /removespawn <world>");
 					return true;
 				}
-				ConfigProvider config = ConfigProvider.initWithoutException("./plugins/ZombieEscape/config.yml");
+				ConfigProvider config = ConfigProvider.initWithoutException("./plugins/ZombieEscape/maps/" + ZombieEscape.mapName + ".yml");
 				List<String> spawns = new ArrayList<String>();
 				spawns.addAll(Arrays.asList(config.getList("spawnPoints.zombie", new ArrayList<String>()).toArray(new String[0])));
 				spawns.remove(Integer.parseInt(args[1]));
@@ -188,7 +209,7 @@ public class ZombieEscapeConfig {
 					sender.sendMessage(ChatColor.RED + "使用法: /removespawn <zombie/player> <0, 1, 2, 3, ...> or /removespawn <world>");
 					return true;
 				}
-				ConfigProvider config = ConfigProvider.initWithoutException("./plugins/ZombieEscape/config.yml");
+				ConfigProvider config = ConfigProvider.initWithoutException("./plugins/ZombieEscape/maps/" + ZombieEscape.mapName + ".yml");
 				List<String> spawns = new ArrayList<String>();
 				spawns.addAll(Arrays.asList(config.getList("spawnPoints.player", new ArrayList<String>()).toArray(new String[0])));
 				spawns.remove(Integer.parseInt(args[1]));
@@ -200,7 +221,7 @@ public class ZombieEscapeConfig {
 					return true;
 				}
 			} else if (args[0].equalsIgnoreCase("world")) {
-				ConfigProvider config = ConfigProvider.initWithoutException("./plugins/ZombieEscape/config.yml");
+				ConfigProvider config = ConfigProvider.initWithoutException("./plugins/ZombieEscape/maps/" + ZombieEscape.mapName + ".yml");
 				try {
 					config.setThenSave("spawnPoints.world", null);
 				} catch (IOException e) {

@@ -60,3 +60,7 @@ commands:
     description: "Set status of the game."
     usage: /<command>
     permission: zombieescape.setstatus
+  setmapname:
+    description: "Set name of the map."
+    usage: /<command>
+    permission: zombieescape.setmapname
