@@ -58,7 +58,7 @@ public class ZombieEscapeGameUtil {
 				return false;
 			}
 			if (sender instanceof BlockCommandSender) {
-				if (ZombieEscape.checkpoint <= Integer.parseInt(args[0])) {
+				if (ZombieEscape.checkpoint >= Integer.parseInt(args[0])) {
 					sender.sendMessage(ChatColor.RED + "そのチェックポイントはすでに通過しています。");
 					return false;
 				}
