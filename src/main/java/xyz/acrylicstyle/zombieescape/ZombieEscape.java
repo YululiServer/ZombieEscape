@@ -304,6 +304,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		event.getPlayer().setHealthScale(20);
 		new BukkitRunnable() {
 			public void run() {
+				event.getPlayer().setGameMode(GameMode.ADVENTURE);
 				event.getPlayer().sendMessage(ChatColor.BLUE + "--------------------------------------------------");
 				event.getPlayer().sendMessage(ChatColor.DARK_GREEN + "          - Zombie Escape -");
 				event.getPlayer().sendMessage("");
@@ -618,8 +619,8 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		if (gameStarted && players < 0) throw new IllegalStateException("Player count is should be 0 or more.");
 		hashMapTeam.remove(event.getPlayer().getUniqueId());
 		if (gameStarted && (zombies == 0 || players == 0)) {
-			String team = zombies == 0 ? "プレイヤー" : "ゾンビ";
-			endGame(team);
+			// String team = zombies == 0 ? "プレイヤー" : "ゾンビ";
+			// endGame(team);
 		}
 	}
 
