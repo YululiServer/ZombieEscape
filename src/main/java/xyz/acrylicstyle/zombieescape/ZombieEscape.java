@@ -876,18 +876,19 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		ItemMeta knifemeta = knifeitem.getItemMeta();
 		knifemeta.setDisplayName("" + ChatColor.RESET + ChatColor.WHITE + "ナイフ");
 		knifeitem.setItemMeta(knifemeta);
-		knifeitem.addUnsafeEnchantment(Enchantment.DURABILITY, 100);
-		knifeitem.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 100);
-		if (event.getItemDrop().getItemStack().isSimilar(knifeitem)) event.setCancelled(true);
-		if (event.getItemDrop().getItemStack().isSimilar(new ItemStack(Material.DIAMOND_HELMET))) event.setCancelled(true);
-		if (event.getItemDrop().getItemStack().isSimilar(new ItemStack(Material.DIAMOND_CHESTPLATE))) event.setCancelled(true);
-		if (event.getItemDrop().getItemStack().isSimilar(new ItemStack(Material.DIAMOND_LEGGINGS))) event.setCancelled(true);
-		if (event.getItemDrop().getItemStack().isSimilar(new ItemStack(Material.DIAMOND_BOOTS))) event.setCancelled(true);
-		if (event.getItemDrop().getItemStack().isSimilar(createLeatherItemStack(Material.LEATHER_HELMET, 0, 100, 0))) event.setCancelled(true);
-		if (event.getItemDrop().getItemStack().isSimilar(createLeatherItemStack(Material.LEATHER_CHESTPLATE, 0, 100, 0))) event.setCancelled(true);
-		if (event.getItemDrop().getItemStack().isSimilar(createLeatherItemStack(Material.LEATHER_LEGGINGS, 0, 100, 0))) event.setCancelled(true);
-		if (event.getItemDrop().getItemStack().isSimilar(createLeatherItemStack(Material.LEATHER_BOOTS, 0, 100, 0))) event.setCancelled(true);
-		if (event.getItemDrop().getItemStack().getType() == Material.IRON_BARDING) event.setCancelled(true);
+		knifeitem.addUnsafeEnchantment(Enchantment.DURABILITY, 100); // Always sharp!
+		knifeitem.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 100); // *stabs someone*
+		if (event.getItemDrop().getItemStack().isSimilar(knifeitem)) event.setCancelled(true); // Please don't drop knife, its dangerous
+		if (event.getItemDrop().getItemStack().isSimilar(new ItemStack(Material.DIAMOND_HELMET))) event.setCancelled(true); // armor
+		if (event.getItemDrop().getItemStack().isSimilar(new ItemStack(Material.DIAMOND_CHESTPLATE))) event.setCancelled(true); // armor
+		if (event.getItemDrop().getItemStack().isSimilar(new ItemStack(Material.DIAMOND_LEGGINGS))) event.setCancelled(true); // armor
+		if (event.getItemDrop().getItemStack().isSimilar(new ItemStack(Material.DIAMOND_BOOTS))) event.setCancelled(true); // armor
+		if (event.getItemDrop().getItemStack().isSimilar(createLeatherItemStack(Material.LEATHER_HELMET, 0, 100, 0))) event.setCancelled(true); // armor
+		if (event.getItemDrop().getItemStack().isSimilar(createLeatherItemStack(Material.LEATHER_CHESTPLATE, 0, 100, 0))) event.setCancelled(true); // armor
+		if (event.getItemDrop().getItemStack().isSimilar(createLeatherItemStack(Material.LEATHER_LEGGINGS, 0, 100, 0))) event.setCancelled(true); // armor
+		if (event.getItemDrop().getItemStack().isSimilar(createLeatherItemStack(Material.LEATHER_BOOTS, 0, 100, 0))) event.setCancelled(true); // armor
+		if (event.getItemDrop().getItemStack().getType() == Material.IRON_BARDING) event.setCancelled(true); // Please don't drop gun
+		if (event.getItemDrop().getItemStack().getType() == Material.STONE_AXE) event.setCancelled(true); // Please don't drop axe
 	}
 
 	public static Player targetP(Location loc){
