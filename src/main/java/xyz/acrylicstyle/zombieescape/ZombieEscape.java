@@ -6,9 +6,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
@@ -208,7 +210,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				locationWall = ConfigProvider.getConfigSectionValue(mapConfig.get("locationWall", new HashMap<String, Object>()), true);
 			}
 		}.runTaskTimer(this, 6000, 6000);
-		/*
 		new BukkitRunnable() {
 			public void run() {
 				for (Player player : Bukkit.getOnlinePlayers()) {
@@ -220,19 +221,18 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 						continue;
 					}
 					String location = block.getLocation().getBlockX() + "," + block.getLocation().getBlockY() + "," + block.getLocation().getBlockZ();
-					Map<String, Object> locationWall = Config.getConfigSectionValue(config2.get("locationWall", new HashMap<String, Object>()), true);
 					String wall = (String) locationWall.getOrDefault(location, null);
 					if (wall == null) {
 						lockActionBar.put(player.getUniqueId(), false);
 						continue;
 					}
 					Integer state = hashMapBlockState.get(wall) != null ? hashMapBlockState.get(wall) : 0;
-					ActionBar.setActionBarWithoutException(player, ChatColor.GREEN + "壁の耐久力: " + state + "/" + Constants.materialDurability.get(block.getType()));
+					int durability = Math.min(Constants.materialDurability.getOrDefault(block.getType(), 5)*(players/5), 1000);
+					ActionBar.setActionBarWithoutException(player, ChatColor.GREEN + "壁の耐久力: " + state + "/" + durability);
 					lockActionBar.put(player.getUniqueId(), true);
 				}
 			}
 		}.runTaskTimer(this, 0, 20);
-		*/
 		BukkitRunnable healthBar = new BukkitRunnable() {
 			public void run() {
 				for (Player player : Bukkit.getOnlinePlayers()) {
@@ -640,7 +640,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				Math.nextUp(event.getEntity().getLocation().getZ()+0.6));
 		Block block = event.getEntity().getWorld().getBlockAt(Llocation);
 		if (block == null) return;
-		int durability = Constants.materialDurability.getOrDefault(block.getType(), 5);
+		int durability = Math.min(Constants.materialDurability.getOrDefault(block.getType(), 5)*(players/5), 1000);
 		if (block.getType() == Material.DIRT || block.getType() == Material.GRASS || block.getType() == Material.WOOD) {
 			String location = block.getLocation().getBlockX() + "," + block.getLocation().getBlockY() + "," + block.getLocation().getBlockZ();
 			String wall = (String) locationWall.getOrDefault(location, null);
