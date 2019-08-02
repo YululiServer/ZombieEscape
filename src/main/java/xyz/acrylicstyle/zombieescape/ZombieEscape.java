@@ -905,6 +905,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	}
 
 	public static Player targetPFindPlayers(Location loc){
+		if (players <= 0) return null;
 		Player nearestPlayer = null;
 		double lastDistance = Double.MAX_VALUE;
 		for(Player p : loc.getWorld().getPlayers()){
