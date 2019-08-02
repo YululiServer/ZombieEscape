@@ -225,6 +225,9 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 					int maxHealth = (int) player.getMaxHealth();
 					int health = (int) player.getHealth();
 					ActionBar.setActionBarWithoutException(player, "" + ChatColor.RED + health + "/" + maxHealth + "❤");
+					String lastScore4 = hashMapLastScore4.get(player.getUniqueId());
+					Scoreboard scoreboard = hashMapScoreboard.get(player.getUniqueId());
+					scoreboard.resetScores(lastScore4);
 				}
 			}
 		}.runTaskTimerAsynchronously(this, 0, 20);
@@ -559,6 +562,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				item.addUnsafeEnchantment(Enchantment.DURABILITY, 100);
 				item.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 100);
 				event.getPlayer().getInventory().setItem(0, item);
+				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "give " + event.getPlayer().getName() + " minecraft:stone_axe 1 0 {CanDestroy:[\"minecraft:grass\",\"minecraft:planks\",\"minecraft:dirt\"],HideFlags:1,Unbreakable:1,display:{Name:\"錆びついた斧\"},ench:[{id:32,lvl:10}]}");
 			}
 		}.runTaskLater(this, 40);
 		if (players == 0 && gameStarted) {
