@@ -290,7 +290,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		score5.setScore(5);
 		Score score3 = objective.getScore("   ");
 		score3.setScore(3);
-		Score score2 = objective.getScore(ChatColor.RED + "    マップ: " + ChatColor.translateAlternateColorCodes('&', mapConfig.getString("mapname", "???")));
+		Score score2 = objective.getScore(ChatColor.GREEN + "    マップ: " + ChatColor.translateAlternateColorCodes('&', mapConfig.getString("mapname", "???")));
 		score2.setScore(2);
 		objective.setDisplaySlot(DisplaySlot.SIDEBAR);
 		objective.setDisplayName(""+ChatColor.GREEN + ChatColor.BOLD + "Zombie Escape");
