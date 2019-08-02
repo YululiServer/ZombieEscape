@@ -4,10 +4,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -88,21 +92,20 @@ public class ZombieEscapeConfig {
 				sender.sendMessage(ChatColor.RED + "This command must be run at in-game.");
 				return true;
 			}
-			if (args.length <= 3) { // for select 4 args
-				sender.sendMessage(ChatColor.RED + "使用法: /addwall <壁の名前> <X座標> <Y座標> <Z座標>");
+			if (args.length == 0) {
+				sender.sendMessage(ChatColor.RED + "使用法: /addwall <壁の名前>");
 				return true;
 			}
-			int x;
-			int y;
-			int z;
-			try {
-				x = Integer.parseInt(args[1]);
-				y = Integer.parseInt(args[2]);
-				z = Integer.parseInt(args[3]);
-			} catch(NumberFormatException e) {
-				sender.sendMessage(ChatColor.RED + "エラーが発生しました。座標は数字にしてやり直してください。");
+			Set<Material> set = new HashSet<Material>();
+			set.add(Material.AIR);
+			Block block = ((Player)sender).getTargetBlock(set, 4);
+			if (block == null) {
+				sender.sendMessage(ChatColor.RED + "ブロックを視野に入れてください(4ブロック以内)。");
 				return true;
 			}
+			int x = block.getLocation().getBlockX();
+			int y = block.getLocation().getBlockY();
+			int z = block.getLocation().getBlockZ();
 			try {
 				String location = x + "," + y + "," + z;
 				ConfigProvider config = new ConfigProvider("./plugins/ZombieEscape/config.yml");
