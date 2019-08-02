@@ -1,11 +1,7 @@
 package xyz.acrylicstyle.zombieescape.commands;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Sound;
 import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -99,7 +95,6 @@ public class ZombieEscapeGameUtil {
 	}
 
 	public final class EndGame implements CommandExecutor {
-		@SuppressWarnings("deprecation")
 		@Override
 		public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 			if (sender instanceof ConsoleCommandSender) {
@@ -121,20 +116,7 @@ public class ZombieEscapeGameUtil {
 			}
 			ZombieEscape.gameEnded = true;
 			String team = nearestPlayer == null ? "ゾンビ" : "プレイヤー";
-			for (Player player : Bukkit.getOnlinePlayers()) {
-				player.playSound(player.getLocation(), Sound.FIREWORK_LAUNCH, 100, 1);
-				player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + team + "チームの勝ち！", "");
-			}
-			Bukkit.broadcastMessage("" + ChatColor.GREEN + ChatColor.BOLD + team + "チームの勝ち！");
-			Bukkit.broadcastMessage(ChatColor.GRAY + "このサーバーはあと15秒でシャットダウンします。");
-			TimerTask task = new TimerTask() {
-				public void run() {
-					Bukkit.broadcastMessage(ChatColor.GRAY + "サーバーをシャットダウン中...");
-					Bukkit.shutdown();
-				}
-			};
-			Timer timer = new Timer();
-			timer.schedule(task, 1000*15);
+			ZombieEscape.endGameStatic(team);
 			return true;
 		}
 	}

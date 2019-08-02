@@ -68,6 +68,7 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.BlockPosition;
 
 import xyz.acrylicstyle.tomeito_core.providers.ConfigProvider;
+import xyz.acrylicstyle.tomeito_core.utils.Log;
 import xyz.acrylicstyle.zombieescape.commands.Sponsor;
 import xyz.acrylicstyle.zombieescape.commands.ZombieEscapeConfig;
 import xyz.acrylicstyle.zombieescape.commands.ZombieEscapeGameUtil;
@@ -446,27 +447,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 					if (hasEnoughPlayers && timesLeft >= 0 && settingsCheck) timesLeft--;
 				} else if (gameStarted) {
 					if (playedTime >= gameTime) {
-						gameEnded = true;
-						for (Player player : Bukkit.getOnlinePlayers()) {
-							player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + "ゾンビチームの勝ち！", "");
-							new BukkitRunnable() {
-								public void run() {
-									if (fireworked >= 20) this.cancel();
-									player.playSound(player.getLocation(), Sound.FIREWORK_LAUNCH, 100, 1);
-									fireworked++;
-								}
-							}.runTaskTimer(getInstance(), 0, 5);
-						}
-						Bukkit.broadcastMessage("" + ChatColor.GREEN + ChatColor.BOLD + "ゾンビチームの勝ち！");
-						Bukkit.broadcastMessage(ChatColor.GRAY + "このサーバーはあと15秒でシャットダウンします。");
-						TimerTask task = new TimerTask() {
-							public void run() {
-								Bukkit.broadcastMessage(ChatColor.GRAY + "サーバーをシャットダウン中...");
-								Bukkit.shutdown();
-							}
-						};
-						Timer timer = new Timer();
-						timer.schedule(task, 1000*15);
+						endGame("ゾンビ");
 						this.cancel();
 						return;
 					}
@@ -491,7 +472,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		}.runTaskTimer(this, 0, 20);
 	}
 
-	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void onPlayerDeath(final PlayerDeathEvent event) {
 		if (event.getEntityType() != EntityType.PLAYER) return;
@@ -509,32 +489,9 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				event.getEntity().spigot().respawn();
 			}
 		}.runTaskLater(this, 1000);
-		if (players == 0 && gameStarted) {
-			gameEnded = true;
-			for (final Player player : Bukkit.getOnlinePlayers()) {
-				player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + "ゾンビチームの勝ち！", "");
-				new BukkitRunnable() {
-					public void run() {
-						if (fireworked >= 20) this.cancel();
-						player.playSound(player.getLocation(), Sound.FIREWORK_LAUNCH, 100, 1);
-						fireworked++;
-					}
-				}.runTaskTimer(this, 0, 5);
-			}
-			Bukkit.broadcastMessage("" + ChatColor.GREEN + ChatColor.BOLD + "ゾンビチームの勝ち！");
-			Bukkit.broadcastMessage(ChatColor.GRAY + "このサーバーはあと15秒でシャットダウンします。");
-			TimerTask task = new TimerTask() {
-				public void run() {
-					Bukkit.broadcastMessage(ChatColor.GRAY + "サーバーをシャットダウン中...");
-					Bukkit.shutdown();
-				}
-			};
-			Timer timer = new Timer();
-			timer.schedule(task, 1000*15);
-		}
+		if (players == 0 && gameStarted) endGame("ゾンビ");
 	}
 
-	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void onPlayerRespawn(PlayerRespawnEvent event) {
 		String[] spawnLists = Arrays.asList(config.getList("spawnPoints.zombie", new ArrayList<String>()).toArray(new String[0])).get(checkpoint).split(",");
@@ -567,27 +524,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			}
 		}.runTaskLater(this, 40);
 		if (players == 0 && gameStarted) {
-			gameEnded = true;
-			for (final Player player : Bukkit.getOnlinePlayers()) {
-				player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + "ゾンビチームの勝ち！", "");
-				new BukkitRunnable() {
-					public void run() {
-						if (fireworked >= 20) this.cancel();
-						player.playSound(player.getLocation(), Sound.FIREWORK_LAUNCH, 100, 1);
-						fireworked++;
-					}
-				}.runTaskTimer(this, 0, 5);
-			}
-			Bukkit.broadcastMessage("" + ChatColor.GREEN + ChatColor.BOLD + "ゾンビチームの勝ち！");
-			Bukkit.broadcastMessage(ChatColor.GRAY + "このサーバーはあと15秒でシャットダウンします。");
-			TimerTask task = new TimerTask() {
-				public void run() {
-					Bukkit.broadcastMessage(ChatColor.GRAY + "サーバーをシャットダウン中...");
-					Bukkit.shutdown();
-				}
-			};
-			Timer timer = new Timer();
-			timer.schedule(task, 1000*15);
+			endGame("ゾンビ");
 		}
 	}
 
@@ -640,27 +577,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		player.sendTitle(ChatColor.DARK_GREEN + "ゾンビチームになった！", "");
 		Bukkit.broadcastMessage(ChatColor.DARK_GREEN + player.getName() + "が" + event.getDamager().getName() + "によってゾンビにされた。");
 		if (players == 0 && gameStarted) {
-			gameEnded = true;
-			for (final Player player2 : Bukkit.getOnlinePlayers()) {
-				player2.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + "ゾンビチームの勝ち！", "");
-				new BukkitRunnable() {
-					public void run() {
-						if (fireworked >= 20) this.cancel();
-						player2.playSound(player2.getLocation(), Sound.FIREWORK_LAUNCH, 100, 1);
-						fireworked++;
-					}
-				}.runTaskTimer(this, 0, 5);
-			}
-			Bukkit.broadcastMessage("" + ChatColor.GREEN + ChatColor.BOLD + "ゾンビチームの勝ち！");
-			Bukkit.broadcastMessage(ChatColor.GRAY + "このサーバーはあと15秒でシャットダウンします。");
-			TimerTask task = new TimerTask() {
-				public void run() {
-					Bukkit.broadcastMessage(ChatColor.GRAY + "サーバーをシャットダウン中...");
-					Bukkit.shutdown();
-				}
-			};
-			Timer timer = new Timer();
-			timer.schedule(task, 1000*15);
+			endGame("ゾンビ");
 		}
 	}
 
@@ -672,7 +589,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		if (hashMapTeam.get(event.getEntity().getUniqueId()) == "player" && event.getCause() == DamageCause.PROJECTILE) event.setCancelled(true);
 	}
 
-	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void onPlayerLeft(PlayerQuitEvent event) {
 		if (Bukkit.getOnlinePlayers().size() >= 2) hasEnoughPlayers = true; else {
@@ -685,26 +601,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		hashMapTeam.remove(event.getPlayer().getUniqueId());
 		if (gameStarted && (zombies == 0 || players == 0)) {
 			String team = zombies == 0 ? "プレイヤー" : "ゾンビ";
-			for (Player player : Bukkit.getOnlinePlayers()) {
-				player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + "ゾンビチームの勝ち！", "");
-				new BukkitRunnable() {
-					public void run() {
-						if (fireworked >= 20) this.cancel();
-						player.playSound(player.getLocation(), Sound.FIREWORK_LAUNCH, 100, 1);
-						fireworked++;
-					}
-				}.runTaskTimer(this, 0, 5);
-			}
-			Bukkit.broadcastMessage("" + ChatColor.GREEN + ChatColor.BOLD + team + "チームの勝ち！");
-			Bukkit.broadcastMessage(ChatColor.GRAY + "このサーバーはあと15秒でシャットダウンします。");
-			TimerTask task = new TimerTask() {
-				public void run() {
-					Bukkit.broadcastMessage(ChatColor.GRAY + "サーバーをシャットダウン中...");
-					Bukkit.shutdown();
-				}
-			};
-			Timer timer = new Timer();
-			timer.schedule(task, 1000*15);
+			endGame(team);
 		}
 	}
 
@@ -908,9 +805,11 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		if (players <= 0) return null;
 		Player nearestPlayer = null;
 		double lastDistance = Double.MAX_VALUE;
+		Log.info("");
 		for(Player p : loc.getWorld().getPlayers()){
 			if (!hashMapTeam.get(p.getUniqueId()).equalsIgnoreCase("player")) continue;
 			double distanceSqrd = loc.distanceSquared(p.getLocation());
+			Log.info("");
 			if (distanceSqrd > 10) continue;
 			if(distanceSqrd < lastDistance){
 				lastDistance = distanceSqrd;
@@ -918,5 +817,48 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			}
 		}
 		return nearestPlayer;
+	}
+
+	@SuppressWarnings("deprecation")
+	public void endGame(String team) {
+		gameEnded = true;
+		for (Player player : Bukkit.getOnlinePlayers()) {
+			player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + team + "チームの勝ち！", "");
+			new BukkitRunnable() {
+				public void run() {
+					if (fireworked >= 20) this.cancel();
+					player.playSound(player.getLocation(), Sound.FIREWORK_LAUNCH, 100, 1);
+					fireworked++;
+				}
+			}.runTaskTimer(this, 0, 5);
+		}
+		Bukkit.broadcastMessage("" + ChatColor.GREEN + ChatColor.BOLD + team + "チームの勝ち！");
+		Bukkit.broadcastMessage(ChatColor.GRAY + "このサーバーはあと15秒でシャットダウンします。");
+		TimerTask task = new TimerTask() {
+			public void run() {
+				Bukkit.broadcastMessage(ChatColor.GRAY + "サーバーをシャットダウン中...");
+				Bukkit.shutdown();
+			}
+		};
+		Timer timer = new Timer();
+		timer.schedule(task, 1000*15);
+	}
+
+	@SuppressWarnings("deprecation")
+	public static void endGameStatic(String team) {
+		for (Player player : Bukkit.getOnlinePlayers()) {
+			player.playSound(player.getLocation(), Sound.FIREWORK_LAUNCH, 100, 1);
+			player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + team + "チームの勝ち！", "");
+		}
+		Bukkit.broadcastMessage("" + ChatColor.GREEN + ChatColor.BOLD + team + "チームの勝ち！");
+		Bukkit.broadcastMessage(ChatColor.GRAY + "このサーバーはあと15秒でシャットダウンします。");
+		TimerTask task = new TimerTask() {
+			public void run() {
+				Bukkit.broadcastMessage(ChatColor.GRAY + "サーバーをシャットダウン中...");
+				Bukkit.shutdown();
+			}
+		};
+		Timer timer = new Timer();
+		timer.schedule(task, 1000*15);
 	}
 }
