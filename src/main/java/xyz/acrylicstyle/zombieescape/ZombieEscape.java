@@ -280,7 +280,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		event.getPlayer().getWorld().setTime(0);
 		event.getPlayer().getInventory().clear();
 		event.getPlayer().setGameMode(GameMode.ADVENTURE);
-		Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "effect " + event.getPlayer().getName() + " minecraft:saturation 100000 1");
 		final Scoreboard board = manager.getNewScoreboard();
 		event.getPlayer().setScoreboard(board);
 		final Objective objective = board.registerNewObjective("scoreboard", "dummy");
@@ -576,7 +575,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		player.setHealthScale(40);
 		new BukkitRunnable() {
 			public void run() {
-				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "effect " + player.getName() + " minecraft:saturation 100000 1");
 				player.addPotionEffect(PotionEffectType.HUNGER.createEffect(100000, 0));
 				player.addPotionEffect(PotionEffectType.SATURATION.createEffect(100000, 1));
 				player.addPotionEffect(PotionEffectType.INCREASE_DAMAGE.createEffect(100000, 100));
