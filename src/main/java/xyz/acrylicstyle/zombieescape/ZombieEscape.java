@@ -477,7 +477,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 						String score4s = ChatColor.GREEN + "    " + Math.round(Math.nextDown(playedTime/60)) + ":" + leftSecondPlayed + " / " + Math.round(Math.nextDown(gameTime/60)) + ":" + leftSecond;
 						Score score4 = objective3.getScore(score4s);
 						score4.setScore(4);
-						player.setScoreboard(scoreboard);
+						player.setScoreboard(hashMapScoreboard.get(player.getUniqueId()));
 						hashMapLastScore4.put(event.getPlayer().getUniqueId(), score4s);
 					}
 					playedTime++;
