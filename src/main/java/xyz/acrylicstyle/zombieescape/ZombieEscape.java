@@ -288,21 +288,21 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				event.getPlayer().sendMessage(ChatColor.BLUE + "--------------------------------------------------");
 				event.getPlayer().sendMessage(ChatColor.DARK_GREEN + "          - Zombie Escape -");
 				event.getPlayer().sendMessage("");
-				event.getPlayer().sendMessage(ChatColor.YELLOW + "プレイヤー: ゾンビから逃げ、ゴールに到達する");
+				event.getPlayer().sendMessage(ChatColor.YELLOW + "プレイヤー: ゾンビから逃げ、ゾンビよりも先にゴールに到達する");
 				event.getPlayer().sendMessage(ChatColor.YELLOW + "ゾンビ: プレイヤーを全員倒すか先にゴールに到達する");
 				event.getPlayer().sendMessage("");
 				event.getPlayer().sendMessage(ChatColor.YELLOW + "チームはゲーム開始5秒前に決定されます。");
 				event.getPlayer().sendMessage(ChatColor.YELLOW + "チャットはデフォルトで" + ChatColor.AQUA + "[チーム]" + ChatColor.YELLOW + "チャットです。");
 				event.getPlayer().sendMessage(ChatColor.YELLOW + "'!'をチャットの先頭につけると" + ChatColor.RED + "[All]" + ChatColor.YELLOW + "(全体)チャットになります。");
 				event.getPlayer().sendMessage(ChatColor.BLUE + "--------------------------------------------------");
-				if (gameStarted) {
-					event.getPlayer().sendMessage(ChatColor.RED + "ゲームはすでに開始しています！");
-					event.getPlayer().setGameMode(GameMode.SPECTATOR);
-					event.getPlayer().setPlayerListName(ChatColor.WHITE + event.getPlayer().getName());
-					return;
-				}
 			}
 		}.runTaskLater(this, 40);
+		if (gameStarted) {
+			event.getPlayer().sendMessage(ChatColor.RED + "ゲームはすでに開始しています！");
+			event.getPlayer().setGameMode(GameMode.SPECTATOR);
+			event.getPlayer().setPlayerListName(ChatColor.WHITE + event.getPlayer().getName());
+			return;
+		}
 		if (timerStarted) return;
 		timerStarted = true;
 		new BukkitRunnable() {
@@ -427,7 +427,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 								new BukkitRunnable() {
 									public void run() {
 										Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "shot give " + player.getName() + " ak-47");
-										player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + "GO!", ChatColor.YELLOW + "目標: ゾンビから逃げ、ゴールに到達する");
+										player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + "GO!", ChatColor.YELLOW + "目標: ゾンビから逃げ、ゾンビよりも先にゴールに到達する");
 										String[] spawnLists = Arrays.asList(config.getList("spawnPoints.player", new ArrayList<String>()).toArray(new String[0])).get(0).split(",");
 										Location location = new Location(Bukkit.getWorld(config.getString("spawnPoints.world")), Double.parseDouble(spawnLists[0]), Double.parseDouble(spawnLists[1]), Double.parseDouble(spawnLists[2]));
 										if (!player.teleport(location)) {
@@ -444,8 +444,14 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 					if (playedTime >= gameTime) {
 						gameEnded = true;
 						for (Player player : Bukkit.getOnlinePlayers()) {
-							player.playSound(player.getLocation(), Sound.FIREWORK_LAUNCH, 100, 1);
 							player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + "ゾンビチームの勝ち！", "");
+							new BukkitRunnable() {
+								public void run() {
+									if (fireworked >= 20) this.cancel();
+									player.playSound(player.getLocation(), Sound.FIREWORK_LAUNCH, 100, 1);
+									fireworked++;
+								}
+							}.runTaskTimer(getInstance(), 0, 5);
 						}
 						Bukkit.broadcastMessage("" + ChatColor.GREEN + ChatColor.BOLD + "ゾンビチームの勝ち！");
 						Bukkit.broadcastMessage(ChatColor.GRAY + "このサーバーはあと15秒でシャットダウンします。");
@@ -463,23 +469,16 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 					for (Player player : Bukkit.getOnlinePlayers()) {
 						Scoreboard scoreboard = hashMapScoreboard.get(player.getUniqueId());
 						Objective objective3 = scoreboard.getObjective(DisplaySlot.SIDEBAR);
-						String lastScore8 = hashMapLastScore8.get(player.getUniqueId());
-						String lastScore4 = hashMapLastScore4.get(player.getUniqueId());
-						if (gameTime == 1800) {
-							scoreboard.resetScores(lastScore8);
-							//board.resetScores(zombieMessage);
-							//board.resetScores(playerMessage);
-							scoreboard.resetScores(lastScore4);
-						}
 						String leftSecondPlayed = Integer.toString(playedTime % 60);
 						if (leftSecondPlayed.length() == 1) leftSecondPlayed = "0" + leftSecondPlayed;
 						String leftSecond = Integer.toString(gameTime % 60);
 						if (leftSecond.length() == 1) leftSecond = "0" + leftSecond;
-						lastScore4 = ChatColor.GREEN + "    " + Math.round(Math.nextDown(playedTime/60)) + ":" + leftSecondPlayed + " / " + Math.round(Math.nextDown(gameTime/60)) + ":" + leftSecond;
-						Score score4 = objective3.getScore(lastScore4);
+						scoreboard.resetScores(hashMapLastScore4.get(event.getPlayer().getUniqueId()));
+						String score4s = ChatColor.GREEN + "    " + Math.round(Math.nextDown(playedTime/60)) + ":" + leftSecondPlayed + " / " + Math.round(Math.nextDown(gameTime/60)) + ":" + leftSecond;
+						Score score4 = objective3.getScore(score4s);
 						score4.setScore(4);
-						hashMapLastScore4.put(player.getUniqueId(), lastScore4);
-						player.setScoreboard(hashMapScoreboard.get(player.getUniqueId()));
+						player.setScoreboard(scoreboard);
+						hashMapLastScore4.put(event.getPlayer().getUniqueId(), score4s);
 					}
 					playedTime++;
 				}
@@ -508,11 +507,11 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		if (players == 0 && gameStarted) {
 			gameEnded = true;
 			for (final Player player : Bukkit.getOnlinePlayers()) {
+				player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + "ゾンビチームの勝ち！", "");
 				new BukkitRunnable() {
 					public void run() {
-						if (fireworked == 20) this.cancel();
+						if (fireworked >= 20) this.cancel();
 						player.playSound(player.getLocation(), Sound.FIREWORK_LAUNCH, 100, 1);
-						player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + "ゾンビチームの勝ち！", "");
 						fireworked++;
 					}
 				}.runTaskTimer(this, 0, 5);
@@ -530,6 +529,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void onPlayerRespawn(PlayerRespawnEvent event) {
 		String[] spawnLists = Arrays.asList(config.getList("spawnPoints.zombie", new ArrayList<String>()).toArray(new String[0])).get(checkpoint).split(",");
@@ -563,12 +563,11 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		if (players == 0 && gameStarted) {
 			gameEnded = true;
 			for (final Player player : Bukkit.getOnlinePlayers()) {
+				player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + "ゾンビチームの勝ち！", "");
 				new BukkitRunnable() {
-					@SuppressWarnings("deprecation")
 					public void run() {
-						if (fireworked == 20) this.cancel();
+						if (fireworked >= 20) this.cancel();
 						player.playSound(player.getLocation(), Sound.FIREWORK_LAUNCH, 100, 1);
-						player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + "ゾンビチームの勝ち！", "");
 						fireworked++;
 					}
 				}.runTaskTimer(this, 0, 5);
@@ -593,6 +592,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		event.setCancelled(true);
 		if (!gameStarted || gameEnded) return;
 		if (hashMapTeam.get(event.getDamager().getUniqueId()) == "zombie" && playedTime < 10) return;
+		if (hashMapTeam.get(event.getEntity().getUniqueId()) == "zombie") return;
 		if (hashMapTeam.get(event.getDamager().getUniqueId()) == hashMapTeam.get(event.getEntity().getUniqueId())) return;
 		Player player = (Player) event.getEntity();
 		player.getInventory().clear();
@@ -636,11 +636,11 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		if (players == 0 && gameStarted) {
 			gameEnded = true;
 			for (final Player player2 : Bukkit.getOnlinePlayers()) {
+				player2.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + "ゾンビチームの勝ち！", "");
 				new BukkitRunnable() {
 					public void run() {
-						if (fireworked == 20) this.cancel();
+						if (fireworked >= 20) this.cancel();
 						player2.playSound(player2.getLocation(), Sound.FIREWORK_LAUNCH, 100, 1);
-						player2.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + "ゾンビチームの勝ち！", "");
 						fireworked++;
 					}
 				}.runTaskTimer(this, 0, 5);
@@ -680,8 +680,14 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		if (zombies == 0 || players == 0) {
 			String team = zombies == 0 ? "プレイヤー" : "ゾンビ";
 			for (Player player : Bukkit.getOnlinePlayers()) {
-				player.playSound(player.getLocation(), Sound.FIREWORK_LAUNCH, 100, 1);
-				player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + team + "チームの勝ち！", "");
+				player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + "ゾンビチームの勝ち！", "");
+				new BukkitRunnable() {
+					public void run() {
+						if (fireworked >= 20) this.cancel();
+						player.playSound(player.getLocation(), Sound.FIREWORK_LAUNCH, 100, 1);
+						fireworked++;
+					}
+				}.runTaskTimer(this, 0, 5);
 			}
 			Bukkit.broadcastMessage("" + ChatColor.GREEN + ChatColor.BOLD + team + "チームの勝ち！");
 			Bukkit.broadcastMessage(ChatColor.GRAY + "このサーバーはあと15秒でシャットダウンします。");
@@ -896,7 +902,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		for(Player p : loc.getWorld().getPlayers()){
 			if (!hashMapTeam.get(p.getUniqueId()).equalsIgnoreCase("player")) continue;
 			double distanceSqrd = loc.distanceSquared(p.getLocation());
-			if (distanceSqrd > 7) continue;
+			if (distanceSqrd > 10) continue;
 			if(distanceSqrd < lastDistance){
 				lastDistance = distanceSqrd;
 				nearestPlayer = p;
