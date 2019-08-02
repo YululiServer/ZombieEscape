@@ -225,9 +225,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 					int maxHealth = (int) player.getMaxHealth();
 					int health = (int) player.getHealth();
 					ActionBar.setActionBarWithoutException(player, "" + ChatColor.RED + health + "/" + maxHealth + "❤");
-					String lastScore4 = hashMapLastScore4.get(player.getUniqueId());
-					Scoreboard scoreboard = hashMapScoreboard.get(player.getUniqueId());
-					scoreboard.resetScores(lastScore4);
 				}
 			}
 		};
@@ -312,6 +309,11 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		new BukkitRunnable() {
 			@SuppressWarnings("deprecation") // player#sendTitle, i can't find non-deprecated methods in 1.8.8.
 			public void run() {
+				for (final Player player : Bukkit.getOnlinePlayers()) {
+					String lastScore4 = hashMapLastScore4.get(player.getUniqueId());
+					Scoreboard scoreboard = hashMapScoreboard.get(player.getUniqueId());
+					scoreboard.resetScores(lastScore4);
+				}
 				final String zombieMessage = ChatColor.GREEN + "    チーム: " + ChatColor.DARK_GREEN + "ゾンビ";
 				final String playerMessage = ChatColor.GREEN + "    チーム: " + ChatColor.AQUA + "プレイヤー";
 				if (!gameStarted) {
