@@ -53,7 +53,19 @@ public class ZombieEscapeGameUtil {
 				sender.sendMessage(ChatColor.RED + "不明なタイプです: " + sender.toString() + ", Name: " + sender.getName());
 				return false;
 			}
-			if (ZombieEscape.hashMapTeam.get(nearestPlayer.getUniqueId()) != "zombie" || !(sender instanceof Player && ((Player)sender).isOp())) {
+			if (sender instanceof Player && ((Player)sender).isOp()) {
+				if (sender instanceof BlockCommandSender) {
+					if (ZombieEscape.checkpoint >= Integer.parseInt(args[0])) {
+						sender.sendMessage(ChatColor.RED + "そのチェックポイントはすでに通過しています。");
+						return false;
+					}
+				}
+				ZombieEscape.checkpoint = Integer.parseInt(args[0]);
+				sender.sendMessage(ChatColor.GREEN + "チェックポイントを " + args[0] + " に設定しました。");
+				Bukkit.broadcastMessage(ChatColor.GREEN + "チェックポイント" + args[0] + "を通過しました。");
+				return true;
+			}
+			if (ZombieEscape.hashMapTeam.get(nearestPlayer.getUniqueId()) != "zombie") {
 				sender.sendMessage(ChatColor.RED + "チェックポイントはゾンビのみが作動できます。");
 				return false;
 			}
