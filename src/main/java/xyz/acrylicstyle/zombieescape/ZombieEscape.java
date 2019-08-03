@@ -490,10 +490,10 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 						score4.setScore(4);
 						Score score0 = objective3.getScore("     ");
 						score0.setScore(0);
-						for (int i = 1; i <= maxCheckpoints; i++) {
+						for (int i = 1; i < maxCheckpoints; i++) {
 							String okString = ChatColor.RED + "✕ チェックポイント" + i;
 							String koString = ChatColor.GREEN + "✓ チェックポイント" + i;
-							if (checkpoint > i) {
+							if (checkpoint >= i) {
 								scoreboard.resetScores(koString);
 								Score score = objective3.getScore(okString);
 								score.setScore(-i);
