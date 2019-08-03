@@ -165,6 +165,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 						ZombieEscape.config.reloadWithoutException();
 						ZombieEscape.mapConfig.reloadWithoutException();
 						locationWall = ConfigProvider.getConfigSectionValue(mapConfig.get("locationWall", new HashMap<String, Object>()), true);
+						maxCheckpoints = Math.min(mapConfig.getStringList("spawnPoints.player").size(), mapConfig.getStringList("spawnPoints.zombie").size());
 						sender.sendMessage(ChatColor.GREEN + "✓ 設定を再読み込みしました。");
 						return true;
 					}
@@ -183,7 +184,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		teams.put("player", manager.getNewScoreboard().registerNewTeam("player"));
 		Bukkit.getPluginManager().registerEvents(this, this);
 		checkConfig();
-		maxCheckpoints = Math.min(mapConfig.getStringList("spawnPoints.players").size(), mapConfig.getStringList("spawnPoints.zombie").size());
+		maxCheckpoints = Math.min(mapConfig.getStringList("spawnPoints.player").size(), mapConfig.getStringList("spawnPoints.zombie").size());
 		locationWall = ConfigProvider.getConfigSectionValue(mapConfig.get("locationWall", new HashMap<String, Object>()), true);
 		Bukkit.getLogger().info("[ZombieEscape] Enabled Zombie Escape");
 	}
@@ -214,13 +215,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		event.getPlayer().teleport(world.getSpawnLocation());
 		hashMapTeam.put(event.getPlayer().getUniqueId(), "player");
 		lockActionBar.put(event.getPlayer().getUniqueId(), false);
-		new BukkitRunnable() {
-			public void run() {
-				ZombieEscape.config.reloadWithoutException();
-				ZombieEscape.mapConfig.reloadWithoutException();
-				locationWall = ConfigProvider.getConfigSectionValue(mapConfig.get("locationWall", new HashMap<String, Object>()), true);
-			}
-		}.runTaskTimer(this, 6000, 6000);
 		new BukkitRunnable() {
 			public void run() {
 				for (Player player : Bukkit.getOnlinePlayers()) {
@@ -496,7 +490,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 						score4.setScore(4);
 						Score score0 = objective3.getScore("     ");
 						score0.setScore(0);
-						for (int i = 0; i <= maxCheckpoints; i++) {
+						for (int i = 1; i <= maxCheckpoints; i++) {
 							String okString = ChatColor.RED + "✕ チェックポイント" + i;
 							String koString = ChatColor.GREEN + "✓ チェックポイント" + i;
 							if (checkpoint > i) {
