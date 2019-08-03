@@ -95,8 +95,8 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	public static String mapName = null;
 	public static ScoreboardManager manager = null;
 	public static ProtocolManager protocol = null;
-	public static int zombies = 0;
-	public static int players = 0;
+	public static volatile int zombies = 0;
+	public static volatile int players = 0;
 	public static int timesLeft = 180;
 	public static boolean timerStarted = false;
 	public static boolean hasEnoughPlayers = false;
@@ -228,6 +228,8 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 					}
 					Integer state = hashMapBlockState.get(wall) != null ? hashMapBlockState.get(wall) : 0;
 					int durability = Math.min(Constants.materialDurability.getOrDefault(block.getType(), 5)*(players/5), 1000);
+					Log.info("Material Durability: " + Constants.materialDurability.getOrDefault(block.getType(), 5));
+					Log.info("Wall Durability: " + Math.min(Constants.materialDurability.getOrDefault(block.getType(), 5)*(players/5), 1000));
 					ActionBar.setActionBarWithoutException(player, ChatColor.GREEN + "壁の耐久力: " + state + "/" + durability);
 					lockActionBar.put(player.getUniqueId(), true);
 				}
@@ -327,7 +329,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		timerStarted = true;
 		new BukkitRunnable() {
 			@SuppressWarnings("deprecation") // player#sendTitle, i can't find non-deprecated methods in 1.8.8.
-			public void run() {
+			public synchronized void run() {
 				for (final Player player : Bukkit.getOnlinePlayers()) {
 					hashMapScoreboard.get(player.getUniqueId()).resetScores(hashMapLastScore4.get(player.getUniqueId()));
 				}
@@ -822,11 +824,12 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		if (players <= 0) return null;
 		Player nearestPlayer = null;
 		double lastDistance = Double.MAX_VALUE;
-		Log.info("");
+		Log.info("we're going to find players");
 		for(Player p : loc.getWorld().getPlayers()){
+			Log.info("team: " + hashMapTeam.get(p.getUniqueId()));
+			Log.info("distance: " + loc.distance(p.getLocation()));
 			if (!hashMapTeam.get(p.getUniqueId()).equalsIgnoreCase("player")) continue;
-			double distanceSqrd = loc.distanceSquared(p.getLocation());
-			Log.info("");
+			double distanceSqrd = loc.distance(p.getLocation());
 			if (distanceSqrd > 10) continue;
 			if(distanceSqrd < lastDistance){
 				lastDistance = distanceSqrd;
