@@ -159,6 +159,12 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			Bukkit.getPluginCommand("zombieescape").setExecutor(new CommandExecutor() {
 				@Override
 				public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+					if (args.length != 0 && args[0].equalsIgnoreCase("reload")) {
+						ZombieEscape.config.reloadWithoutException();
+						ZombieEscape.mapConfig.reloadWithoutException();
+						locationWall = ConfigProvider.getConfigSectionValue(mapConfig.get("locationWall", new HashMap<String, Object>()), true);
+						sender.sendMessage(ChatColor.GREEN + "✓ 設定を再読み込みしました。");
+					}
 					if (!(sender instanceof Player)) {
 						sender.sendMessage(ChatColor.RED + "This command must be run from in-game.");
 						return true;
@@ -198,7 +204,8 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	}
 
 	@EventHandler
-	public void onPlayerJoin(final PlayerJoinEvent event) {
+	public synchronized void onPlayerJoin(final PlayerJoinEvent event) {
+		players = players + 1;
 		World world = Bukkit.getWorld(mapConfig.getString("spawnPoints.world", "world"));
 		event.getPlayer().teleport(world.getSpawnLocation());
 		hashMapTeam.put(event.getPlayer().getUniqueId(), "player");
@@ -367,6 +374,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 						}
 						player.setScoreboard(hashMapScoreboard.get(player.getUniqueId()));
 						if (timesLeft == 5) {
+							players = 0;
 							board.resetScores(playerMessage);
 							if ((((int) Math.round(Bukkit.getOnlinePlayers().size() / 10) - zombies) >= 0) == true) {
 								hashMapOriginZombie.put(player.getUniqueId(), true);
