@@ -164,6 +164,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 						ZombieEscape.mapConfig.reloadWithoutException();
 						locationWall = ConfigProvider.getConfigSectionValue(mapConfig.get("locationWall", new HashMap<String, Object>()), true);
 						sender.sendMessage(ChatColor.GREEN + "✓ 設定を再読み込みしました。");
+						return true;
 					}
 					if (!(sender instanceof Player)) {
 						sender.sendMessage(ChatColor.RED + "This command must be run from in-game.");
