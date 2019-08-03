@@ -210,7 +210,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 
 	@EventHandler
 	public synchronized void onPlayerJoin(final PlayerJoinEvent event) {
-		players = players + 1;
+		if (!gameStarted) players = players + 1;
 		World world = Bukkit.getWorld(mapConfig.getString("spawnPoints.world", "world"));
 		event.getPlayer().teleport(world.getSpawnLocation());
 		hashMapTeam.put(event.getPlayer().getUniqueId(), "player");
