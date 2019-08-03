@@ -238,7 +238,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 					int durability = Math.min(Constants.materialDurability.getOrDefault(block.getType(), 5)*(players/5), 1000);
 					Log.info("Current players: " + players);
 					Log.info("Material Durability: " + Constants.materialDurability.getOrDefault(block.getType(), 5));
-					Log.info("Players/5: " + (players/5));
+					Log.info("Players/5: " + (double) (players/5));
 					Log.info("Raw Wall Durability: " + Constants.materialDurability.getOrDefault(block.getType(), 5)*(players/5));
 					Log.info("Wall Durability: " + Math.min(Constants.materialDurability.getOrDefault(block.getType(), 5)*(players/5), 1000));
 					ActionBar.setActionBarWithoutException(player, ChatColor.GREEN + "壁の耐久力: " + state + "/" + durability);
