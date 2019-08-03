@@ -235,7 +235,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 						continue;
 					}
 					Integer state = hashMapBlockState.get(wall) != null ? hashMapBlockState.get(wall) : 0;
-					int durability = (int) Math.nextDown(Math.min(Constants.materialDurability.getOrDefault(block.getType(), 5)*((double)players/(double)5), 1000));
+					int durability = (int) Math.nextUp(Math.min(Constants.materialDurability.getOrDefault(block.getType(), 5)*((double)players/(double)5), 1000));
 					ActionBar.setActionBarWithoutException(player, ChatColor.GREEN + "壁の耐久力: " + state + "/" + durability);
 					lockActionBar.put(player.getUniqueId(), true);
 				}
@@ -649,7 +649,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				Math.nextUp(event.getEntity().getLocation().getZ()+0.6));
 		Block block = event.getEntity().getWorld().getBlockAt(Llocation);
 		if (block == null) return;
-		int durability = (int) Math.nextDown(Math.min(Constants.materialDurability.getOrDefault(block.getType(), 5)*((double)players/(double)5), 1000));
+		int durability = (int) Math.nextUp(Math.min(Constants.materialDurability.getOrDefault(block.getType(), 5)*((double)players/(double)5), 1000));
 		if (block.getType() == Material.DIRT || block.getType() == Material.GRASS || block.getType() == Material.WOOD) {
 			String location = block.getLocation().getBlockX() + "," + block.getLocation().getBlockY() + "," + block.getLocation().getBlockZ();
 			String wall = (String) locationWall.getOrDefault(location, null);
