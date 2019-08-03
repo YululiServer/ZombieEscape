@@ -78,6 +78,7 @@ import xyz.acrylicstyle.zombieescape.commands.ZombieEscapeGameUtil;
 import xyz.acrylicstyle.zombieescape.data.Constants;
 import xyz.acrylicstyle.zombieescape.effects.ActionBar;
 
+@SuppressWarnings("depression")
 public class ZombieEscape extends JavaPlugin implements Listener {
 	public final static int mininumPlayers = 2;
 	public static ConfigProvider config = null;
@@ -106,6 +107,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	public static int gameTime = 1800; // 30 minutes
 	public static int playedTime = 0;
 	public static int checkpoint = 0;
+	public static int maxCheckpoints = 0;
 	public static int fireworked = 0;
 	public static boolean gameEnded = false;
 	public static Map<String, Object> locationWall = null;
@@ -181,6 +183,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		teams.put("player", manager.getNewScoreboard().registerNewTeam("player"));
 		Bukkit.getPluginManager().registerEvents(this, this);
 		checkConfig();
+		maxCheckpoints = Math.min(mapConfig.getStringList("spawnPoints.players").size(), mapConfig.getStringList("spawnPoints.zombie").size());
 		locationWall = ConfigProvider.getConfigSectionValue(mapConfig.get("locationWall", new HashMap<String, Object>()), true);
 		Bukkit.getLogger().info("[ZombieEscape] Enabled Zombie Escape");
 	}
@@ -479,7 +482,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 						return;
 					}
 					for (Player player : Bukkit.getOnlinePlayers()) {
-						Scoreboard scoreboard = hashMapScoreboard.get(player.getUniqueId());
+						final Scoreboard scoreboard = hashMapScoreboard.get(player.getUniqueId());
 						Objective objective3 = scoreboard.getObjective(DisplaySlot.SIDEBAR);
 						String leftSecondPlayed = Integer.toString(playedTime % 60);
 						if (leftSecondPlayed.length() == 1) leftSecondPlayed = "0" + leftSecondPlayed;
@@ -491,6 +494,21 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 						hashMapLastScore4.put(player.getUniqueId(), lastScore4);
 						Score score4 = objective3.getScore(lastScore4);
 						score4.setScore(4);
+						Score score0 = objective3.getScore("     ");
+						score0.setScore(0);
+						for (int i = 0; i <= maxCheckpoints; i++) {
+							String okString = ChatColor.RED + "✕ チェックポイント" + i;
+							String koString = ChatColor.GREEN + "✓ チェックポイント" + i;
+							if (checkpoint > i) {
+								scoreboard.resetScores(koString);
+								Score score = objective3.getScore(okString);
+								score.setScore(-i);
+							} else {
+								scoreboard.resetScores(okString);
+								Score score = objective3.getScore(koString);
+								score.setScore(-i);
+							}
+						}
 						player.setScoreboard(scoreboard);
 					}
 					playedTime++;
