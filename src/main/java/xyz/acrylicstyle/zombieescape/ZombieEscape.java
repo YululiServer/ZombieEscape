@@ -355,8 +355,8 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 					event.getPlayer().sendMessage(ChatColor.GREEN + "/startgame - ゲーム開始までのカウントダウンを6秒に設定します。" + ChatColor.AQUA + "/setstatus timesLeft 6" + ChatColor.GREEN + "と同等です。");
 					event.getPlayer().sendMessage(ChatColor.GREEN + "/endgame - ゲームが開始している場合、ゲームを終了します。");
 					event.getPlayer().sendMessage("");
-					event.getPlayer().sendMessage("" + ChatColor.RED + ChatColor.BOLD + "これらのOP用コマンドの乱用は禁止されています。");
-					event.getPlayer().sendMessage("" + ChatColor.RED + ChatColor.BOLD + "乱用した場合、OP権限の剥奪や、BANが行われます。");
+					event.getPlayer().sendMessage("" + ChatColor.RED + "これらのOP用コマンドの乱用は禁止されています。");
+					event.getPlayer().sendMessage("" + ChatColor.RED + "乱用した場合、OP権限の剥奪や、BANが行われます。");
 					event.getPlayer().sendMessage(ChatColor.BLUE + "--------------------------------------------------");
 				}
 				if (gameStarted) {
