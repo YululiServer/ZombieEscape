@@ -953,7 +953,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			Log.info("distance: " + loc.distance(p.getLocation()));
 			if (!(hashMapTeam.get(p.getUniqueId()) == PlayerTeam.PLAYER)) continue;
 			double distanceSqrd = loc.distance(p.getLocation());
-			if (distanceSqrd > 10) continue;
+			if (distanceSqrd > 7) continue;
 			if(distanceSqrd < lastDistance){
 				lastDistance = distanceSqrd;
 				nearestPlayer = p;
