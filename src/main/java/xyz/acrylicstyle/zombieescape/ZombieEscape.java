@@ -279,7 +279,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 					if (player.isDead()) player.spigot().respawn();
 					player.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 1, false, false));
 					if (hashMapTeam.get(player.getUniqueId()) == PlayerTeam.ZOMBIE) {
-						player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100000, 1, false, false));
+						player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100000, 0, false, false));
 						player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 100000, 0, false, false));
 						player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 100000, 100, false, false));
 						player.getInventory().setHelmet(createLeatherItemStack(Material.LEATHER_HELMET, 0, 100, 0));
@@ -449,7 +449,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 									player.getInventory().setChestplate(createLeatherItemStack(Material.LEATHER_CHESTPLATE, 0, 100, 0));
 									player.getInventory().setLeggings(createLeatherItemStack(Material.LEATHER_LEGGINGS, 0, 100, 0));
 									player.getInventory().setBoots(createLeatherItemStack(Material.LEATHER_BOOTS, 0, 100, 0));
-									player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100000, 1, false, false));
+									player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100000, 0, false, false));
 									player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 100000, 0, false, false));
 									player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 100000, 100, false, false));
 									player.setPlayerListName(ChatColor.DARK_GREEN + player.getName());
@@ -491,7 +491,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 							player.playSound(player.getLocation(), Sound.ENDERDRAGON_GROWL, 100, 1);
 							if (hashMapTeam.get(player.getUniqueId()) == PlayerTeam.ZOMBIE) {
 								player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + "GO!", ChatColor.YELLOW + "目標: プレイヤーを全員倒すか先にゴールに到達する");
-								player.sendMessage(ChatColor.GRAY + "あと10秒後にワープします...");
+								player.sendMessage(ChatColor.GRAY + "あと8秒後にワープします...");
 								new BukkitRunnable() {
 									@Override
 									public void run() {
@@ -512,7 +512,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 											return;
 										}
 									}
-								}.runTaskLater(getInstance(), 20*10);
+								}.runTaskLater(getInstance(), 20*8);
 							} else if (hashMapTeam.get(player.getUniqueId()) == PlayerTeam.PLAYER) {
 								new BukkitRunnable() {
 									public void run() {
@@ -614,7 +614,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, 100000, 0, false, false));
 				event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 1, false, false));
 				event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 100000, 100, false, false));
-				event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100000, 1, false, false));
+				event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100000, 0, false, false));
 				event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 100000, 0, false, false));
 				ItemStack item = new ItemStack(Material.IRON_SWORD);
 				ItemMeta meta = item.getItemMeta();
@@ -667,7 +667,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				player.addPotionEffect(PotionEffectType.HUNGER.createEffect(100000, 0));
 				player.addPotionEffect(PotionEffectType.SATURATION.createEffect(100000, 1));
 				player.addPotionEffect(PotionEffectType.INCREASE_DAMAGE.createEffect(100000, 100));
-				player.addPotionEffect(PotionEffectType.SPEED.createEffect(100000, 1));
+				player.addPotionEffect(PotionEffectType.SPEED.createEffect(100000, 0));
 				player.addPotionEffect(PotionEffectType.JUMP.createEffect(100000, 0));
 				ItemStack item = new ItemStack(Material.IRON_SWORD);
 				ItemMeta meta = item.getItemMeta();
