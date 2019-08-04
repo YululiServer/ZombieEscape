@@ -105,6 +105,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	public static boolean settingsCheck = false;
 	public static boolean gameStarted = false;
 	public static boolean debug = false;
+	public static boolean playersReset = false;
 	public static int gameTime = 1800; // 30 minutes
 	public static int playedTime = 0;
 	public static int checkpoint = 0;
@@ -384,8 +385,10 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 						}
 						player.setScoreboard(hashMapScoreboard.get(player.getUniqueId()));
 						if (timesLeft == 5) {
-							players = 0;
-							zombies = 0;
+							if (!playersReset) {
+								players = 0;
+								zombies = 0;
+							}
 							board.resetScores(playerMessage);
 							if (((int) Math.round((double) Bukkit.getOnlinePlayers().size() / (double) 10) - zombies) >= 0) {
 								hashMapOriginZombie.put(player.getUniqueId(), true);
