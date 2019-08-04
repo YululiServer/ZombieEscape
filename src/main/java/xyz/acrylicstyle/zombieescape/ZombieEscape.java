@@ -338,6 +338,12 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			}
 		}.runTaskLater(this, 40);
 		healthBar.runTaskTimer(this, 0, 20);
+		for (final Player player : Bukkit.getOnlinePlayers()) {
+			for (final Player other : Bukkit.getOnlinePlayers()) {
+				player.hidePlayer(other);
+				player.showPlayer(other);
+			}
+		}
 		if (debug) {
 			long end = System.currentTimeMillis() - time;
 			Log.debug("onPlayerJoin() took " + end + "ms");
