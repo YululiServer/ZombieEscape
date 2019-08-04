@@ -221,6 +221,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		lockActionBar.put(event.getPlayer().getUniqueId(), false);
 		new BukkitRunnable() {
 			public void run() {
+				long time = System.currentTimeMillis();
 				for (Player player : Bukkit.getOnlinePlayers()) {
 					Set<Material> set = new HashSet<Material>();
 					set.add(Material.AIR);
@@ -239,6 +240,10 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 					int durability = (int) Math.nextUp(Math.min(Constants.materialDurability.getOrDefault(block.getType(), 5)*((double)players/(double)5), 1000));
 					ActionBar.setActionBarWithoutException(player, ChatColor.GREEN + "壁の耐久力: " + state + "/" + durability);
 					lockActionBar.put(player.getUniqueId(), true);
+					if (debug) {
+						long end = System.currentTimeMillis()-time;
+						Log.debug("Display durability took " + end + "ms");
+					}
 				}
 			}
 		}.runTaskTimer(this, 0, 20);
