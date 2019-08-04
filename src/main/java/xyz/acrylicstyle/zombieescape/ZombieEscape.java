@@ -74,7 +74,6 @@ import com.comphenix.protocol.wrappers.BlockPosition;
 
 import xyz.acrylicstyle.tomeito_core.providers.ConfigProvider;
 import xyz.acrylicstyle.tomeito_core.utils.Log;
-import xyz.acrylicstyle.zombieescape.commands.Holder;
 import xyz.acrylicstyle.zombieescape.commands.Sponsor;
 import xyz.acrylicstyle.zombieescape.commands.ZombieEscapeConfig;
 import xyz.acrylicstyle.zombieescape.commands.ZombieEscapeGameUtil;
@@ -151,11 +150,11 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			e.getCause().printStackTrace();
 		}
 		if (sponsor != null && zec != null && zegu != null) {
-			if (config.getStringList("disabledcommands") != null) {
-				config.getStringList("disabledcommands").forEach(cmd -> {
-					Bukkit.getPluginCommand(cmd).setExecutor(new Holder());
-				});
-			}
+			//if (config.getStringList("disabledcommands") != null) {
+			//	config.getStringList("disabledcommands").forEach(cmd -> {
+			//		Bukkit.getPluginCommand(cmd).setExecutor(new Holder());
+			//	});
+			//}
 			Bukkit.getPluginCommand("setsponsor").setExecutor(sponsor.new SetSponsor());
 			Bukkit.getPluginCommand("removesponsor").setExecutor(sponsor.new RemoveSponsor());
 			Bukkit.getPluginCommand("setspawn").setExecutor(zec.new SetSpawn());
