@@ -599,7 +599,9 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		if (hashMapTeam.get(event.getDamager().getUniqueId()) == hashMapTeam.get(event.getEntity().getUniqueId())) return;
 		Player player = (Player) event.getEntity();
 		player.getInventory().clear();
-		if (hashMapTeam.get(player.getUniqueId()) == PlayerTeam.PLAYER) players--;
+		if (hashMapTeam.get(player.getUniqueId()) == PlayerTeam.PLAYER) {
+			players = players - 1;
+		}
 		hashMapTeam.remove(player.getUniqueId());
 		hashMapTeam.put(player.getUniqueId(), PlayerTeam.ZOMBIE);
 		final Objective objective = hashMapScoreboard.get(player.getUniqueId()).getObjective("scoreboard");
@@ -635,7 +637,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		player.playSound(player.getLocation(), Sound.ENDERDRAGON_GROWL, 100, 1);
 		player.sendTitle(ChatColor.DARK_GREEN + "ゾンビチームになった！", "");
 		Bukkit.broadcastMessage(ChatColor.DARK_GREEN + player.getName() + "が" + event.getDamager().getName() + "によってゾンビにされた。");
-		if (players == 0 && gameStarted) {
+		if (players <= 0 && gameStarted) {
 			endGame("ゾンビ");
 		}
 		if (debug) {
@@ -663,8 +665,14 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		} else {
 			players = players - 1;
 		}
-		if (gameStarted && zombies < 0) throw new IllegalStateException("Zombie count is should be 0 or more.");
-		if (gameStarted && players < 0) throw new IllegalStateException("Player count is should be 0 or more.");
+		if (gameStarted && zombies < 0) {
+			zombies = 0;
+			throw new IllegalStateException("Zombie count is should be 0 or more.");
+		}
+		if (gameStarted && players < 0) {
+			players = 0;
+			throw new IllegalStateException("Player count is should be 0 or more.");
+		}
 		hashMapTeam.remove(event.getPlayer().getUniqueId());
 		if (gameStarted && (zombies == 0 || players == 0)) {
 			// String team = zombies == 0 ? "プレイヤー" : "ゾンビ";
