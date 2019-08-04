@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -101,6 +102,34 @@ public class ZombieEscapeConfig {
 				return true;
 			}
 			ZombieEscape.checkConfig();
+			sender.sendMessage(ChatColor.GREEN + "設定を保存しました。");
+			return true;
+		}
+	}
+
+	public final class SetMap implements CommandExecutor {
+		@Override
+		public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+			if (ZombieEscape.gameStarted) {
+				sender.sendMessage(ChatColor.RED + "ゲームがすでに開始しているので設定できません！");
+				return true;
+			}
+			if (args.length == 0) {
+				sender.sendMessage(ChatColor.RED + "使用法: /setmap <マップ名>");
+				return true;
+			}
+			try {
+				ConfigProvider.setThenSave("map", args[0], new File("./plugins/ZombieEscape/config.yml"));
+				for (Player player : Bukkit.getOnlinePlayers()) {
+					player.kickPlayer(ChatColor.RED + sender.getName() + ChatColor.AQUA + "によってマップが変更されました。もう一度参加しなおしてください！");
+				}
+			} catch (IOException | InvalidConfigurationException e) {
+				e.printStackTrace();
+				sender.sendMessage(ChatColor.RED + "設定の保存中にエラーが発生しました。");
+				return true;
+			}
+			ZombieEscape.checkConfig();
+			ZombieEscape.reload();
 			sender.sendMessage(ChatColor.GREEN + "設定を保存しました。");
 			return true;
 		}

@@ -155,6 +155,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			Bukkit.getPluginCommand("addwall").setExecutor(zec.new AddWall());
 			Bukkit.getPluginCommand("deletewall").setExecutor(zec.new DeleteWall());
 			Bukkit.getPluginCommand("setmapname").setExecutor(zec.new SetMapName());
+			Bukkit.getPluginCommand("setmap").setExecutor(zec.new SetMap());
 			Bukkit.getPluginCommand("suicide").setExecutor(zegu.new Suicide());
 			Bukkit.getPluginCommand("setcp").setExecutor(zegu.new SetCheckpoint());
 			Bukkit.getPluginCommand("startgame").setExecutor(zegu.new StartGame());
@@ -165,11 +166,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				@Override
 				public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 					if (args.length != 0 && args[0].equalsIgnoreCase("reload")) {
-						ZombieEscape.config.reloadWithoutException();
-						ZombieEscape.mapConfig.reloadWithoutException();
-						locationWall = ConfigProvider.getConfigSectionValue(mapConfig.get("locationWall", new HashMap<String, Object>()), true);
-						maxCheckpoints = Math.min(mapConfig.getStringList("spawnPoints.player").size(), mapConfig.getStringList("spawnPoints.zombie").size());
-						debug = config.getBoolean("debug", false);
+						reload();
 						sender.sendMessage(ChatColor.GREEN + "✓ 設定を再読み込みしました。");
 						return true;
 					}
@@ -191,6 +188,14 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		maxCheckpoints = Math.min(mapConfig.getStringList("spawnPoints.player").size(), mapConfig.getStringList("spawnPoints.zombie").size());
 		locationWall = ConfigProvider.getConfigSectionValue(mapConfig.get("locationWall", new HashMap<String, Object>()), true);
 		Bukkit.getLogger().info("[ZombieEscape] Enabled Zombie Escape");
+	}
+
+	public static void reload() {
+		ZombieEscape.config.reloadWithoutException();
+		ZombieEscape.mapConfig.reloadWithoutException();
+		locationWall = ConfigProvider.getConfigSectionValue(mapConfig.get("locationWall", new HashMap<String, Object>()), true);
+		maxCheckpoints = Math.min(mapConfig.getStringList("spawnPoints.player").size(), mapConfig.getStringList("spawnPoints.zombie").size());
+		debug = config.getBoolean("debug", false);
 	}
 
 	/**
