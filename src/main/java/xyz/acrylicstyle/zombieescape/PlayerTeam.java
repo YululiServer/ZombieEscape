@@ -1,5 +1,7 @@
 package xyz.acrylicstyle.zombieescape;
 
+import java.util.Locale;
+
 public enum PlayerTeam {
 	/**
 	 * Represents ZOMBIE, returns "zombie" if called {@link #toString()}
@@ -8,14 +10,12 @@ public enum PlayerTeam {
 	/**
 	 * Represents PLAYER, returns "player" if called {@link #toString()}
 	 */
-	PLAYER;
+	PLAYER,
+	OYACHU,
+	SAND;
 
 	@Override
 	public String toString() {
-		switch (this) {
-			case ZOMBIE: return "zombie";
-			case PLAYER: return "player";
-			default: return null;
-		}
+		return super.toString().toLowerCase(Locale.ROOT);
 	}
 }
