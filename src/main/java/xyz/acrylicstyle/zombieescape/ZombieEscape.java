@@ -387,7 +387,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 							players = 0;
 							zombies = 0;
 							board.resetScores(playerMessage);
-							if ((((int) Math.round(Bukkit.getOnlinePlayers().size() / 10) - zombies) >= 0) == true) {
+							if (((int) Math.round((double) Bukkit.getOnlinePlayers().size() / (double) 10) - zombies) >= 0) {
 								hashMapOriginZombie.put(player.getUniqueId(), true);
 								hashMapTeam.put(player.getUniqueId(), PlayerTeam.ZOMBIE);
 								zombies = zombies+1;
@@ -406,7 +406,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 								player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 100000, 0, false, false));
 								player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 100000, 100, false, false));
 								player.setPlayerListName(ChatColor.DARK_GREEN + player.getName());
-							} else if ((((int) Math.round(Bukkit.getOnlinePlayers().size() / 10) - zombies) >= 0) == false) {
+							} else {
 								players = players+1;
 								hashMapTeam.put(player.getUniqueId(), PlayerTeam.PLAYER);
 								teams.get(hashMapTeam.get(player.getUniqueId()).toString()).setAllowFriendlyFire(false);
