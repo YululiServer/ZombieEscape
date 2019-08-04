@@ -24,9 +24,11 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
@@ -161,7 +163,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			Bukkit.getPluginCommand("suicide").setExecutor(zegu.new Suicide());
 			Bukkit.getPluginCommand("setcp").setExecutor(zegu.new SetCheckpoint());
 			Bukkit.getPluginCommand("startgame").setExecutor(zegu.new StartGame());
-			Bukkit.getPluginCommand("endgame").setExecutor(zegu.new EndGame());
+			Bukkit.getPluginCommand("endgame").setExecutor(new EndGame());
 			Bukkit.getPluginCommand("check").setExecutor(zegu.new CheckConfig());
 			Bukkit.getPluginCommand("setstatus").setExecutor(zegu.new SetStatus());
 			Bukkit.getPluginCommand("zombieescape").setExecutor(new CommandExecutor() {
@@ -950,31 +952,51 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		return nearestPlayer;
 	}
 
+	public static List<Player> targetAFindPlayersWithRange(Location loc, double range) {
+		if (players <= 0) return null;
+		List<Player> players = new ArrayList<Player>();
+		Log.info("we're going to find players");
+		for(Player p : loc.getWorld().getPlayers()){
+			Log.info("team: " + hashMapTeam.get(p.getUniqueId()));
+			Log.info("distance: " + loc.distance(p.getLocation()));
+			if (hashMapTeam.get(p.getUniqueId()) != PlayerTeam.PLAYER) continue;
+			double distanceSqrd = loc.distance(p.getLocation());
+			if (distanceSqrd > range) continue;
+			players.add(p);
+		}
+		return players;
+	}
+
 	@SuppressWarnings("deprecation")
 	public void endGame(String team) {
 		gameEnded = true;
-		for (Player player : Bukkit.getOnlinePlayers()) {
-			player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + team + "チームの勝ち！", "");
-			new BukkitRunnable() {
-				public void run() {
-					if (fireworked >= 80) this.cancel();
-					player.playSound(player.getLocation(), Sound.FIREWORK_LAUNCH, 100, 1);
-					Entity tnt = player.getWorld().spawn(player.getLocation(), TNTPrimed.class);
-					((TNTPrimed)tnt).setFuseTicks(40);
-					fireworked++;
-				}
-			}.runTaskTimer(this, 0, 5);
-		}
-		Bukkit.broadcastMessage("" + ChatColor.GREEN + ChatColor.BOLD + team + "チームの勝ち！");
-		Bukkit.broadcastMessage(ChatColor.GRAY + "このサーバーはあと15秒でシャットダウンします。");
-		TimerTask task = new TimerTask() {
+		Bukkit.broadcastMessage("" + ChatColor.GOLD + ChatColor.BOLD + "あと10秒で救援が来ます！");
+		new BukkitRunnable() {
 			public void run() {
-				Bukkit.broadcastMessage(ChatColor.GRAY + "サーバーをシャットダウン中...");
-				Bukkit.shutdown();
+				for (Player player : Bukkit.getOnlinePlayers()) {
+					player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + team + "チームの勝ち！", "");
+					new BukkitRunnable() {
+						public void run() {
+							if (fireworked >= 200) this.cancel();
+							player.playSound(player.getLocation(), Sound.FIREWORK_LAUNCH, 100, 1);
+							Entity tnt = player.getWorld().spawn(player.getLocation(), TNTPrimed.class);
+							((TNTPrimed)tnt).setFuseTicks(40);
+							fireworked++;
+						}
+					}.runTaskTimer(getInstance(), 0, 5);
+				}
+				Bukkit.broadcastMessage("" + ChatColor.GREEN + ChatColor.BOLD + team + "チームの勝ち！");
+				Bukkit.broadcastMessage(ChatColor.GRAY + "このサーバーはあと15秒でシャットダウンします。");
+				TimerTask task = new TimerTask() {
+					public void run() {
+						Bukkit.broadcastMessage(ChatColor.GRAY + "サーバーをシャットダウン中...");
+						Bukkit.shutdown();
+					}
+				};
+				Timer timer = new Timer();
+				timer.schedule(task, 1000*15);
 			}
-		};
-		Timer timer = new Timer();
-		timer.schedule(task, 1000*15);
+		}.runTaskLater(this, 20*10);
 	}
 
 	@SuppressWarnings("deprecation")
@@ -1005,6 +1027,43 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			};
 			Timer timer2 = new Timer();
 			timer2.schedule(task2, 5);
+		}
+	}
+
+	public final class EndGame implements CommandExecutor {
+		@Override
+		public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+			if (sender instanceof ConsoleCommandSender) {
+				sender.sendMessage(ChatColor.RED + "This command must be used in-game.");
+				return true;
+			}
+			if (!ZombieEscape.gameStarted) {
+				sender.sendMessage(ChatColor.RED + "ゲームはまだ開始されていません！");
+				return true;
+			}
+			gameEnded = true;
+			Player nearestPlayer = null;
+			List<Player> players = null;
+			if (sender instanceof BlockCommandSender) {
+				nearestPlayer = ZombieEscape.targetPFindPlayers(((BlockCommandSender)sender).getBlock().getLocation());
+				players = ZombieEscape.targetAFindPlayersWithRange(((BlockCommandSender)sender).getBlock().getLocation(), 7);
+			} else if (sender instanceof Player) {
+				nearestPlayer = ZombieEscape.targetPFindPlayers(((Player)sender).getLocation());
+				players = ZombieEscape.targetAFindPlayersWithRange(((Player)sender).getLocation(), 7);
+			} else {
+				sender.sendMessage(ChatColor.RED + "不明なタイプです: " + sender.toString() + ", Name: " + sender.getName());
+				return true;
+			}
+			ZombieEscape.gameEnded = true;
+			String team = nearestPlayer == null ? "ゾンビ" : "プレイヤー";
+			if (players.size() != 0) {
+				Bukkit.broadcastMessage(ChatColor.GREEN + "下記のプレイヤーの勝ち！:");
+				players.forEach(player -> {
+					Bukkit.broadcastMessage(ChatColor.GREEN + " - " + player.getUniqueId());
+				});
+			}
+			endGame(team);
+			return true;
 		}
 	}
 }

@@ -6,7 +6,6 @@ import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 import xyz.acrylicstyle.zombieescape.PlayerTeam;
@@ -91,33 +90,6 @@ public class ZombieEscapeGameUtil {
 				return true;
 			}
 			ZombieEscape.timesLeft = 6;
-			return true;
-		}
-	}
-
-	public final class EndGame implements CommandExecutor {
-		@Override
-		public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-			if (sender instanceof ConsoleCommandSender) {
-				sender.sendMessage(ChatColor.RED + "This command must be used in-game.");
-				return true;
-			}
-			if (!ZombieEscape.gameStarted) {
-				sender.sendMessage(ChatColor.RED + "ゲームはまだ開始されていません！");
-				return true;
-			}
-			Player nearestPlayer = null;
-			if (sender instanceof BlockCommandSender) {
-				nearestPlayer = ZombieEscape.targetPFindPlayers(((BlockCommandSender)sender).getBlock().getLocation());
-			} else if (sender instanceof Player) {
-				nearestPlayer = ZombieEscape.targetPFindPlayers(((Player)sender).getLocation());
-			} else {
-				sender.sendMessage(ChatColor.RED + "不明なタイプです: " + sender.toString() + ", Name: " + sender.getName());
-				return true;
-			}
-			ZombieEscape.gameEnded = true;
-			String team = nearestPlayer == null ? "ゾンビ" : "プレイヤー";
-			ZombieEscape.endGameStatic(team);
 			return true;
 		}
 	}
