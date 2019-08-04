@@ -136,6 +136,8 @@ public class ZombieEscapeGameUtil {
 		public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 			if (args.length != 2) {
 				sender.sendMessage(ChatColor.RED + "引数が2つ必要です。");
+				sender.sendMessage(ChatColor.GRAY + "?????? [gameEnded<Boolean>, gameStarted<Boolean>, gameTime<Integer>, playedTime<Integer>, timesLeft<Integer>, debug<Boolean>]");
+				return true;
 			}
 			if (args[0].equalsIgnoreCase("gameEnded")) {
 				ZombieEscape.gameEnded = Boolean.getBoolean(args[1]);
@@ -147,8 +149,10 @@ public class ZombieEscapeGameUtil {
 				ZombieEscape.playedTime = Integer.parseInt(args[1]);
 			} else if (args[0].equalsIgnoreCase("timesLeft")) {
 				ZombieEscape.timesLeft = Integer.parseInt(args[1]);
+			} else if (args[0].equalsIgnoreCase("debug")) {
+				ZombieEscape.debug = Boolean.parseBoolean(args[1]);
 			} else {
-				sender.sendMessage(ChatColor.GRAY + "?????? [gameEnded, gameStarted, gameTime, playedTime, timesLeft]");
+				sender.sendMessage(ChatColor.GRAY + "?????? [gameEnded<Boolean>, gameStarted<Boolean>, gameTime<Integer>, playedTime<Integer>, timesLeft<Integer>, debug<Boolean>]");
 			}
 			return true;
 		}
