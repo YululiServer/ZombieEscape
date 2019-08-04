@@ -881,7 +881,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				event.setFormat(ChatColor.RED + "[All] " + ChatColor.GRAY + "[S] " + event.getPlayer().getName() + ChatColor.RESET + ChatColor.WHITE + ": " + event.getMessage());
 			} else {
 				hashMapTeam.forEach((uuid, team) -> {
-					if (team != PlayerTeam.PLAYER) return;
+					if (team != PlayerTeam.SPECTATOR) return;
 					for (Player player : Bukkit.getOnlinePlayers()) {
 						if (player.getUniqueId().equals(uuid)) {
 							player.sendMessage(ChatColor.AQUA + "[チーム] " +  ChatColor.GRAY + "[S] " + event.getPlayer().getName() + ChatColor.RESET + ChatColor.WHITE + ": " + event.getMessage());
