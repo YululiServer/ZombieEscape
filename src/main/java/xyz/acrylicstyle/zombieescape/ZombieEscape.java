@@ -168,6 +168,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 						ZombieEscape.mapConfig.reloadWithoutException();
 						locationWall = ConfigProvider.getConfigSectionValue(mapConfig.get("locationWall", new HashMap<String, Object>()), true);
 						maxCheckpoints = Math.min(mapConfig.getStringList("spawnPoints.player").size(), mapConfig.getStringList("spawnPoints.zombie").size());
+						debug = config.getBoolean("debug", false);
 						sender.sendMessage(ChatColor.GREEN + "✓ 設定を再読み込みしました。");
 						return true;
 					}
