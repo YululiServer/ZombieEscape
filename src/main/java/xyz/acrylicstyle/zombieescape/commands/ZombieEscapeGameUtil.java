@@ -9,6 +9,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
+import xyz.acrylicstyle.zombieescape.PlayerTeam;
 import xyz.acrylicstyle.zombieescape.ZombieEscape;
 
 public class ZombieEscapeGameUtil {
@@ -61,7 +62,7 @@ public class ZombieEscapeGameUtil {
 				Bukkit.broadcastMessage(ChatColor.GREEN + "チェックポイント" + args[0] + "を通過しました。");
 				return true;
 			}
-			if (ZombieEscape.hashMapTeam.get(nearestPlayer.getUniqueId()) != "zombie") {
+			if (ZombieEscape.hashMapTeam.get(nearestPlayer.getUniqueId()) != PlayerTeam.ZOMBIE) {
 				sender.sendMessage(ChatColor.RED + "チェックポイントはゾンビのみが作動できます。");
 				return false;
 			}

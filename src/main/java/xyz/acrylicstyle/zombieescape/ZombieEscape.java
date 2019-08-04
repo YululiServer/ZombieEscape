@@ -84,7 +84,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	public static ConfigProvider config = null;
 	public static ConfigProvider mapConfig = null;
 	public static HashMap<UUID, Scoreboard> hashMapScoreboard = new HashMap<UUID, Scoreboard>();
-	public static HashMap<UUID, String> hashMapTeam = new HashMap<UUID, String>();
+	public static HashMap<UUID, PlayerTeam> hashMapTeam = new HashMap<UUID, PlayerTeam>();
 	public static HashMap<UUID, String> hashMapLastScore4 = new HashMap<UUID, String>();
 	public static HashMap<UUID, String> hashMapLastScore8 = new HashMap<UUID, String>();
 	public static HashMap<String, Integer> hashMapBlockState = new HashMap<String, Integer>();
@@ -93,6 +93,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	 */
 	public static HashMap<UUID, Boolean> hashMapOriginZombie = new HashMap<UUID, Boolean>();
 	public static HashMap<UUID, Boolean> lockActionBar = new HashMap<UUID, Boolean>();
+	public static HashMap<String, Team> teams = new HashMap<String, Team>();
 	public static String mapName = null;
 	public static ScoreboardManager manager = null;
 	public static ProtocolManager protocol = null;
@@ -102,8 +103,8 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	public static boolean timerStarted = false;
 	public static boolean hasEnoughPlayers = false;
 	public static boolean settingsCheck = false;
-	public static HashMap<String, Team> teams = new HashMap<String, Team>();
 	public static boolean gameStarted = false;
+	public static boolean debug = false;
 	public static int gameTime = 1800; // 30 minutes
 	public static int playedTime = 0;
 	public static int checkpoint = 0;
@@ -119,6 +120,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			config = new ConfigProvider("./plugins/ZombieEscape/config.yml");
 			mapName = config.getString("map", "world");
 			mapConfig = new ConfigProvider("./plugins/ZombieEscape/maps/" + mapName + ".yml");
+			debug = config.getBoolean("debug", false);
 		} catch (IOException | InvalidConfigurationException e1) {
 			e1.printStackTrace();
 			e1.getCause().printStackTrace();
@@ -210,10 +212,11 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 
 	@EventHandler
 	public synchronized void onPlayerJoin(final PlayerJoinEvent event) {
+		long time = System.currentTimeMillis();
 		if (!gameStarted) players = players + 1;
 		World world = Bukkit.getWorld(mapConfig.getString("spawnPoints.world", "world"));
 		event.getPlayer().teleport(world.getSpawnLocation());
-		hashMapTeam.put(event.getPlayer().getUniqueId(), "player");
+		hashMapTeam.put(event.getPlayer().getUniqueId(), PlayerTeam.PLAYER);
 		lockActionBar.put(event.getPlayer().getUniqueId(), false);
 		new BukkitRunnable() {
 			public void run() {
@@ -253,7 +256,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				for (Player player : Bukkit.getOnlinePlayers()) {
 					if (player.isDead()) player.spigot().respawn();
 					player.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 1, false, false));
-					if (hashMapTeam.get(player.getUniqueId()) == "zombie") {
+					if (hashMapTeam.get(player.getUniqueId()) == PlayerTeam.ZOMBIE) {
 						player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100000, 1, false, false));
 						player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 100000, 0, false, false));
 						player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 100000, 100, false, false));
@@ -328,11 +331,16 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			}
 		}.runTaskLater(this, 40);
 		healthBar.runTaskTimer(this, 0, 20);
+		if (debug) {
+			long end = System.currentTimeMillis() - time;
+			Log.debug("onPlayerJoin() took " + end + "ms");
+		}
 		if (timerStarted) return;
 		timerStarted = true;
 		new BukkitRunnable() {
 			@SuppressWarnings("deprecation") // player#sendTitle, i can't find non-deprecated methods in 1.8.8.
 			public synchronized void run() {
+				long time = System.currentTimeMillis();
 				for (final Player player : Bukkit.getOnlinePlayers()) {
 					hashMapScoreboard.get(player.getUniqueId()).resetScores(hashMapLastScore4.get(player.getUniqueId()));
 				}
@@ -361,10 +369,10 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 						score4.setScore(4);
 						scoreboard.resetScores(zombieMessage);
 						scoreboard.resetScores(playerMessage);
-						if (hashMapTeam.get(player.getUniqueId()) == "zombie") {
+						if (hashMapTeam.get(player.getUniqueId()) == PlayerTeam.ZOMBIE) {
 							Score score6 = objective3.getScore(zombieMessage);
 							score6.setScore(6);
-						} else if (hashMapTeam.get(player.getUniqueId()) == "player") {
+						} else if (hashMapTeam.get(player.getUniqueId()) == PlayerTeam.PLAYER) {
 							Score score6 = objective3.getScore(playerMessage);
 							score6.setScore(6);
 						}
@@ -374,7 +382,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 							board.resetScores(playerMessage);
 							if ((((int) Math.round(Bukkit.getOnlinePlayers().size() / 10) - zombies) >= 0) == true) {
 								hashMapOriginZombie.put(player.getUniqueId(), true);
-								hashMapTeam.put(player.getUniqueId(), "zombie");
+								hashMapTeam.put(player.getUniqueId(), PlayerTeam.ZOMBIE);
 								zombies = zombies+1;
 								teams.get(hashMapTeam.get(player.getUniqueId())).setAllowFriendlyFire(false);
 								teams.get(hashMapTeam.get(player.getUniqueId())).addEntry(player.getName());
@@ -393,7 +401,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 								player.setPlayerListName(ChatColor.DARK_GREEN + player.getName());
 							} else if ((((int) Math.round(Bukkit.getOnlinePlayers().size() / 10) - zombies) >= 0) == false) {
 								players = players+1;
-								hashMapTeam.put(player.getUniqueId(), "player");
+								hashMapTeam.put(player.getUniqueId(), PlayerTeam.PLAYER);
 								teams.get(hashMapTeam.get(player.getUniqueId())).setAllowFriendlyFire(false);
 								teams.get(hashMapTeam.get(player.getUniqueId())).addEntry(player.getName());
 								player.setMaxHealth(1);
@@ -428,7 +436,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 							player.setGameMode(GameMode.ADVENTURE);
 							gameStarted = true;
 							player.playSound(player.getLocation(), Sound.ENDERDRAGON_GROWL, 100F, 1F);
-							if (hashMapTeam.get(player.getUniqueId()) == "zombie") {
+							if (hashMapTeam.get(player.getUniqueId()) == PlayerTeam.ZOMBIE) {
 								player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + "GO!", ChatColor.YELLOW + "目標: プレイヤーを全員倒すか先にゴールに到達する");
 								player.sendMessage(ChatColor.GRAY + "あと10秒後にワープします...");
 								new BukkitRunnable() {
@@ -452,7 +460,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 										}
 									}
 								}.runTaskLater(getInstance(), 20*10);
-							} else if (hashMapTeam.get(player.getUniqueId()) == "player") {
+							} else if (hashMapTeam.get(player.getUniqueId()) == PlayerTeam.PLAYER) {
 								new BukkitRunnable() {
 									public void run() {
 										Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "shot give " + player.getName() + " ak-47");
@@ -507,6 +515,10 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 					}
 					playedTime++;
 				}
+				if (debug) {
+					long end = System.currentTimeMillis()-time;
+					Log.debug("Scoreboard update tick took " + end + "ms");
+				}
 			}
 		}.runTaskTimer(this, 0, 20);
 	}
@@ -515,9 +527,9 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	public void onPlayerDeath(final PlayerDeathEvent event) {
 		if (event.getEntityType() != EntityType.PLAYER) return;
 		event.getEntity().getInventory().clear();
-		if (hashMapTeam.get(event.getEntity().getUniqueId()) == "player") players--;
+		if (hashMapTeam.get(event.getEntity().getUniqueId()) == PlayerTeam.PLAYER) players--;
 		hashMapTeam.remove(event.getEntity().getUniqueId());
-		hashMapTeam.put(event.getEntity().getUniqueId(), "zombie");
+		hashMapTeam.put(event.getEntity().getUniqueId(), PlayerTeam.ZOMBIE);
 		final Objective objective = hashMapScoreboard.get(event.getEntity().getUniqueId()).getObjective("scoreboard");
 		Score score6 = objective.getScore(ChatColor.GREEN + "    チーム: " + ChatColor.DARK_GREEN + "ゾンビ");
 		objective.getScoreboard().resetScores(ChatColor.GREEN + "    チーム: " + ChatColor.AQUA + "プレイヤー");
@@ -570,17 +582,18 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	@SuppressWarnings("deprecation")
 	@EventHandler(priority=EventPriority.HIGHEST)
 	public void onPlayerHurt(EntityDamageByEntityEvent event) {
+		long time = System.currentTimeMillis();
 		if (event.getEntityType() != EntityType.PLAYER || event.getDamager().getType() != EntityType.PLAYER) return;
 		event.setCancelled(true);
 		if (!gameStarted || gameEnded) return;
-		if (hashMapTeam.get(event.getDamager().getUniqueId()) == "zombie" && playedTime < 10) return;
-		if (hashMapTeam.get(event.getEntity().getUniqueId()) == "zombie") return;
+		if (hashMapTeam.get(event.getDamager().getUniqueId()) == PlayerTeam.ZOMBIE && playedTime < 10) return;
+		if (hashMapTeam.get(event.getEntity().getUniqueId()) == PlayerTeam.ZOMBIE) return;
 		if (hashMapTeam.get(event.getDamager().getUniqueId()) == hashMapTeam.get(event.getEntity().getUniqueId())) return;
 		Player player = (Player) event.getEntity();
 		player.getInventory().clear();
-		if (hashMapTeam.get(player.getUniqueId()) == "player") players--;
+		if (hashMapTeam.get(player.getUniqueId()) == PlayerTeam.PLAYER) players--;
 		hashMapTeam.remove(player.getUniqueId());
-		hashMapTeam.put(player.getUniqueId(), "zombie");
+		hashMapTeam.put(player.getUniqueId(), PlayerTeam.ZOMBIE);
 		final Objective objective = hashMapScoreboard.get(player.getUniqueId()).getObjective("scoreboard");
 		Score score6 = objective.getScore(ChatColor.GREEN + "    チーム: " + ChatColor.DARK_GREEN + "ゾンビ");
 		objective.getScoreboard().resetScores(ChatColor.GREEN + "    チーム: " + ChatColor.AQUA + "プレイヤー");
@@ -617,6 +630,10 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		if (players == 0 && gameStarted) {
 			endGame("ゾンビ");
 		}
+		if (debug) {
+			long end = System.currentTimeMillis()-time;
+			Log.debug("onPlayerHurt() took " + end + "ms");
+		}
 	}
 
 	@EventHandler(priority=EventPriority.HIGHEST)
@@ -624,7 +641,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		if (event.getEntityType() != EntityType.PLAYER) return;
 		if (!gameStarted || gameEnded) event.setCancelled(true);
 		if (event.getCause() == DamageCause.FALL) event.setCancelled(true);
-		if (hashMapTeam.get(event.getEntity().getUniqueId()) == "player" && event.getCause() == DamageCause.PROJECTILE) event.setCancelled(true);
+		if (hashMapTeam.get(event.getEntity().getUniqueId()) == PlayerTeam.PLAYER && event.getCause() == DamageCause.PROJECTILE) event.setCancelled(true);
 	}
 
 	@EventHandler
@@ -633,7 +650,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			hasEnoughPlayers = false;
 			timesLeft = 180;
 		}
-		if (hashMapTeam.get(event.getPlayer().getUniqueId()) == "zombie") zombies--; else players--;
+		if (hashMapTeam.get(event.getPlayer().getUniqueId()) == PlayerTeam.ZOMBIE) zombies--; else players--;
 		if (gameStarted && zombies < 0) throw new IllegalStateException("Zombie count is should be 0 or more.");
 		if (gameStarted && players < 0) throw new IllegalStateException("Player count is should be 0 or more.");
 		hashMapTeam.remove(event.getPlayer().getUniqueId());
@@ -654,6 +671,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 
 	@EventHandler
 	public void onProjectileHit(ProjectileHitEvent event) {
+		long time = System.currentTimeMillis();
 		Location Llocation = new Location(
 				event.getEntity().getLocation().getWorld(),
 				Math.nextUp(event.getEntity().getLocation().getX()),
@@ -701,15 +719,15 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				}
 			}
 		}
+		if (debug) {
+			long end = System.currentTimeMillis()-time;
+			Log.debug("onProjectileHit() took " + end + "ms");
+		}
 	}
 
 	@EventHandler
 	public void onBlockBreak(BlockBreakEvent event) {
-		if (gameStarted) {
-			if (hashMapTeam.get(event.getPlayer().getUniqueId()) == "zombie") {
-
-			}
-		}
+		long time = System.currentTimeMillis();
 		Block block = event.getBlock();
 		if (block == null) return;
 		String location = block.getLocation().getBlockX() + "," + block.getLocation().getBlockY() + "," + block.getLocation().getBlockZ();
@@ -725,6 +743,10 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			} catch (InvocationTargetException e) {
 				e.printStackTrace();
 			}
+		}
+		if (debug) {
+			long end = System.currentTimeMillis()-time;
+			Log.debug("onBlockBreak() took " + end + "ms");
 		}
 	}
 
@@ -756,13 +778,13 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		if (event.getMessage().equalsIgnoreCase("gg") || event.getMessage().equalsIgnoreCase("good game")) {
 			event.setMessage(ChatColor.GOLD + event.getMessage());
 		}
-		if (hashMapTeam.get(event.getPlayer().getUniqueId()) == "zombie") {
+		if (hashMapTeam.get(event.getPlayer().getUniqueId()) == PlayerTeam.ZOMBIE) {
 			if (event.getMessage().startsWith("!") || gameEnded || !gameStarted) {
 				event.setMessage(event.getMessage().replaceFirst("!", ""));
 				event.setFormat(ChatColor.RED + "[All] " + ChatColor.DARK_GREEN + "[Z] " + event.getPlayer().getName() + ChatColor.RESET + ChatColor.WHITE + ": " + event.getMessage());
 			} else {
 				hashMapTeam.forEach((uuid, team) -> {
-					if (team != "zombie") return;
+					if (team != PlayerTeam.ZOMBIE) return;
 					for (Player player : Bukkit.getOnlinePlayers()) {
 						if (player.getUniqueId().equals(uuid)) {
 							player.sendMessage(ChatColor.AQUA + "[チーム] " +  ChatColor.DARK_GREEN + "[Z] " + event.getPlayer().getName() + ChatColor.RESET + ChatColor.WHITE + ": " + event.getMessage());
@@ -777,7 +799,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				event.setFormat(ChatColor.RED + "[All] " + ChatColor.AQUA + "[P] " + event.getPlayer().getName() + ChatColor.RESET + ChatColor.WHITE + ": " + event.getMessage());
 			} else {
 				hashMapTeam.forEach((uuid, team) -> {
-					if (team != "player") return;
+					if (team != PlayerTeam.PLAYER) return;
 					for (Player player : Bukkit.getOnlinePlayers()) {
 						if (player.getUniqueId().equals(uuid)) {
 							player.sendMessage(ChatColor.AQUA + "[チーム] " +  ChatColor.AQUA + "[P] " + event.getPlayer().getName() + ChatColor.RESET + ChatColor.WHITE + ": " + event.getMessage());
@@ -847,7 +869,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		for(Player p : loc.getWorld().getPlayers()){
 			Log.info("team: " + hashMapTeam.get(p.getUniqueId()));
 			Log.info("distance: " + loc.distance(p.getLocation()));
-			if (!hashMapTeam.get(p.getUniqueId()).equalsIgnoreCase("player")) continue;
+			if (!(hashMapTeam.get(p.getUniqueId()) == PlayerTeam.PLAYER)) continue;
 			double distanceSqrd = loc.distance(p.getLocation());
 			if (distanceSqrd > 10) continue;
 			if(distanceSqrd < lastDistance){
