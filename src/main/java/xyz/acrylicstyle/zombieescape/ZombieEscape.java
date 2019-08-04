@@ -385,6 +385,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 						player.setScoreboard(hashMapScoreboard.get(player.getUniqueId()));
 						if (timesLeft == 5) {
 							players = 0;
+							zombies = 0;
 							board.resetScores(playerMessage);
 							if ((((int) Math.round(Bukkit.getOnlinePlayers().size() / 10) - zombies) >= 0) == true) {
 								hashMapOriginZombie.put(player.getUniqueId(), true);
@@ -484,6 +485,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 					}
 					if (hasEnoughPlayers && timesLeft >= 0 && settingsCheck) timesLeft--;
 				} else if (gameStarted) {
+					if (debug) Log.debug("Players: " + players + ", Zombies: " + zombies);
 					if (playedTime >= gameTime) {
 						endGame("ゾンビ");
 						this.cancel();
@@ -656,7 +658,11 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			hasEnoughPlayers = false;
 			timesLeft = 180;
 		}
-		if (hashMapTeam.get(event.getPlayer().getUniqueId()) == PlayerTeam.ZOMBIE) zombies--; else players--;
+		if (hashMapTeam.get(event.getPlayer().getUniqueId()) == PlayerTeam.ZOMBIE) {
+			zombies = zombies - 1;
+		} else {
+			players = players - 1;
+		}
 		if (gameStarted && zombies < 0) throw new IllegalStateException("Zombie count is should be 0 or more.");
 		if (gameStarted && players < 0) throw new IllegalStateException("Player count is should be 0 or more.");
 		hashMapTeam.remove(event.getPlayer().getUniqueId());
