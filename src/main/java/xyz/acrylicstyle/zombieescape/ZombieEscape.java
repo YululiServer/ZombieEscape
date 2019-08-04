@@ -193,6 +193,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	public static void reload() {
 		ZombieEscape.config.reloadWithoutException();
 		ZombieEscape.mapConfig.reloadWithoutException();
+		mapName = config.getString("map", "world");
 		locationWall = ConfigProvider.getConfigSectionValue(mapConfig.get("locationWall", new HashMap<String, Object>()), true);
 		maxCheckpoints = Math.min(mapConfig.getStringList("spawnPoints.player").size(), mapConfig.getStringList("spawnPoints.zombie").size());
 		debug = config.getBoolean("debug", false);
