@@ -442,8 +442,8 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 									teams.get(hashMapTeam.get(player.getUniqueId()).toString()).addEntry(player.getName());
 									Score score6 = objective.getScore(ChatColor.GREEN + "    チーム: " + ChatColor.DARK_GREEN + "ゾンビ");
 									score6.setScore(6);
-									player.setMaxHealth(200);
-									player.setHealth(200);
+									player.setMaxHealth(150);
+									player.setHealth(150);
 									player.setHealthScale(40);
 									player.getInventory().setHelmet(createLeatherItemStack(Material.LEATHER_HELMET, 0, 100, 0));
 									player.getInventory().setChestplate(createLeatherItemStack(Material.LEATHER_CHESTPLATE, 0, 100, 0));
@@ -606,8 +606,8 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		event.getPlayer().getInventory().setChestplate(createLeatherItemStack(Material.LEATHER_CHESTPLATE, 0, 100, 0));
 		event.getPlayer().getInventory().setLeggings(createLeatherItemStack(Material.LEATHER_LEGGINGS, 0, 100, 0));
 		event.getPlayer().getInventory().setBoots(createLeatherItemStack(Material.LEATHER_BOOTS, 0, 100, 0));
-		event.getPlayer().setMaxHealth(200);
-		event.getPlayer().setHealth(200);
+		event.getPlayer().setMaxHealth(150);
+		event.getPlayer().setHealth(150);
 		event.getPlayer().setHealthScale(40);
 		new BukkitRunnable() {
 			public void run() {
@@ -659,8 +659,8 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		player.getInventory().setChestplate(createLeatherItemStack(Material.LEATHER_CHESTPLATE, 0, 100, 0));
 		player.getInventory().setLeggings(createLeatherItemStack(Material.LEATHER_LEGGINGS, 0, 100, 0));
 		player.getInventory().setBoots(createLeatherItemStack(Material.LEATHER_BOOTS, 0, 100, 0));
-		player.setMaxHealth(200);
-		player.setHealth(200);
+		player.setMaxHealth(150);
+		player.setHealth(150);
 		player.setHealthScale(40);
 		new BukkitRunnable() {
 			public void run() {
