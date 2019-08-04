@@ -344,6 +344,21 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				event.getPlayer().sendMessage(ChatColor.YELLOW + "チャットはデフォルトで" + ChatColor.AQUA + "[チーム]" + ChatColor.YELLOW + "チャットです。");
 				event.getPlayer().sendMessage(ChatColor.YELLOW + "'!'をチャットの先頭につけると" + ChatColor.RED + "[All]" + ChatColor.YELLOW + "(全体)チャットになります。");
 				event.getPlayer().sendMessage(ChatColor.BLUE + "--------------------------------------------------");
+				if (event.getPlayer().isOp()) {
+					event.getPlayer().sendMessage(ChatColor.BLUE + "--------------------------------------------------");
+					event.getPlayer().sendMessage(ChatColor.DARK_GREEN + "          - OP用コマンド -");
+					event.getPlayer().sendMessage(ChatColor.GREEN + "/setmap <マップ> - プレイするマップを設定します。全プレイヤーがキックされます。*ここで指定するマップはマップ名ではありません*");
+					event.getPlayer().sendMessage(ChatColor.GREEN + "/setstatus - ゲームに関する設定を変更します。");
+					event.getPlayer().sendMessage(ChatColor.GREEN + "/sponsor <プレイヤー> - 指定したプレイヤーをスポンサーとして登録します。");
+					event.getPlayer().sendMessage(ChatColor.GREEN + "/removesponsor <プレイヤー> - 指定したプレイヤーをスポンサーから削除します。");
+					event.getPlayer().sendMessage(ChatColor.GREEN + "/setcp <数値> - チェックポイントを設定します。");
+					event.getPlayer().sendMessage(ChatColor.GREEN + "/startgame - ゲーム開始までのカウントダウンを6秒に設定します。" + ChatColor.AQUA + "/setstatus timesLeft 6" + ChatColor.GREEN + "と同等です。");
+					event.getPlayer().sendMessage(ChatColor.GREEN + "/endgame - ゲームが開始している場合、ゲームを終了します。");
+					event.getPlayer().sendMessage("");
+					event.getPlayer().sendMessage("" + ChatColor.RED + ChatColor.BOLD + "これらのOP用コマンドの乱用は禁止されています。");
+					event.getPlayer().sendMessage("" + ChatColor.RED + ChatColor.BOLD + "乱用した場合、OP権限の剥奪や、BANが行われます。");
+					event.getPlayer().sendMessage(ChatColor.BLUE + "--------------------------------------------------");
+				}
 				if (gameStarted) {
 					event.getPlayer().sendMessage(ChatColor.RED + "ゲームはすでに開始しています！");
 					event.getPlayer().setGameMode(GameMode.SPECTATOR);
