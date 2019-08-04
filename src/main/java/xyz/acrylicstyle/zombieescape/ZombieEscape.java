@@ -386,6 +386,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 						player.setScoreboard(hashMapScoreboard.get(player.getUniqueId()));
 						if (timesLeft == 5) {
 							if (!playersReset) {
+								playersReset = true;
 								players = 0;
 								zombies = 0;
 							}
