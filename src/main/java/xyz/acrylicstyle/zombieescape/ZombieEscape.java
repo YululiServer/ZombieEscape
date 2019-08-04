@@ -357,6 +357,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				event.getPlayer().sendMessage(ChatColor.YELLOW + "チームはゲーム開始5秒前に決定されます。");
 				event.getPlayer().sendMessage(ChatColor.YELLOW + "チャットはデフォルトで" + ChatColor.AQUA + "[チーム]" + ChatColor.YELLOW + "チャットです。");
 				event.getPlayer().sendMessage(ChatColor.YELLOW + "'!'をチャットの先頭につけると" + ChatColor.RED + "[All]" + ChatColor.YELLOW + "(全体)チャットになります。");
+				event.getPlayer().sendMessage(ChatColor.DARK_GREEN + "[Z] = ゾンビ " + ChatColor.AQUA + "[P] = プレイヤー " + ChatColor.GRAY + "[S] = スペクテイター");
 				event.getPlayer().sendMessage(ChatColor.BLUE + "--------------------------------------------------");
 				if (event.getPlayer().isOp()) {
 					event.getPlayer().sendMessage(ChatColor.BLUE + "--------------------------------------------------");
@@ -528,18 +529,14 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 									}
 								}.runTaskLater(getInstance(), 20*12);
 							} else if (hashMapTeam.get(player.getUniqueId()) == PlayerTeam.PLAYER) {
-								new BukkitRunnable() {
-									public void run() {
-										Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "shot give " + player.getName() + " ak-47");
-										player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + "GO!", ChatColor.YELLOW + "目標: ゾンビから逃げ、ゾンビよりも先にゴールに到達する");
-										String[] spawnLists = Arrays.asList(mapConfig.getList("spawnPoints.player", new ArrayList<String>()).toArray(new String[0])).get(0).split(",");
-										Location location = new Location(Bukkit.getWorld(mapConfig.getString("spawnPoints.world")), Double.parseDouble(spawnLists[0]), Double.parseDouble(spawnLists[1]), Double.parseDouble(spawnLists[2]));
-										if (!player.teleport(location)) {
-											player.sendMessage(ChatColor.RED + "ワープに失敗しました。");
-											return;
-										}
-									}
-								}.runTaskLater(getInstance(), 10);
+								Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "shot give " + player.getName() + " ak-47");
+								player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + "GO!", ChatColor.YELLOW + "目標: ゾンビから逃げ、ゾンビよりも先にゴールに到達する");
+								String[] spawnLists = Arrays.asList(mapConfig.getList("spawnPoints.player", new ArrayList<String>()).toArray(new String[0])).get(0).split(",");
+								Location location = new Location(Bukkit.getWorld(mapConfig.getString("spawnPoints.world")), Double.parseDouble(spawnLists[0]), Double.parseDouble(spawnLists[1]), Double.parseDouble(spawnLists[2]));
+								if (!player.teleport(location)) {
+									player.sendMessage(ChatColor.RED + "ワープに失敗しました。");
+									return;
+								}
 							} else {
 								player.setGameMode(GameMode.SPECTATOR);
 							}
@@ -742,11 +739,16 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	}
 
 	public ItemStack createLeatherItemStack(Material material, int red, int green, int blue) {
+		long time = System.nanoTime();
 		ItemStack item = new ItemStack(material);
 		LeatherArmorMeta lam = (LeatherArmorMeta) item.getItemMeta();
 		lam.setColor(Color.fromRGB(red, green, blue));
 		item.setItemMeta(lam);
 		item.addUnsafeEnchantment(Enchantment.DURABILITY, 100);
+		if (debug) {
+			long end = System.nanoTime()-time;
+			Log.debug("createLeatherItemStack() took " + end + "ns");
+		}
 		return item;
 	}
 
@@ -854,69 +856,42 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		}
 	}
 
+	private void chat(AsyncPlayerChatEvent event, PlayerTeam pteam, String teamname) {
+		if (event.getMessage().startsWith("!") || gameEnded || !gameStarted) {
+			event.setMessage(event.getMessage().replaceFirst("!", ""));
+			event.setFormat(ChatColor.RED + "[All] " + teamname + " " + event.getPlayer().getName() + ChatColor.RESET + ChatColor.WHITE + ": " + event.getMessage());
+		} else {
+			hashMapTeam.forEach((uuid, team) -> {
+				if (team != pteam) return;
+				for (Player player : Bukkit.getOnlinePlayers()) {
+					if (player.getUniqueId().equals(uuid)) {
+						player.sendMessage(ChatColor.AQUA + "[チーム] " + teamname + " " + event.getPlayer().getName() + ChatColor.RESET + ChatColor.WHITE + ": " + event.getMessage());
+					}
+				}
+			});
+			event.setCancelled(true);
+		}
+	}
+
 	@EventHandler(priority=EventPriority.HIGHEST)
 	public void onPlayerChat(AsyncPlayerChatEvent event) {
 		if (event.getMessage().equalsIgnoreCase("gg") || event.getMessage().equalsIgnoreCase("good game")) {
 			event.setMessage(ChatColor.GOLD + event.getMessage());
 		}
 		if (hashMapTeam.get(event.getPlayer().getUniqueId()) == PlayerTeam.ZOMBIE) {
-			if (event.getMessage().startsWith("!") || gameEnded || !gameStarted) {
-				event.setMessage(event.getMessage().replaceFirst("!", ""));
-				event.setFormat(ChatColor.RED + "[All] " + ChatColor.DARK_GREEN + "[Z] " + event.getPlayer().getName() + ChatColor.RESET + ChatColor.WHITE + ": " + event.getMessage());
-			} else {
-				hashMapTeam.forEach((uuid, team) -> {
-					if (team != PlayerTeam.ZOMBIE) return;
-					for (Player player : Bukkit.getOnlinePlayers()) {
-						if (player.getUniqueId().equals(uuid)) {
-							player.sendMessage(ChatColor.AQUA + "[チーム] " +  ChatColor.DARK_GREEN + "[Z] " + event.getPlayer().getName() + ChatColor.RESET + ChatColor.WHITE + ": " + event.getMessage());
-						}
-					}
-				});
-				event.setCancelled(true);
-			}
+			chat(event, PlayerTeam.ZOMBIE, ChatColor.DARK_GREEN + "[Z]");
 		} else if (hashMapTeam.get(event.getPlayer().getUniqueId()) == PlayerTeam.PLAYER) {
-			if (event.getMessage().startsWith("!") || gameEnded || !gameStarted) {
-				event.setMessage(event.getMessage().replaceFirst("!", ""));
-				event.setFormat(ChatColor.RED + "[All] " + ChatColor.AQUA + "[P] " + event.getPlayer().getName() + ChatColor.RESET + ChatColor.WHITE + ": " + event.getMessage());
-			} else {
-				hashMapTeam.forEach((uuid, team) -> {
-					if (team != PlayerTeam.PLAYER) return;
-					for (Player player : Bukkit.getOnlinePlayers()) {
-						if (player.getUniqueId().equals(uuid)) {
-							player.sendMessage(ChatColor.AQUA + "[チーム] " +  ChatColor.AQUA + "[P] " + event.getPlayer().getName() + ChatColor.RESET + ChatColor.WHITE + ": " + event.getMessage());
-						}
-					}
-				});
-				event.setCancelled(true);
-			}
-		} else { // Spectator
-			if (event.getMessage().startsWith("!") || gameEnded || !gameStarted) {
-				event.setMessage(event.getMessage().replaceFirst("!", ""));
-				event.setFormat(ChatColor.RED + "[All] " + ChatColor.GRAY + "[S] " + event.getPlayer().getName() + ChatColor.RESET + ChatColor.WHITE + ": " + event.getMessage());
-			} else {
-				hashMapTeam.forEach((uuid, team) -> {
-					if (team != PlayerTeam.SPECTATOR) return;
-					for (Player player : Bukkit.getOnlinePlayers()) {
-						if (player.getUniqueId().equals(uuid)) {
-							player.sendMessage(ChatColor.AQUA + "[チーム] " +  ChatColor.GRAY + "[S] " + event.getPlayer().getName() + ChatColor.RESET + ChatColor.WHITE + ": " + event.getMessage());
-						}
-					}
-				});
-				event.setCancelled(true);
-			}
+			chat(event, PlayerTeam.PLAYER, ChatColor.AQUA + "[P]");
+		} else {
+			chat(event, PlayerTeam.SPECTATOR, ChatColor.GRAY + "[S]");
 		}
 	}
 
 	@EventHandler
-	/**
-	 * Cancel the click event when player has clicked armor slot to prevents wear off their armors.
-	 */
-	public void onInventoryClick(InventoryClickEvent event) {
-		if (event.getSlotType() == SlotType.ARMOR) event.setCancelled(true);
-	}
+	public void onInventoryClick(InventoryClickEvent event) { if (event.getSlotType() == SlotType.ARMOR) event.setCancelled(true); }
 
 	@EventHandler
-	public void onWeatherChange(WeatherChangeEvent e){
+	public void onWeatherChange(WeatherChangeEvent e) {
 		World world = e.getWorld();
 		if (world.hasStorm()) {
 			world.setWeatherDuration(1);
@@ -930,7 +905,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		knifemeta.setDisplayName("" + ChatColor.RESET + ChatColor.WHITE + "ナイフ");
 		knifeitem.setItemMeta(knifemeta);
 		knifeitem.addUnsafeEnchantment(Enchantment.DURABILITY, 100); // Always sharp!
-		knifeitem.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 100); // *stabs someone*
+		knifeitem.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 100); // *stabs someone* *bleeding blood from the someone's heart*
 		if (event.getItemDrop().getItemStack().isSimilar(knifeitem)) event.setCancelled(true); // Please don't drop knife, its dangerous
 		if (event.getItemDrop().getItemStack().isSimilar(new ItemStack(Material.DIAMOND_HELMET))) event.setCancelled(true); // armor
 		if (event.getItemDrop().getItemStack().isSimilar(new ItemStack(Material.DIAMOND_CHESTPLATE))) event.setCancelled(true); // armor
