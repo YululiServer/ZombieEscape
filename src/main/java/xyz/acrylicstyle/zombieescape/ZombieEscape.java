@@ -217,7 +217,11 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		long time = System.currentTimeMillis();
 		if (!gameStarted) players = players + 1;
 		World world = Bukkit.getWorld(mapConfig.getString("spawnPoints.world", "world"));
-		event.getPlayer().teleport(world.getSpawnLocation());
+		new BukkitRunnable() {
+			public void run() {
+				event.getPlayer().teleport(world.getSpawnLocation());
+			}
+		}.runTask(this);
 		hashMapTeam.put(event.getPlayer().getUniqueId(), PlayerTeam.PLAYER);
 		lockActionBar.put(event.getPlayer().getUniqueId(), false);
 		new BukkitRunnable() {
