@@ -384,8 +384,8 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 								hashMapOriginZombie.put(player.getUniqueId(), true);
 								hashMapTeam.put(player.getUniqueId(), PlayerTeam.ZOMBIE);
 								zombies = zombies+1;
-								teams.get(hashMapTeam.get(player.getUniqueId())).setAllowFriendlyFire(false);
-								teams.get(hashMapTeam.get(player.getUniqueId())).addEntry(player.getName());
+								teams.get(hashMapTeam.get(player.getUniqueId()).toString()).setAllowFriendlyFire(false);
+								teams.get(hashMapTeam.get(player.getUniqueId()).toString()).addEntry(player.getName());
 								Score score6 = objective.getScore(ChatColor.GREEN + "    チーム: " + ChatColor.DARK_GREEN + "ゾンビ");
 								score6.setScore(6);
 								player.setMaxHealth(200);
@@ -402,8 +402,8 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 							} else if ((((int) Math.round(Bukkit.getOnlinePlayers().size() / 10) - zombies) >= 0) == false) {
 								players = players+1;
 								hashMapTeam.put(player.getUniqueId(), PlayerTeam.PLAYER);
-								teams.get(hashMapTeam.get(player.getUniqueId())).setAllowFriendlyFire(false);
-								teams.get(hashMapTeam.get(player.getUniqueId())).addEntry(player.getName());
+								teams.get(hashMapTeam.get(player.getUniqueId()).toString()).setAllowFriendlyFire(false);
+								teams.get(hashMapTeam.get(player.getUniqueId()).toString()).addEntry(player.getName());
 								player.setMaxHealth(1);
 								player.setHealth(1);
 								player.setHealthScale(1);
