@@ -81,7 +81,6 @@ import xyz.acrylicstyle.zombieescape.commands.ZombieEscapeGameUtil;
 import xyz.acrylicstyle.zombieescape.data.Constants;
 import xyz.acrylicstyle.zombieescape.effects.ActionBar;
 
-@SuppressWarnings("depression")
 public class ZombieEscape extends JavaPlugin implements Listener {
 	public final static int mininumPlayers = 2;
 	public static ConfigProvider config = null;
