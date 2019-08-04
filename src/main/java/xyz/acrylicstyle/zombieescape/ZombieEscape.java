@@ -605,6 +605,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		player.getInventory().clear();
 		if (hashMapTeam.get(player.getUniqueId()) == PlayerTeam.PLAYER) {
 			players = players - 1;
+			zombies = zombies + 1;
 		}
 		hashMapTeam.remove(player.getUniqueId());
 		hashMapTeam.put(player.getUniqueId(), PlayerTeam.ZOMBIE);
