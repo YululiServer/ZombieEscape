@@ -110,7 +110,7 @@ public class ZombieEscapeConfig {
 	public final class SetMap implements CommandExecutor {
 		@Override
 		public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-			if (ZombieEscape.gameStarted) {
+			if (ZombieEscape.gameStarted || ZombieEscape.timesLeft < 6) {
 				sender.sendMessage(ChatColor.RED + "ゲームがすでに開始しているので設定できません！");
 				return true;
 			}
