@@ -1059,7 +1059,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			if (players.size() != 0) {
 				Bukkit.broadcastMessage(ChatColor.GREEN + "下記のプレイヤーの勝ち！:");
 				players.forEach(player -> {
-					Bukkit.broadcastMessage(ChatColor.GREEN + " - " + player.getUniqueId());
+					Bukkit.broadcastMessage(ChatColor.GREEN + " - " + player.getName());
 				});
 			}
 			endGame(team);
