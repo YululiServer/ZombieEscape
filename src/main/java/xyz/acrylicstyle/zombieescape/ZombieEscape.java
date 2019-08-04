@@ -45,6 +45,7 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType.SlotType;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
@@ -150,11 +151,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			e.getCause().printStackTrace();
 		}
 		if (sponsor != null && zec != null && zegu != null) {
-			//if (config.getStringList("disabledcommands") != null) {
-			//	config.getStringList("disabledcommands").forEach(cmd -> {
-			//		Bukkit.getPluginCommand(cmd).setExecutor(new Holder());
-			//	});
-			//}
 			Bukkit.getPluginCommand("setsponsor").setExecutor(sponsor.new SetSponsor());
 			Bukkit.getPluginCommand("removesponsor").setExecutor(sponsor.new RemoveSponsor());
 			Bukkit.getPluginCommand("setspawn").setExecutor(zec.new SetSpawn());
@@ -195,6 +191,17 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		maxCheckpoints = Math.min(mapConfig.getStringList("spawnPoints.player").size(), mapConfig.getStringList("spawnPoints.zombie").size());
 		locationWall = ConfigProvider.getConfigSectionValue(mapConfig.get("locationWall", new HashMap<String, Object>()), true);
 		Bukkit.getLogger().info("[ZombieEscape] Enabled Zombie Escape");
+	}
+
+	@EventHandler
+	public void onCommand(PlayerCommandPreprocessEvent e){
+		List<String> cmds = config.getStringList("disabledcommands");
+		cmds.forEach(cmd -> {
+			if (e.getMessage().startsWith(cmd) || e.getMessage().startsWith("/" + cmd)) {
+				e.getPlayer().sendMessage(ChatColor.RED + "このコマンドは無効化されています。");
+				e.setCancelled(true);
+			}
+		});
 	}
 
 	public static void reload() {
