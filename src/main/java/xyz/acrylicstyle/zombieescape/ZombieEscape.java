@@ -491,7 +491,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 							player.playSound(player.getLocation(), Sound.ENDERDRAGON_GROWL, 100, 1);
 							if (hashMapTeam.get(player.getUniqueId()) == PlayerTeam.ZOMBIE) {
 								player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + "GO!", ChatColor.YELLOW + "目標: プレイヤーを全員倒すか先にゴールに到達する");
-								player.sendMessage(ChatColor.GRAY + "あと8秒後にワープします...");
+								player.sendMessage(ChatColor.GRAY + "あと12秒後にワープします...");
 								new BukkitRunnable() {
 									@Override
 									public void run() {
@@ -512,7 +512,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 											return;
 										}
 									}
-								}.runTaskLater(getInstance(), 20*8);
+								}.runTaskLater(getInstance(), 20*12);
 							} else if (hashMapTeam.get(player.getUniqueId()) == PlayerTeam.PLAYER) {
 								new BukkitRunnable() {
 									public void run() {
