@@ -226,7 +226,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	@EventHandler
 	public synchronized void onPlayerJoin(final PlayerJoinEvent event) {
 		long time = System.currentTimeMillis();
-		if (!gameStarted) players = players + 1;
+		if (!gameStarted && timesLeft >= 7) players = players + 1;
 		World world = Bukkit.getWorld(mapConfig.getString("spawnPoints.world", "world"));
 		new BukkitRunnable() {
 			public void run() {
@@ -359,10 +359,11 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 					event.getPlayer().sendMessage("" + ChatColor.RED + "乱用した場合、OP権限の剥奪や、BANが行われます。");
 					event.getPlayer().sendMessage(ChatColor.BLUE + "--------------------------------------------------");
 				}
-				if (gameStarted) {
+				if (gameStarted || timesLeft < 6) {
 					event.getPlayer().sendMessage(ChatColor.RED + "ゲームはすでに開始しています！");
 					event.getPlayer().setGameMode(GameMode.SPECTATOR);
 					event.getPlayer().setPlayerListName(ChatColor.WHITE + event.getPlayer().getName());
+					hashMapTeam.put(event.getPlayer().getUniqueId(), PlayerTeam.SPECTATOR);
 					return;
 				}
 			}
@@ -389,6 +390,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				}
 				final String zombieMessage = ChatColor.GREEN + "    チーム: " + ChatColor.DARK_GREEN + "ゾンビ";
 				final String playerMessage = ChatColor.GREEN + "    チーム: " + ChatColor.AQUA + "プレイヤー";
+				final String spectatorMessage = ChatColor.GREEN + "    チーム: " + ChatColor.GRAY + "スペクテイター";
 				if (!gameStarted) {
 					for (final Player player : Bukkit.getOnlinePlayers()) {
 						Scoreboard scoreboard = hashMapScoreboard.get(player.getUniqueId());
@@ -412,11 +414,15 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 						score4.setScore(4);
 						scoreboard.resetScores(zombieMessage);
 						scoreboard.resetScores(playerMessage);
+						scoreboard.resetScores(spectatorMessage);
 						if (hashMapTeam.get(player.getUniqueId()) == PlayerTeam.ZOMBIE) {
 							Score score6 = objective3.getScore(zombieMessage);
 							score6.setScore(6);
 						} else if (hashMapTeam.get(player.getUniqueId()) == PlayerTeam.PLAYER) {
 							Score score6 = objective3.getScore(playerMessage);
+							score6.setScore(6);
+						} else { // spectator
+							Score score6 = objective3.getScore(spectatorMessage);
 							score6.setScore(6);
 						}
 						player.setScoreboard(hashMapScoreboard.get(player.getUniqueId()));
@@ -427,43 +433,43 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 								zombies = 0;
 							}
 							board.resetScores(playerMessage);
-							if (((int) Math.round((double) Bukkit.getOnlinePlayers().size() / (double) 10) - zombies) >= 0) {
-								hashMapOriginZombie.put(player.getUniqueId(), true);
-								hashMapTeam.put(player.getUniqueId(), PlayerTeam.ZOMBIE);
-								zombies = zombies+1;
-								teams.get(hashMapTeam.get(player.getUniqueId()).toString()).setAllowFriendlyFire(false);
-								teams.get(hashMapTeam.get(player.getUniqueId()).toString()).addEntry(player.getName());
-								Score score6 = objective.getScore(ChatColor.GREEN + "    チーム: " + ChatColor.DARK_GREEN + "ゾンビ");
-								score6.setScore(6);
-								player.setMaxHealth(200);
-								player.setHealth(200);
-								player.setHealthScale(40);
-								player.getInventory().setHelmet(createLeatherItemStack(Material.LEATHER_HELMET, 0, 100, 0));
-								player.getInventory().setChestplate(createLeatherItemStack(Material.LEATHER_CHESTPLATE, 0, 100, 0));
-								player.getInventory().setLeggings(createLeatherItemStack(Material.LEATHER_LEGGINGS, 0, 100, 0));
-								player.getInventory().setBoots(createLeatherItemStack(Material.LEATHER_BOOTS, 0, 100, 0));
-								player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100000, 1, false, false));
-								player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 100000, 0, false, false));
-								player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 100000, 100, false, false));
-								player.setPlayerListName(ChatColor.DARK_GREEN + player.getName());
-							} else {
-								players = players+1;
-								hashMapTeam.put(player.getUniqueId(), PlayerTeam.PLAYER);
-								teams.get(hashMapTeam.get(player.getUniqueId()).toString()).setAllowFriendlyFire(false);
-								teams.get(hashMapTeam.get(player.getUniqueId()).toString()).addEntry(player.getName());
-								player.setMaxHealth(1);
-								player.setHealth(1);
-								player.setHealthScale(1);
-								player.getInventory().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
-								player.getInventory().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
-								player.getInventory().setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
-								player.getInventory().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
-								player.removePotionEffect(PotionEffectType.INCREASE_DAMAGE);
-								Score score6 = objective.getScore(ChatColor.GREEN + "    チーム: " + ChatColor.AQUA + "プレイヤー");
-								score6.setScore(6);
-								player.setMaxHealth(1);
-								player.setHealth(1);
-								player.setPlayerListName(ChatColor.AQUA + player.getName());
+							if (hashMapTeam.get(event.getPlayer().getUniqueId()) != PlayerTeam.SPECTATOR) {
+								if (((int) Math.round((double) Bukkit.getOnlinePlayers().size() / (double) 10) - zombies) >= 0) {
+									hashMapOriginZombie.put(player.getUniqueId(), true);
+									hashMapTeam.put(player.getUniqueId(), PlayerTeam.ZOMBIE);
+									zombies = zombies+1;
+									teams.get(hashMapTeam.get(player.getUniqueId()).toString()).setAllowFriendlyFire(false);
+									teams.get(hashMapTeam.get(player.getUniqueId()).toString()).addEntry(player.getName());
+									Score score6 = objective.getScore(ChatColor.GREEN + "    チーム: " + ChatColor.DARK_GREEN + "ゾンビ");
+									score6.setScore(6);
+									player.setMaxHealth(200);
+									player.setHealth(200);
+									player.setHealthScale(40);
+									player.getInventory().setHelmet(createLeatherItemStack(Material.LEATHER_HELMET, 0, 100, 0));
+									player.getInventory().setChestplate(createLeatherItemStack(Material.LEATHER_CHESTPLATE, 0, 100, 0));
+									player.getInventory().setLeggings(createLeatherItemStack(Material.LEATHER_LEGGINGS, 0, 100, 0));
+									player.getInventory().setBoots(createLeatherItemStack(Material.LEATHER_BOOTS, 0, 100, 0));
+									player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100000, 1, false, false));
+									player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 100000, 0, false, false));
+									player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 100000, 100, false, false));
+									player.setPlayerListName(ChatColor.DARK_GREEN + player.getName());
+								} else {
+									players = players+1;
+									hashMapTeam.put(player.getUniqueId(), PlayerTeam.PLAYER);
+									teams.get(hashMapTeam.get(player.getUniqueId()).toString()).setAllowFriendlyFire(false);
+									teams.get(hashMapTeam.get(player.getUniqueId()).toString()).addEntry(player.getName());
+									player.setMaxHealth(1);
+									player.setHealth(1);
+									player.setHealthScale(1);
+									player.getInventory().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
+									player.getInventory().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
+									player.getInventory().setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
+									player.getInventory().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
+									player.removePotionEffect(PotionEffectType.INCREASE_DAMAGE);
+									Score score6 = objective.getScore(ChatColor.GREEN + "    チーム: " + ChatColor.AQUA + "プレイヤー");
+									score6.setScore(6);
+									player.setPlayerListName(ChatColor.AQUA + player.getName());
+								}
 							}
 							player.playSound(player.getLocation(), Sound.NOTE_STICKS, 100, 1);
 							player.sendTitle(ChatColor.GREEN + "5", ChatColor.YELLOW + "チーム: " + hashMapTeam.get(player.getUniqueId()));
@@ -482,7 +488,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 						} else if (timesLeft == 0) {
 							player.setGameMode(GameMode.ADVENTURE);
 							gameStarted = true;
-							player.playSound(player.getLocation(), Sound.ENDERDRAGON_GROWL, 100F, 1F);
+							player.playSound(player.getLocation(), Sound.ENDERDRAGON_GROWL, 100, 1);
 							if (hashMapTeam.get(player.getUniqueId()) == PlayerTeam.ZOMBIE) {
 								player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + "GO!", ChatColor.YELLOW + "目標: プレイヤーを全員倒すか先にゴールに到達する");
 								player.sendMessage(ChatColor.GRAY + "あと10秒後にワープします...");
@@ -520,6 +526,8 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 										}
 									}
 								}.runTaskLater(getInstance(), 10);
+							} else {
+								player.setGameMode(GameMode.SPECTATOR);
 							}
 						}
 					}
@@ -574,6 +582,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	@EventHandler
 	public void onPlayerDeath(final PlayerDeathEvent event) {
 		if (event.getEntityType() != EntityType.PLAYER) return;
+		if (hashMapTeam.get(event.getEntity().getUniqueId()) == PlayerTeam.SPECTATOR) return;
 		event.getEntity().getInventory().clear();
 		if (hashMapTeam.get(event.getEntity().getUniqueId()) == PlayerTeam.PLAYER) players--;
 		hashMapTeam.remove(event.getEntity().getUniqueId());
@@ -583,12 +592,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		objective.getScoreboard().resetScores(ChatColor.GREEN + "    チーム: " + ChatColor.AQUA + "プレイヤー");
 		score6.setScore(6);
 		event.getEntity().setPlayerListName(ChatColor.DARK_GREEN + event.getEntity().getName());
-		new BukkitRunnable() {
-			public void run() {
-				event.getEntity().spigot().respawn();
-			}
-		}.runTaskLater(this, 1000);
-		if (players == 0 && gameStarted) endGame("ゾンビ");
+		if (players <= 0 && gameStarted) endGame("ゾンビ");
 	}
 
 	@EventHandler
@@ -675,7 +679,9 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "give " + event.getEntity().getName() + " minecraft:stone_axe 1 0 {CanDestroy:[\"minecraft:grass\",\"minecraft:planks\",\"minecraft:dirt\"],HideFlags:1,Unbreakable:1,display:{Name:\"錆びついた斧\"},ench:[{id:32,lvl:10}]}");
 			}
 		}.runTaskLater(this, 40);
-		player.playSound(player.getLocation(), Sound.ENDERDRAGON_GROWL, 100, 1);
+		for (Player player2 : Bukkit.getOnlinePlayers()) {
+			player2.playSound(player2.getLocation(), Sound.ENDERDRAGON_GROWL, 80, 1); // avoid loud sound, it's 80%!
+		}
 		player.sendTitle(ChatColor.DARK_GREEN + "ゾンビチームになった！", "");
 		Bukkit.broadcastMessage(ChatColor.DARK_GREEN + player.getName() + "が" + event.getDamager().getName() + "によってゾンビにされた。");
 		if (players <= 0 && gameStarted) {
@@ -703,9 +709,9 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		}
 		if (hashMapTeam.get(event.getPlayer().getUniqueId()) == PlayerTeam.ZOMBIE) {
 			zombies = zombies - 1;
-		} else {
+		} else if(hashMapTeam.get(event.getPlayer().getUniqueId()) == PlayerTeam.PLAYER) {
 			players = players - 1;
-		}
+		} // if else, do nothing.
 		if (gameStarted && zombies < 0) {
 			zombies = 0;
 			throw new IllegalStateException("Zombie count is should be 0 or more.");
@@ -854,7 +860,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				});
 				event.setCancelled(true);
 			}
-		} else {
+		} else if (hashMapTeam.get(event.getPlayer().getUniqueId()) == PlayerTeam.PLAYER) {
 			if (event.getMessage().startsWith("!") || gameEnded || !gameStarted) {
 				event.setMessage(event.getMessage().replaceFirst("!", ""));
 				event.setFormat(ChatColor.RED + "[All] " + ChatColor.AQUA + "[P] " + event.getPlayer().getName() + ChatColor.RESET + ChatColor.WHITE + ": " + event.getMessage());
@@ -864,6 +870,21 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 					for (Player player : Bukkit.getOnlinePlayers()) {
 						if (player.getUniqueId().equals(uuid)) {
 							player.sendMessage(ChatColor.AQUA + "[チーム] " +  ChatColor.AQUA + "[P] " + event.getPlayer().getName() + ChatColor.RESET + ChatColor.WHITE + ": " + event.getMessage());
+						}
+					}
+				});
+				event.setCancelled(true);
+			}
+		} else { // Spectator
+			if (event.getMessage().startsWith("!") || gameEnded || !gameStarted) {
+				event.setMessage(event.getMessage().replaceFirst("!", ""));
+				event.setFormat(ChatColor.RED + "[All] " + ChatColor.GRAY + "[S] " + event.getPlayer().getName() + ChatColor.RESET + ChatColor.WHITE + ": " + event.getMessage());
+			} else {
+				hashMapTeam.forEach((uuid, team) -> {
+					if (team != PlayerTeam.PLAYER) return;
+					for (Player player : Bukkit.getOnlinePlayers()) {
+						if (player.getUniqueId().equals(uuid)) {
+							player.sendMessage(ChatColor.AQUA + "[チーム] " +  ChatColor.GRAY + "[S] " + event.getPlayer().getName() + ChatColor.RESET + ChatColor.WHITE + ": " + event.getMessage());
 						}
 					}
 				});

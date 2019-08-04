@@ -11,8 +11,10 @@ public enum PlayerTeam {
 	 * Represents PLAYER, returns "player" if called {@link #toString()}
 	 */
 	PLAYER,
-	OYACHU,
-	SAND;
+	/**
+	 * Represents SPECTATOR mode, returns "spectator" if called {@link #toString()}
+	 */
+	SPECTATOR;
 
 	@Override
 	public String toString() {
