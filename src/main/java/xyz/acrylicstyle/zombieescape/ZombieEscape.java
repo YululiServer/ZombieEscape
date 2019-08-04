@@ -1019,5 +1019,18 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		};
 		Timer timer = new Timer();
 		timer.schedule(task, 1000*15);
+		for (Player player : Bukkit.getOnlinePlayers()) {
+			TimerTask task2 = new TimerTask() {
+				public void run() {
+					if (fireworked >= 80) this.cancel();
+					player.playSound(player.getLocation(), Sound.FIREWORK_LAUNCH, 100, 1);
+					Entity tnt = player.getWorld().spawn(player.getLocation(), TNTPrimed.class);
+					((TNTPrimed)tnt).setFuseTicks(40);
+					fireworked++;
+				}
+			};
+			Timer timer2 = new Timer();
+			timer2.schedule(task2, 5);
+		}
 	}
 }
