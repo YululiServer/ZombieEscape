@@ -105,6 +105,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	 * Player, Map name
 	 */
 	public static HashMap<UUID, String> hashMapVote = new HashMap<UUID, String>();
+	public static HashMap<String, Integer> hashMapVotes = new HashMap<String, Integer>();
 	public static String mapName = null;
 	public static ScoreboardManager manager = null;
 	public static ProtocolManager protocol = null;
@@ -710,46 +711,45 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	public void onProjectileHit(ProjectileHitEvent event) {
 		long time = System.currentTimeMillis();
 		Block block = event.getHitBlock();
-		if (!(event.getEntity() instanceof Snowball) || event.getHitEntity().getType() != EntityType.PLAYER) {
-			if (block == null) return;
-			int durability = (int) Math.nextUp(Math.min(Constants.materialDurability.getOrDefault(block.getType(), 5)*((double)players/(double)5), 3000));
-			if (block.getType() == Material.DIRT || block.getType() == Material.GRASS || block.getType() == Material.WOOD) {
-				String location = block.getLocation().getBlockX() + "," + block.getLocation().getBlockY() + "," + block.getLocation().getBlockZ();
-				String wall = (String) locationWall.getOrDefault(location, null);
-				Integer state = hashMapBlockState.get(wall) != null ? hashMapBlockState.get(wall) : 0;
-				if (state >= durability) {
-					mapConfig.getStringList("wallLocation." + wall).forEach(blocation -> {
-						String[] blocationArray = blocation.split(",");
-						Block ablock = event.getEntity().getWorld().getBlockAt(Integer.parseInt(blocationArray[0]), Integer.parseInt(blocationArray[1]), Integer.parseInt(blocationArray[2]));
-						ablock.setType(Material.AIR);
-					});
-					block.setType(Material.AIR);
-					hashMapBlockState.remove(wall);
-					PacketContainer packet1 = protocol.createPacket(PacketType.Play.Server.BLOCK_BREAK_ANIMATION);
-					packet1.getBlockPositionModifier().write(0, new BlockPosition(block.getX(), block.getY()-1, block.getZ()));
-					packet1.getIntegers().write(0, new Random().nextInt(2000));
-					packet1.getIntegers().write(1, 0); // remove animation
-					for (Player player : Bukkit.getOnlinePlayers()) {
-						try {
-							protocol.sendServerPacket(player, packet1);
-						} catch (InvocationTargetException e) {
-							e.printStackTrace();
-						}
-					}
-					return;
-				}
-				hashMapBlockState.put(wall, state+1);
+		if (event.getEntity() instanceof Snowball) return;
+		if (block == null) return;
+		int durability = (int) Math.nextUp(Math.min(Constants.materialDurability.getOrDefault(block.getType(), 5)*((double)players/(double)5), 3000));
+		if (block.getType() == Material.DIRT || block.getType() == Material.GRASS || block.getType() == Material.WOOD) {
+			String location = block.getLocation().getBlockX() + "," + block.getLocation().getBlockY() + "," + block.getLocation().getBlockZ();
+			String wall = (String) locationWall.getOrDefault(location, null);
+			Integer state = hashMapBlockState.get(wall) != null ? hashMapBlockState.get(wall) : 0;
+			if (state >= durability) {
+				mapConfig.getStringList("wallLocation." + wall).forEach(blocation -> {
+					String[] blocationArray = blocation.split(",");
+					Block ablock = event.getEntity().getWorld().getBlockAt(Integer.parseInt(blocationArray[0]), Integer.parseInt(blocationArray[1]), Integer.parseInt(blocationArray[2]));
+					ablock.setType(Material.AIR);
+				});
+				block.setType(Material.AIR);
+				hashMapBlockState.remove(wall);
 				PacketContainer packet1 = protocol.createPacket(PacketType.Play.Server.BLOCK_BREAK_ANIMATION);
-				packet1.getBlockPositionModifier().write(0, new BlockPosition(block.getX(), block.getY(), block.getZ()));
+				packet1.getBlockPositionModifier().write(0, new BlockPosition(block.getX(), block.getY()-1, block.getZ()));
 				packet1.getIntegers().write(0, new Random().nextInt(2000));
-				packet1.getIntegers().write(1, (state+1)*3);
+				packet1.getIntegers().write(1, 0); // remove animation
 				for (Player player : Bukkit.getOnlinePlayers()) {
 					try {
 						protocol.sendServerPacket(player, packet1);
 					} catch (InvocationTargetException e) {
-						e.printStackTrace();
-						e.getCause().printStackTrace();
+					e.printStackTrace();
 					}
+				}
+				return;
+			}
+			hashMapBlockState.put(wall, state+1);
+			PacketContainer packet1 = protocol.createPacket(PacketType.Play.Server.BLOCK_BREAK_ANIMATION);
+			packet1.getBlockPositionModifier().write(0, new BlockPosition(block.getX(), block.getY(), block.getZ()));
+			packet1.getIntegers().write(0, new Random().nextInt(2000));
+			packet1.getIntegers().write(1, (state+1)*3);
+			for (Player player : Bukkit.getOnlinePlayers()) {
+				try {
+					protocol.sendServerPacket(player, packet1);
+				} catch (InvocationTargetException e) {
+					e.printStackTrace();
+					e.getCause().printStackTrace();
 				}
 			}
 		}
