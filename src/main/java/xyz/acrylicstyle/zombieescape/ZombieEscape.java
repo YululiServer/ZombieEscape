@@ -30,10 +30,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -859,8 +857,8 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				public void run() {
 					if (fireworked >= 200*Bukkit.getOnlinePlayers().size()) this.cancel();
 					player.playSound(player.getLocation(), Sound.FIREWORK_LAUNCH, 100, 1);
-					Entity tnt = player.getWorld().spawn(player.getLocation(), TNTPrimed.class);
-					((TNTPrimed)tnt).setFuseTicks(40);
+					//Entity tnt = player.getWorld().spawn(player.getLocation(), TNTPrimed.class);
+					//((TNTPrimed)tnt).setFuseTicks(40);
 					fireworked++;
 				}
 			}.runTaskTimer(getInstance(), 0, 5);
