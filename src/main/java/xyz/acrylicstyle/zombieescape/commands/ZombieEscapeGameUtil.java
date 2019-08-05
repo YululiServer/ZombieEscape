@@ -1,15 +1,24 @@
 package xyz.acrylicstyle.zombieescape.commands;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
 
+import xyz.acrylicstyle.tomeito_core.providers.ConfigProvider;
+import xyz.acrylicstyle.tomeito_core.utils.Log;
 import xyz.acrylicstyle.zombieescape.PlayerTeam;
 import xyz.acrylicstyle.zombieescape.ZombieEscape;
+import xyz.acrylicstyle.zombieescape.utils.Utils;
 
 public class ZombieEscapeGameUtil {
 	public final class Suicide implements CommandExecutor {
@@ -42,9 +51,9 @@ public class ZombieEscapeGameUtil {
 			}
 			Player nearestPlayer = null;
 			if (sender instanceof BlockCommandSender) {
-				nearestPlayer = ZombieEscape.targetP(((BlockCommandSender)sender).getBlock().getLocation());
+				nearestPlayer = Utils.targetP(((BlockCommandSender)sender).getBlock().getLocation());
 			} else if (sender instanceof Player) {
-				nearestPlayer = ZombieEscape.targetP(((Player)sender).getLocation());
+				nearestPlayer = Utils.targetP(((Player)sender).getLocation());
 			} else {
 				sender.sendMessage(ChatColor.RED + "不明なタイプです: " + sender.toString() + ", Name: " + sender.getName());
 				return false;
@@ -97,7 +106,7 @@ public class ZombieEscapeGameUtil {
 	public final class CheckConfig implements CommandExecutor {
 		@Override
 		public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-			ZombieEscape.checkConfig();
+			Utils.checkConfig();
 			sender.sendMessage(ChatColor.GREEN + "設定を再確認しました。結果は " + ZombieEscape.settingsCheck + " です。");
 			return true;
 		}
@@ -108,7 +117,7 @@ public class ZombieEscapeGameUtil {
 		public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 			if (args.length != 2) {
 				sender.sendMessage(ChatColor.RED + "引数が2つ必要です。");
-				sender.sendMessage(ChatColor.GRAY + "?????? [gameEnded<Boolean>, gameStarted<Boolean>, gameTime<Integer>, playedTime<Integer>, timesLeft<Integer>, debug<Boolean>]");
+				sender.sendMessage(ChatColor.GRAY + "引数<type> [gameEnded<Boolean>, gameStarted<Boolean>, gameTime<Integer>, playedTime<Integer>, timesLeft<Integer>, debug<Boolean>]");
 				return true;
 			}
 			if (args[0].equalsIgnoreCase("gameEnded")) {
@@ -123,9 +132,45 @@ public class ZombieEscapeGameUtil {
 				ZombieEscape.timesLeft = Integer.parseInt(args[1]);
 			} else if (args[0].equalsIgnoreCase("debug")) {
 				ZombieEscape.debug = Boolean.parseBoolean(args[1]);
+			} else if (args[0].equalsIgnoreCase("hashMapVote")) {
+				ZombieEscape.hashMapVote = null;
+				args[1] = "null";
 			} else {
-				sender.sendMessage(ChatColor.GRAY + "?????? [gameEnded<Boolean>, gameStarted<Boolean>, gameTime<Integer>, playedTime<Integer>, timesLeft<Integer>, debug<Boolean>]");
+				sender.sendMessage(ChatColor.GRAY + "引数<type> [gameEnded<Boolean>, gameStarted<Boolean>, gameTime<Integer>, playedTime<Integer>, timesLeft<Integer>, debug<Boolean>]");
+				return true;
 			}
+			sender.sendMessage(ChatColor.GREEN + args[0] + "を" + args[1] + "に設定しました。");
+			return true;
+		}
+	}
+
+	public final class Vote implements CommandExecutor {
+		@Override
+		public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+			if (!Utils.senderCheck(sender)) return true;
+			Player ps = (Player) sender;
+			if (args.length == 0) {
+				sender.sendMessage(ChatColor.RED + "使用法: /vote <マップ名>");
+				return true;
+			}
+			File maps = new File("./plugins/ZombieEscape/maps/");
+			List<String> files = new ArrayList<String>();
+			for (File file : maps.listFiles()) files.add(file.getName().replaceAll(".yml", ""));
+			files.forEach(test -> {
+				Log.debug(test);
+			});
+			if (!files.contains(args[0])) {
+				sender.sendMessage(ChatColor.RED + "指定されたマップは存在しません。");
+				return true;
+			}
+			ConfigProvider mapConfig = null;
+			try {
+				mapConfig = new ConfigProvider("./plugins/ZombieEscape/maps/" + args[0] + ".yml");
+			} catch (IOException | InvalidConfigurationException e) {
+				e.printStackTrace();
+			}
+			ZombieEscape.hashMapVote.put(ps.getUniqueId(), args[0]);
+			sender.sendMessage(ChatColor.GREEN + mapConfig.getString("mapname") + " に投票しました。");
 			return true;
 		}
 	}

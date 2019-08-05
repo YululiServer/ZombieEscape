@@ -6,12 +6,13 @@ import org.junit.Test;
 
 import xyz.acrylicstyle.zombieescape.ZombieEscape;
 import xyz.acrylicstyle.zombieescape.data.Constants;
+import xyz.acrylicstyle.zombieescape.utils.Utils;
 
 public class ZombieEscapeTest {
 	@Test(expected=NullPointerException.class)
 	public void endGame() {
 		if (ZombieEscape.gameEnded) throw new IllegalStateException("Game is already ended");
-		ZombieEscape.endGameStatic("Zombie");
+		Utils.endGameStatic("Zombie");
 	}
 
 	@Test

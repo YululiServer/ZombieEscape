@@ -22,6 +22,7 @@ import org.bukkit.entity.Player;
 
 import xyz.acrylicstyle.tomeito_core.providers.ConfigProvider;
 import xyz.acrylicstyle.zombieescape.ZombieEscape;
+import xyz.acrylicstyle.zombieescape.utils.Utils;
 
 public class ZombieEscapeConfig {
 	public final class SetSpawn implements CommandExecutor {
@@ -81,7 +82,7 @@ public class ZombieEscapeConfig {
 				sender.sendMessage(ChatColor.RED + "使用法: /setspawn <zombie/player> <0, 1, 2, 3, ...> or /setspawn <world>");
 				return true;
 			}
-			ZombieEscape.checkConfig();
+			Utils.checkConfig();
 			sender.sendMessage(ChatColor.GREEN + "設定を保存しました。");
 			return true;
 		}
@@ -101,7 +102,7 @@ public class ZombieEscapeConfig {
 				sender.sendMessage(ChatColor.RED + "設定の保存中にエラーが発生しました。");
 				return true;
 			}
-			ZombieEscape.checkConfig();
+			Utils.checkConfig();
 			sender.sendMessage(ChatColor.GREEN + "設定を保存しました。");
 			return true;
 		}
@@ -128,8 +129,8 @@ public class ZombieEscapeConfig {
 				sender.sendMessage(ChatColor.RED + "設定の保存中にエラーが発生しました。");
 				return true;
 			}
-			ZombieEscape.checkConfig();
-			ZombieEscape.reload();
+			Utils.checkConfig();
+			Utils.reload();
 			sender.sendMessage(ChatColor.GREEN + "設定を保存しました。");
 			return true;
 		}
@@ -170,7 +171,7 @@ public class ZombieEscapeConfig {
 				sender.sendMessage(ChatColor.RED + "コマンドの実行中に不明なエラーが発生しました");
 				return true;
 			}
-			ZombieEscape.checkConfig(); // well we dont need to do this smh
+			Utils.checkConfig(); // well we dont need to do this smh
 			sender.sendMessage(ChatColor.GREEN + "設定を保存しました。");
 			return true;
 		}
@@ -200,7 +201,7 @@ public class ZombieEscapeConfig {
 				sender.sendMessage(ChatColor.RED + "コマンドの実行中に不明なエラーが発生しました");
 				return true;
 			}
-			ZombieEscape.checkConfig(); // well we dont need to do this
+			Utils.checkConfig(); // well we dont need to do this
 			sender.sendMessage(ChatColor.GREEN + "設定を保存しました。");
 			return true;
 		}
@@ -262,7 +263,7 @@ public class ZombieEscapeConfig {
 				sender.sendMessage(ChatColor.RED + "使用法: /removespawn <zombie/player> <0, 1, 2, 3, ...> or /removespawn <world>");
 				return true;
 			}
-			ZombieEscape.checkConfig();
+			Utils.checkConfig();
 			sender.sendMessage(ChatColor.GREEN + "設定を保存しました。");
 			return true;
 		}

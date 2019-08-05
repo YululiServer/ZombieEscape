@@ -17,7 +17,6 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -57,7 +56,6 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.weather.WeatherChangeEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -78,10 +76,12 @@ import com.comphenix.protocol.wrappers.BlockPosition;
 import xyz.acrylicstyle.tomeito_core.providers.ConfigProvider;
 import xyz.acrylicstyle.tomeito_core.utils.Log;
 import xyz.acrylicstyle.zombieescape.commands.Sponsor;
+import xyz.acrylicstyle.zombieescape.commands.ZombieEscapeCommand;
 import xyz.acrylicstyle.zombieescape.commands.ZombieEscapeConfig;
 import xyz.acrylicstyle.zombieescape.commands.ZombieEscapeGameUtil;
 import xyz.acrylicstyle.zombieescape.data.Constants;
 import xyz.acrylicstyle.zombieescape.effects.ActionBar;
+import xyz.acrylicstyle.zombieescape.utils.Utils;
 
 public class ZombieEscape extends JavaPlugin implements Listener {
 	public final static int mininumPlayers = 2;
@@ -98,6 +98,10 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	public static HashMap<UUID, Boolean> hashMapOriginZombie = new HashMap<UUID, Boolean>();
 	public static HashMap<UUID, Boolean> lockActionBar = new HashMap<UUID, Boolean>();
 	public static HashMap<String, Team> teams = new HashMap<String, Team>();
+	/**
+	 * Player, Map name
+	 */
+	public static HashMap<UUID, String> hashMapVote = new HashMap<UUID, String>();
 	public static String mapName = null;
 	public static ScoreboardManager manager = null;
 	public static ProtocolManager protocol = null;
@@ -166,29 +170,14 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			Bukkit.getPluginCommand("endgame").setExecutor(new EndGame());
 			Bukkit.getPluginCommand("check").setExecutor(zegu.new CheckConfig());
 			Bukkit.getPluginCommand("setstatus").setExecutor(zegu.new SetStatus());
-			Bukkit.getPluginCommand("zombieescape").setExecutor(new CommandExecutor() {
-				@Override
-				public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-					if (args.length != 0 && args[0].equalsIgnoreCase("reload")) {
-						reload();
-						sender.sendMessage(ChatColor.GREEN + "✓ 設定を再読み込みしました。");
-						return true;
-					}
-					if (!(sender instanceof Player)) {
-						sender.sendMessage(ChatColor.RED + "This command must be run from in-game.");
-						return true;
-					}
-					((Player) sender).performCommand("bukkit:help ZombieEscape");
-					return true;
-				}
-			});
+			Bukkit.getPluginCommand("zombieescape").setExecutor(new ZombieEscapeCommand());
 		} else {
 			Bukkit.getLogger().severe("[ZombieEscape] Unable to register commands! Commands are disabled.");
 		}
 		teams.put("zombie", manager.getNewScoreboard().registerNewTeam("zombie"));
 		teams.put("player", manager.getNewScoreboard().registerNewTeam("player"));
 		Bukkit.getPluginManager().registerEvents(this, this);
-		checkConfig();
+		Utils.checkConfig();
 		maxCheckpoints = Math.min(mapConfig.getStringList("spawnPoints.player").size(), mapConfig.getStringList("spawnPoints.zombie").size());
 		locationWall = ConfigProvider.getConfigSectionValue(mapConfig.get("locationWall", new HashMap<String, Object>()), true);
 		Bukkit.getLogger().info("[ZombieEscape] Enabled Zombie Escape");
@@ -203,35 +192,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				e.setCancelled(true);
 			}
 		});
-	}
-
-	public static void reload() {
-		ZombieEscape.config.reloadWithoutException();
-		mapName = config.getString("map", "world");
-		try {
-			mapConfig = new ConfigProvider("./plugins/ZombieEscape/maps/" + mapName + ".yml");
-		} catch (IOException | InvalidConfigurationException e) {
-			Log.error("Couldn't read config: maps/" + mapName + ".yml");
-			e.printStackTrace();
-		}
-		locationWall = ConfigProvider.getConfigSectionValue(mapConfig.get("locationWall", new HashMap<String, Object>()), true);
-		maxCheckpoints = Math.min(mapConfig.getStringList("spawnPoints.player").size(), mapConfig.getStringList("spawnPoints.zombie").size());
-		debug = config.getBoolean("debug", false);
-	}
-
-	/**
-	 * Reload config and check if all configs are set correctly.<br>
-	 * If all checks passed, settingsCheck will be true. Otherwise it'll set to false.
-	 */
-	public static void checkConfig() {
-		config.reloadWithoutException();
-		mapConfig.reloadWithoutException();
-		if (mapConfig.getList("spawnPoints.zombie") != null // check if zombie spawn points exists
-				&& mapConfig.getList("spawnPoints.zombie").size() != 0 // check if zombie spawn points are *actually* exists(0 isn't exist)
-				&& mapConfig.getList("spawnPoints.player") != null // check if player spawn points exists
-				&& mapConfig.getList("spawnPoints.player").size() != 0
-				&& mapConfig.get("locationWall") != null) settingsCheck = true; // if it's null, ProjectileHitEvent won't work!
-		else settingsCheck = false;
 	}
 
 	public ZombieEscape getInstance() {
@@ -297,10 +257,10 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 						player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100000, 0, false, false));
 						player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 100000, 0, false, false));
 						player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 100000, 100, false, false));
-						player.getInventory().setHelmet(createLeatherItemStack(Material.LEATHER_HELMET, 0, 100, 0));
-						player.getInventory().setChestplate(createLeatherItemStack(Material.LEATHER_CHESTPLATE, 0, 100, 0));
-						player.getInventory().setLeggings(createLeatherItemStack(Material.LEATHER_LEGGINGS, 0, 100, 0));
-						player.getInventory().setBoots(createLeatherItemStack(Material.LEATHER_BOOTS, 0, 100, 0));
+						player.getInventory().setHelmet(Utils.createLeatherItemStack(Material.LEATHER_HELMET, 0, 100, 0));
+						player.getInventory().setChestplate(Utils.createLeatherItemStack(Material.LEATHER_CHESTPLATE, 0, 100, 0));
+						player.getInventory().setLeggings(Utils.createLeatherItemStack(Material.LEATHER_LEGGINGS, 0, 100, 0));
+						player.getInventory().setBoots(Utils.createLeatherItemStack(Material.LEATHER_BOOTS, 0, 100, 0));
 					} else {
 						player.getInventory().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
 						player.getInventory().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
@@ -461,10 +421,10 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 									player.setMaxHealth(150);
 									player.setHealth(150);
 									player.setHealthScale(40);
-									player.getInventory().setHelmet(createLeatherItemStack(Material.LEATHER_HELMET, 0, 100, 0));
-									player.getInventory().setChestplate(createLeatherItemStack(Material.LEATHER_CHESTPLATE, 0, 100, 0));
-									player.getInventory().setLeggings(createLeatherItemStack(Material.LEATHER_LEGGINGS, 0, 100, 0));
-									player.getInventory().setBoots(createLeatherItemStack(Material.LEATHER_BOOTS, 0, 100, 0));
+									player.getInventory().setHelmet(Utils.createLeatherItemStack(Material.LEATHER_HELMET, 0, 100, 0));
+									player.getInventory().setChestplate(Utils.createLeatherItemStack(Material.LEATHER_CHESTPLATE, 0, 100, 0));
+									player.getInventory().setLeggings(Utils.createLeatherItemStack(Material.LEATHER_LEGGINGS, 0, 100, 0));
+									player.getInventory().setBoots(Utils.createLeatherItemStack(Material.LEATHER_BOOTS, 0, 100, 0));
 									player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100000, 0, false, false));
 									player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 100000, 0, false, false));
 									player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 100000, 100, false, false));
@@ -614,10 +574,10 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		event.setRespawnLocation(location);
 		event.getPlayer().setGameMode(GameMode.ADVENTURE);
 		event.getPlayer().setPlayerListName(ChatColor.DARK_GREEN + event.getPlayer().getName());
-		event.getPlayer().getInventory().setHelmet(createLeatherItemStack(Material.LEATHER_HELMET, 0, 100, 0));
-		event.getPlayer().getInventory().setChestplate(createLeatherItemStack(Material.LEATHER_CHESTPLATE, 0, 100, 0));
-		event.getPlayer().getInventory().setLeggings(createLeatherItemStack(Material.LEATHER_LEGGINGS, 0, 100, 0));
-		event.getPlayer().getInventory().setBoots(createLeatherItemStack(Material.LEATHER_BOOTS, 0, 100, 0));
+		event.getPlayer().getInventory().setHelmet(Utils.createLeatherItemStack(Material.LEATHER_HELMET, 0, 100, 0));
+		event.getPlayer().getInventory().setChestplate(Utils.createLeatherItemStack(Material.LEATHER_CHESTPLATE, 0, 100, 0));
+		event.getPlayer().getInventory().setLeggings(Utils.createLeatherItemStack(Material.LEATHER_LEGGINGS, 0, 100, 0));
+		event.getPlayer().getInventory().setBoots(Utils.createLeatherItemStack(Material.LEATHER_BOOTS, 0, 100, 0));
 		event.getPlayer().setMaxHealth(150);
 		event.getPlayer().setHealth(150);
 		event.getPlayer().setHealthScale(40);
@@ -667,10 +627,10 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		score6.setScore(6);
 		player.setGameMode(GameMode.ADVENTURE);
 		player.setPlayerListName(ChatColor.DARK_GREEN + player.getName());
-		player.getInventory().setHelmet(createLeatherItemStack(Material.LEATHER_HELMET, 0, 100, 0));
-		player.getInventory().setChestplate(createLeatherItemStack(Material.LEATHER_CHESTPLATE, 0, 100, 0));
-		player.getInventory().setLeggings(createLeatherItemStack(Material.LEATHER_LEGGINGS, 0, 100, 0));
-		player.getInventory().setBoots(createLeatherItemStack(Material.LEATHER_BOOTS, 0, 100, 0));
+		player.getInventory().setHelmet(Utils.createLeatherItemStack(Material.LEATHER_HELMET, 0, 100, 0));
+		player.getInventory().setChestplate(Utils.createLeatherItemStack(Material.LEATHER_CHESTPLATE, 0, 100, 0));
+		player.getInventory().setLeggings(Utils.createLeatherItemStack(Material.LEATHER_LEGGINGS, 0, 100, 0));
+		player.getInventory().setBoots(Utils.createLeatherItemStack(Material.LEATHER_BOOTS, 0, 100, 0));
 		player.setMaxHealth(150);
 		player.setHealth(150);
 		player.setHealthScale(40);
@@ -737,20 +697,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			// String team = zombies == 0 ? "プレイヤー" : "ゾンビ";
 			// endGame(team);
 		}
-	}
-
-	public ItemStack createLeatherItemStack(Material material, int red, int green, int blue) {
-		long time = System.nanoTime();
-		ItemStack item = new ItemStack(material);
-		LeatherArmorMeta lam = (LeatherArmorMeta) item.getItemMeta();
-		lam.setColor(Color.fromRGB(red, green, blue));
-		item.setItemMeta(lam);
-		item.addUnsafeEnchantment(Enchantment.DURABILITY, 100);
-		if (debug) {
-			long end = System.nanoTime()-time;
-			Log.debug("createLeatherItemStack() took " + end + "ns");
-		}
-		return item;
 	}
 
 	@EventHandler
@@ -857,34 +803,17 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		}
 	}
 
-	private void chat(AsyncPlayerChatEvent event, PlayerTeam pteam, String teamname) {
-		if (event.getMessage().startsWith("!") || gameEnded || !gameStarted) {
-			event.setMessage(event.getMessage().replaceFirst("!", ""));
-			event.setFormat(ChatColor.RED + "[All] " + teamname + " " + event.getPlayer().getName() + ChatColor.RESET + ChatColor.WHITE + ": " + event.getMessage());
-		} else {
-			hashMapTeam.forEach((uuid, team) -> {
-				if (team != pteam) return;
-				for (Player player : Bukkit.getOnlinePlayers()) {
-					if (player.getUniqueId().equals(uuid)) {
-						player.sendMessage(ChatColor.AQUA + "[チーム] " + teamname + " " + event.getPlayer().getName() + ChatColor.RESET + ChatColor.WHITE + ": " + event.getMessage());
-					}
-				}
-			});
-			event.setCancelled(true);
-		}
-	}
-
 	@EventHandler(priority=EventPriority.HIGHEST)
 	public void onPlayerChat(AsyncPlayerChatEvent event) {
 		if (event.getMessage().equalsIgnoreCase("gg") || event.getMessage().equalsIgnoreCase("good game")) {
 			event.setMessage(ChatColor.GOLD + event.getMessage());
 		}
 		if (hashMapTeam.get(event.getPlayer().getUniqueId()) == PlayerTeam.ZOMBIE) {
-			chat(event, PlayerTeam.ZOMBIE, ChatColor.DARK_GREEN + "[Z]");
+			Utils.chat(event, PlayerTeam.ZOMBIE, ChatColor.DARK_GREEN + "[Z]");
 		} else if (hashMapTeam.get(event.getPlayer().getUniqueId()) == PlayerTeam.PLAYER) {
-			chat(event, PlayerTeam.PLAYER, ChatColor.AQUA + "[P]");
+			Utils.chat(event, PlayerTeam.PLAYER, ChatColor.AQUA + "[P]");
 		} else {
-			chat(event, PlayerTeam.SPECTATOR, ChatColor.GRAY + "[S]");
+			Utils.chat(event, PlayerTeam.SPECTATOR, ChatColor.GRAY + "[S]");
 		}
 	}
 
@@ -912,59 +841,12 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		if (event.getItemDrop().getItemStack().isSimilar(new ItemStack(Material.DIAMOND_CHESTPLATE))) event.setCancelled(true); // armor
 		if (event.getItemDrop().getItemStack().isSimilar(new ItemStack(Material.DIAMOND_LEGGINGS))) event.setCancelled(true); // armor
 		if (event.getItemDrop().getItemStack().isSimilar(new ItemStack(Material.DIAMOND_BOOTS))) event.setCancelled(true); // armor
-		if (event.getItemDrop().getItemStack().isSimilar(createLeatherItemStack(Material.LEATHER_HELMET, 0, 100, 0))) event.setCancelled(true); // armor
-		if (event.getItemDrop().getItemStack().isSimilar(createLeatherItemStack(Material.LEATHER_CHESTPLATE, 0, 100, 0))) event.setCancelled(true); // armor
-		if (event.getItemDrop().getItemStack().isSimilar(createLeatherItemStack(Material.LEATHER_LEGGINGS, 0, 100, 0))) event.setCancelled(true); // armor
-		if (event.getItemDrop().getItemStack().isSimilar(createLeatherItemStack(Material.LEATHER_BOOTS, 0, 100, 0))) event.setCancelled(true); // armor
+		if (event.getItemDrop().getItemStack().isSimilar(Utils.createLeatherItemStack(Material.LEATHER_HELMET, 0, 100, 0))) event.setCancelled(true); // armor
+		if (event.getItemDrop().getItemStack().isSimilar(Utils.createLeatherItemStack(Material.LEATHER_CHESTPLATE, 0, 100, 0))) event.setCancelled(true); // armor
+		if (event.getItemDrop().getItemStack().isSimilar(Utils.createLeatherItemStack(Material.LEATHER_LEGGINGS, 0, 100, 0))) event.setCancelled(true); // armor
+		if (event.getItemDrop().getItemStack().isSimilar(Utils.createLeatherItemStack(Material.LEATHER_BOOTS, 0, 100, 0))) event.setCancelled(true); // armor
 		if (event.getItemDrop().getItemStack().getType() == Material.IRON_BARDING) event.setCancelled(true); // Please don't drop gun
 		if (event.getItemDrop().getItemStack().getType() == Material.STONE_AXE) event.setCancelled(true); // Please don't drop axe
-	}
-
-	public static Player targetP(Location loc){
-		Player nearestPlayer = null;
-		double lastDistance = Double.MAX_VALUE;
-		for(Player p : loc.getWorld().getPlayers()){
-			double distanceSqrd = loc.distanceSquared(p.getLocation());
-			if(distanceSqrd < lastDistance){
-				lastDistance = distanceSqrd;
-				nearestPlayer = p;
-			}
-		}
-		return nearestPlayer;
-	}
-
-	public static Player targetPFindPlayers(Location loc){
-		if (players <= 0) return null;
-		Player nearestPlayer = null;
-		double lastDistance = Double.MAX_VALUE;
-		Log.info("we're going to find players");
-		for(Player p : loc.getWorld().getPlayers()){
-			Log.info("team: " + hashMapTeam.get(p.getUniqueId()));
-			Log.info("distance: " + loc.distance(p.getLocation()));
-			if (!(hashMapTeam.get(p.getUniqueId()) == PlayerTeam.PLAYER)) continue;
-			double distanceSqrd = loc.distance(p.getLocation());
-			if (distanceSqrd > 7) continue;
-			if(distanceSqrd < lastDistance){
-				lastDistance = distanceSqrd;
-				nearestPlayer = p;
-			}
-		}
-		return nearestPlayer;
-	}
-
-	public static List<Player> targetAFindPlayersWithRange(Location loc, double range) {
-		if (players <= 0) return null;
-		List<Player> players = new ArrayList<Player>();
-		Log.info("we're going to find players");
-		for(Player p : loc.getWorld().getPlayers()){
-			Log.info("team: " + hashMapTeam.get(p.getUniqueId()));
-			Log.info("distance: " + loc.distance(p.getLocation()));
-			if (hashMapTeam.get(p.getUniqueId()) != PlayerTeam.PLAYER) continue;
-			double distanceSqrd = loc.distance(p.getLocation());
-			if (distanceSqrd > range) continue;
-			players.add(p);
-		}
-		return players;
 	}
 
 	@SuppressWarnings("deprecation")
@@ -994,37 +876,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		timer.schedule(task, 1000*15);
 	}
 
-	@SuppressWarnings("deprecation")
-	public static void endGameStatic(String team) {
-		for (Player player : Bukkit.getOnlinePlayers()) {
-			player.playSound(player.getLocation(), Sound.FIREWORK_LAUNCH, 100, 1);
-			player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + team + "チームの勝ち！", "");
-		}
-		Bukkit.broadcastMessage("" + ChatColor.GREEN + ChatColor.BOLD + team + "チームの勝ち！");
-		Bukkit.broadcastMessage(ChatColor.GRAY + "このサーバーはあと15秒でシャットダウンします。");
-		TimerTask task = new TimerTask() {
-			public void run() {
-				Bukkit.broadcastMessage(ChatColor.GRAY + "サーバーをシャットダウン中...");
-				Bukkit.shutdown();
-			}
-		};
-		Timer timer = new Timer();
-		timer.schedule(task, 1000*15);
-		for (Player player : Bukkit.getOnlinePlayers()) {
-			TimerTask task2 = new TimerTask() {
-				public synchronized void run() {
-					if (fireworked >= 80) this.cancel();
-					player.playSound(player.getLocation(), Sound.FIREWORK_LAUNCH, 100, 1);
-					Entity tnt = player.getWorld().spawn(player.getLocation(), TNTPrimed.class);
-					((TNTPrimed)tnt).setFuseTicks(40);
-					fireworked++;
-				}
-			};
-			Timer timer2 = new Timer();
-			timer2.schedule(task2, 5);
-		}
-	}
-
 	public final class EndGame implements CommandExecutor {
 		@Override
 		public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -1043,11 +894,11 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 					Player nearestPlayer = null;
 					List<Player> players = null;
 					if (sender instanceof BlockCommandSender) {
-						nearestPlayer = ZombieEscape.targetPFindPlayers(((BlockCommandSender)sender).getBlock().getLocation());
-						players = ZombieEscape.targetAFindPlayersWithRange(((BlockCommandSender)sender).getBlock().getLocation(), 7);
+						nearestPlayer = Utils.targetPFindPlayers(((BlockCommandSender)sender).getBlock().getLocation());
+						players = Utils.targetAFindPlayersWithRange(((BlockCommandSender)sender).getBlock().getLocation(), 7);
 					} else if (sender instanceof Player) {
-						nearestPlayer = ZombieEscape.targetPFindPlayers(((Player)sender).getLocation());
-						players = ZombieEscape.targetAFindPlayersWithRange(((Player)sender).getLocation(), 7);
+						nearestPlayer = Utils.targetPFindPlayers(((Player)sender).getLocation());
+						players = Utils.targetAFindPlayersWithRange(((Player)sender).getLocation(), 7);
 					} else {
 						sender.sendMessage(ChatColor.RED + "不明なタイプです: " + sender.toString() + ", Name: " + sender.getName());
 						return;
