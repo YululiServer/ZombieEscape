@@ -568,38 +568,45 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 
 	@EventHandler
 	public void onPlayerRespawn(PlayerRespawnEvent event) {
-		String[] spawnLists = Arrays.asList(mapConfig.getList("spawnPoints.zombie", new ArrayList<String>()).toArray(new String[0])).get(checkpoint).split(",");
-		Location location = new Location(Bukkit.getWorld(mapConfig.getString("spawnPoints.world")), Double.parseDouble(spawnLists[0]), Double.parseDouble(spawnLists[1]), Double.parseDouble(spawnLists[2]));
-		event.setRespawnLocation(location);
-		event.getPlayer().setGameMode(GameMode.ADVENTURE);
-		event.getPlayer().setPlayerListName(ChatColor.DARK_GREEN + event.getPlayer().getName());
-		event.getPlayer().getInventory().setHelmet(Utils.createLeatherItemStack(Material.LEATHER_HELMET, 0, 100, 0));
-		event.getPlayer().getInventory().setChestplate(Utils.createLeatherItemStack(Material.LEATHER_CHESTPLATE, 0, 100, 0));
-		event.getPlayer().getInventory().setLeggings(Utils.createLeatherItemStack(Material.LEATHER_LEGGINGS, 0, 100, 0));
-		event.getPlayer().getInventory().setBoots(Utils.createLeatherItemStack(Material.LEATHER_BOOTS, 0, 100, 0));
-		event.getPlayer().setMaxHealth(150);
-		event.getPlayer().setHealth(150);
-		event.getPlayer().setHealthScale(40);
+		event.getPlayer().sendMessage("" + ChatColor.GREEN + ChatColor.BOLD + "あと5秒でリスポーンします！");
+		event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 100000, 100, false, false));
 		new BukkitRunnable() {
 			public void run() {
-				event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, 100000, 0, false, false));
-				event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 1, false, false));
-				event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 100000, 100, false, false));
-				event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100000, 0, false, false));
-				event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 100000, 0, false, false));
-				ItemStack item = new ItemStack(Material.IRON_SWORD);
-				ItemMeta meta = item.getItemMeta();
-				meta.setDisplayName("" + ChatColor.RESET + ChatColor.WHITE + "ナイフ");
-				item.setItemMeta(meta);
-				item.addUnsafeEnchantment(Enchantment.DURABILITY, 100);
-				item.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 100);
-				event.getPlayer().getInventory().setItem(0, item);
-				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "give " + event.getPlayer().getName() + " minecraft:stone_axe 1 0 {CanDestroy:[\"minecraft:grass\",\"minecraft:planks\",\"minecraft:dirt\"],HideFlags:1,Unbreakable:1,display:{Name:\"錆びついた斧\"},ench:[{id:32,lvl:10}]}");
+				event.getPlayer().removePotionEffect(PotionEffectType.SLOW);
+				String[] spawnLists = Arrays.asList(mapConfig.getList("spawnPoints.zombie", new ArrayList<String>()).toArray(new String[0])).get(checkpoint).split(",");
+				Location location = new Location(Bukkit.getWorld(mapConfig.getString("spawnPoints.world")), Double.parseDouble(spawnLists[0]), Double.parseDouble(spawnLists[1]), Double.parseDouble(spawnLists[2]));
+				event.setRespawnLocation(location);
+				event.getPlayer().setGameMode(GameMode.ADVENTURE);
+				event.getPlayer().setPlayerListName(ChatColor.DARK_GREEN + event.getPlayer().getName());
+				event.getPlayer().getInventory().setHelmet(Utils.createLeatherItemStack(Material.LEATHER_HELMET, 0, 100, 0));
+				event.getPlayer().getInventory().setChestplate(Utils.createLeatherItemStack(Material.LEATHER_CHESTPLATE, 0, 100, 0));
+				event.getPlayer().getInventory().setLeggings(Utils.createLeatherItemStack(Material.LEATHER_LEGGINGS, 0, 100, 0));
+				event.getPlayer().getInventory().setBoots(Utils.createLeatherItemStack(Material.LEATHER_BOOTS, 0, 100, 0));
+				event.getPlayer().setMaxHealth(150);
+				event.getPlayer().setHealth(150);
+				event.getPlayer().setHealthScale(40);
+				new BukkitRunnable() {
+					public void run() {
+						event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, 100000, 0, false, false));
+						event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 1, false, false));
+						event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 100000, 100, false, false));
+						event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100000, 0, false, false));
+						event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 100000, 0, false, false));
+						ItemStack item = new ItemStack(Material.IRON_SWORD);
+						ItemMeta meta = item.getItemMeta();
+						meta.setDisplayName("" + ChatColor.RESET + ChatColor.WHITE + "ナイフ");
+						item.setItemMeta(meta);
+						item.addUnsafeEnchantment(Enchantment.DURABILITY, 100);
+						item.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 100);
+						event.getPlayer().getInventory().setItem(0, item);
+						Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "give " + event.getPlayer().getName() + " minecraft:stone_axe 1 0 {CanDestroy:[\"minecraft:grass\",\"minecraft:planks\",\"minecraft:dirt\"],HideFlags:1,Unbreakable:1,display:{Name:\"錆びついた斧\"},ench:[{id:32,lvl:10}]}");
+					}
+				}.runTaskLater(getInstance(), 40);
+				if (players == 0 && gameStarted) {
+				endGame("ゾンビ");
+				}
 			}
-		}.runTaskLater(this, 40);
-		if (players == 0 && gameStarted) {
-			endGame("ゾンビ");
-		}
+		}.runTaskLater(this, 20*5);
 	}
 
 	@SuppressWarnings("deprecation")
