@@ -38,8 +38,8 @@ public final class Utils {
 	public static boolean senderCheck(CommandSender sender) {
 		if (!(sender instanceof Player)) {
 			sender.sendMessage(ChatColor.RED + "This command must be run from in-game.");
-			return false;
-		} else return true;
+		}
+		return sender instanceof Player;
 	}
 
 	/**
