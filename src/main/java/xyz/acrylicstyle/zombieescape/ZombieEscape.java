@@ -896,10 +896,10 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 					List<Player> players = null;
 					if (sender instanceof BlockCommandSender) {
 						nearestPlayer = Utils.targetPFindPlayers(((BlockCommandSender)sender).getBlock().getLocation());
-						players = Utils.targetAFindPlayersWithRange(((BlockCommandSender)sender).getBlock().getLocation(), 7);
+						players = Utils.targetAFindPlayersWithRange(((BlockCommandSender)sender).getBlock().getLocation(), 10);
 					} else if (sender instanceof Player) {
 						nearestPlayer = Utils.targetPFindPlayers(((Player)sender).getLocation());
-						players = Utils.targetAFindPlayersWithRange(((Player)sender).getLocation(), 7);
+						players = Utils.targetAFindPlayersWithRange(((Player)sender).getLocation(), 10);
 					} else {
 						sender.sendMessage(ChatColor.RED + "不明なタイプです: " + sender.toString() + ", Name: " + sender.getName());
 						return;
