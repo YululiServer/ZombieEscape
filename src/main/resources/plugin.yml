@@ -68,3 +68,6 @@ commands:
     description: "Set map"
     usage: /<command>
     permission: zombieescape.setmap
+  vote:
+    description: "Vote for map!"
+    usage: /<command> <map>

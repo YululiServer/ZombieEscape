@@ -170,6 +170,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			Bukkit.getPluginCommand("endgame").setExecutor(new EndGame());
 			Bukkit.getPluginCommand("check").setExecutor(zegu.new CheckConfig());
 			Bukkit.getPluginCommand("setstatus").setExecutor(zegu.new SetStatus());
+			Bukkit.getPluginCommand("vote").setExecutor(zegu.new Vote());
 			Bukkit.getPluginCommand("zombieescape").setExecutor(new ZombieEscapeCommand());
 		} else {
 			Bukkit.getLogger().severe("[ZombieEscape] Unable to register commands! Commands are disabled.");
