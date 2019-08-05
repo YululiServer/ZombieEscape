@@ -568,14 +568,14 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 
 	@EventHandler
 	public void onPlayerRespawn(PlayerRespawnEvent event) {
+		String[] spawnLists = Arrays.asList(mapConfig.getList("spawnPoints.zombie", new ArrayList<String>()).toArray(new String[0])).get(checkpoint).split(",");
+		Location location = new Location(Bukkit.getWorld(mapConfig.getString("spawnPoints.world")), Double.parseDouble(spawnLists[0]), Double.parseDouble(spawnLists[1]), Double.parseDouble(spawnLists[2]));
+		event.setRespawnLocation(location);
 		event.getPlayer().sendMessage("" + ChatColor.GREEN + ChatColor.BOLD + "あと5秒でリスポーンします！");
 		event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 100000, 100, false, false));
 		new BukkitRunnable() {
 			public void run() {
 				event.getPlayer().removePotionEffect(PotionEffectType.SLOW);
-				String[] spawnLists = Arrays.asList(mapConfig.getList("spawnPoints.zombie", new ArrayList<String>()).toArray(new String[0])).get(checkpoint).split(",");
-				Location location = new Location(Bukkit.getWorld(mapConfig.getString("spawnPoints.world")), Double.parseDouble(spawnLists[0]), Double.parseDouble(spawnLists[1]), Double.parseDouble(spawnLists[2]));
-				event.setRespawnLocation(location);
 				event.getPlayer().setGameMode(GameMode.ADVENTURE);
 				event.getPlayer().setPlayerListName(ChatColor.DARK_GREEN + event.getPlayer().getName());
 				event.getPlayer().getInventory().setHelmet(Utils.createLeatherItemStack(Material.LEATHER_HELMET, 0, 100, 0));
