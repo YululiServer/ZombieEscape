@@ -86,11 +86,10 @@ public final class Utils {
 		ZombieEscape.debug = ZombieEscape.config.getBoolean("debug", false);
 	}
 
-	@SuppressWarnings("deprecation")
 	public static void endGameStatic(String team) {
 		for (Player player : Bukkit.getOnlinePlayers()) {
-			player.playSound(player.getLocation(), Sound.FIREWORK_LAUNCH, 100, 1);
-			player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + team + "チームの勝ち！", "");
+			player.playSound(player.getLocation(), Sound.ENTITY_FIREWORK_LAUNCH, 100, 1);
+			player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + team + "チームの勝ち！", "", 0, 60, 20);
 		}
 		Bukkit.broadcastMessage("" + ChatColor.GREEN + ChatColor.BOLD + team + "チームの勝ち！");
 		Bukkit.broadcastMessage(ChatColor.GRAY + "このサーバーはあと15秒でシャットダウンします。");
@@ -106,7 +105,7 @@ public final class Utils {
 			TimerTask task2 = new TimerTask() {
 				public synchronized void run() {
 					if (ZombieEscape.fireworked >= 80) this.cancel();
-					player.playSound(player.getLocation(), Sound.FIREWORK_LAUNCH, 100, 1);
+					player.playSound(player.getLocation(), Sound.ENTITY_FIREWORK_LAUNCH, 100, 1);
 					Entity tnt = player.getWorld().spawn(player.getLocation(), TNTPrimed.class);
 					((TNTPrimed)tnt).setFuseTicks(40);
 					ZombieEscape.fireworked++;

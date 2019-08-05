@@ -169,6 +169,10 @@ public class ZombieEscapeGameUtil {
 			} catch (IOException | InvalidConfigurationException e) {
 				e.printStackTrace();
 			}
+			if (Bukkit.getWorld(mapConfig.getString("spawnPoints.world", "world")) == null) {
+				sender.sendMessage(ChatColor.RED + "指定されたマップのワールドはこのサーバーには存在しません。");
+				return true;
+			}
 			ZombieEscape.hashMapVote.put(ps.getUniqueId(), args[0]);
 			sender.sendMessage(ChatColor.GREEN + mapConfig.getString("mapname") + " に投票しました。");
 			return true;

@@ -22,6 +22,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.Command;
@@ -32,6 +33,8 @@ import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Snowball;
+import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -71,6 +74,8 @@ import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.BlockPosition;
 
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import xyz.acrylicstyle.tomeito_core.providers.ConfigProvider;
 import xyz.acrylicstyle.tomeito_core.utils.Log;
 import xyz.acrylicstyle.zombieescape.commands.Sponsor;
@@ -78,7 +83,6 @@ import xyz.acrylicstyle.zombieescape.commands.ZombieEscapeCommand;
 import xyz.acrylicstyle.zombieescape.commands.ZombieEscapeConfig;
 import xyz.acrylicstyle.zombieescape.commands.ZombieEscapeGameUtil;
 import xyz.acrylicstyle.zombieescape.data.Constants;
-import xyz.acrylicstyle.zombieescape.effects.ActionBar;
 import xyz.acrylicstyle.zombieescape.utils.Utils;
 
 public class ZombieEscape extends JavaPlugin implements Listener {
@@ -100,6 +104,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	 * Player, Map name
 	 */
 	public static HashMap<UUID, String> hashMapVote = new HashMap<UUID, String>();
+	public static HashMap<String, Integer> hashMapVotes = new HashMap<String, Integer>();
 	public static String mapName = null;
 	public static ScoreboardManager manager = null;
 	public static ProtocolManager protocol = null;
@@ -204,6 +209,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		World world = Bukkit.getWorld(mapConfig.getString("spawnPoints.world", "world"));
 		new BukkitRunnable() {
 			public void run() {
+				event.getPlayer().setCollidable(false);
 				event.getPlayer().teleport(world.getSpawnLocation());
 			}
 		}.runTask(this);
@@ -227,8 +233,8 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 						continue;
 					}
 					Integer state = hashMapBlockState.get(wall) != null ? hashMapBlockState.get(wall) : 0;
-					int durability = (int) Math.nextUp(Math.min(Constants.materialDurability.getOrDefault(block.getType(), 5)*((double)players/(double)5), 1000));
-					ActionBar.setActionBarWithoutException(player, ChatColor.GREEN + "壁の耐久力: " + state + "/" + durability);
+					int durability = (int) Math.nextUp(Math.min(Constants.materialDurability.getOrDefault(block.getType(), 5)*((double)players/(double)5), 3000));
+					player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(ChatColor.GREEN + "壁の耐久力: " + state + "/" + durability));
 					lockActionBar.put(player.getUniqueId(), true);
 					if (debug) {
 						long end = System.currentTimeMillis()-time;
@@ -241,9 +247,10 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			public void run() {
 				for (Player player : Bukkit.getOnlinePlayers()) {
 					if (lockActionBar.getOrDefault(player.getUniqueId(), false)) continue;
-					int maxHealth = (int) player.getMaxHealth();
+					int maxHealth = (int) player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue();
 					int health = (int) player.getHealth();
-					ActionBar.setActionBarWithoutException(player, "" + ChatColor.RED + health + "/" + maxHealth + "❤");
+					//ActionBar.setActionBarWithoutException(player, "" + ChatColor.RED + health + "/" + maxHealth + "❤");
+					player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("" + ChatColor.RED + health + "/" + maxHealth + "❤"));
 				}
 			}
 		};
@@ -302,7 +309,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			timesLeft = 180;
 		}
 		hashMapScoreboard.put(event.getPlayer().getUniqueId(), board);
-		event.getPlayer().setMaxHealth(100);
+		event.getPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(100);
 		event.getPlayer().setHealth(100);
 		event.getPlayer().setHealthScale(20);
 		new BukkitRunnable() {
@@ -346,8 +353,8 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		healthBar.runTaskTimer(this, 0, 20);
 		for (final Player player : Bukkit.getOnlinePlayers()) {
 			for (final Player other : Bukkit.getOnlinePlayers()) {
-				player.hidePlayer(other);
-				player.showPlayer(other);
+				player.hidePlayer(this, other);
+				player.showPlayer(this, other);
 			}
 		}
 		if (debug) {
@@ -357,7 +364,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		if (timerStarted) return;
 		timerStarted = true;
 		new BukkitRunnable() {
-			@SuppressWarnings("deprecation") // player#sendTitle, i can't find non-deprecated methods in 1.8.8.
 			public synchronized void run() {
 				long time = System.currentTimeMillis();
 				for (final Player player : Bukkit.getOnlinePlayers()) {
@@ -417,7 +423,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 									teams.get(hashMapTeam.get(player.getUniqueId()).toString()).addEntry(player.getName());
 									Score score6 = objective.getScore(ChatColor.GREEN + "    チーム: " + ChatColor.DARK_GREEN + "ゾンビ");
 									score6.setScore(6);
-									player.setMaxHealth(150);
+									player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(150);
 									player.setHealth(150);
 									player.setHealthScale(40);
 									player.getInventory().setHelmet(Utils.createLeatherItemStack(Material.LEATHER_HELMET, 0, 100, 0));
@@ -433,7 +439,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 									hashMapTeam.put(player.getUniqueId(), PlayerTeam.PLAYER);
 									teams.get(hashMapTeam.get(player.getUniqueId()).toString()).setAllowFriendlyFire(false);
 									teams.get(hashMapTeam.get(player.getUniqueId()).toString()).addEntry(player.getName());
-									player.setMaxHealth(1);
+									player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(150);
 									player.setHealth(1);
 									player.setHealthScale(1);
 									player.getInventory().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
@@ -446,26 +452,26 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 									player.setPlayerListName(ChatColor.AQUA + player.getName());
 								}
 							}
-							player.playSound(player.getLocation(), Sound.NOTE_STICKS, 100, 1);
-							player.sendTitle(ChatColor.GREEN + "5", ChatColor.YELLOW + "チーム: " + hashMapTeam.get(player.getUniqueId()));
+							player.playSound(player.getLocation(), Sound.BLOCK_NOTE_XYLOPHONE, 100, 1);
+							player.sendTitle(ChatColor.GREEN + "5", ChatColor.YELLOW + "チーム: " + hashMapTeam.get(player.getUniqueId()), 0, 25, 0);
 						} else if (timesLeft == 4) {
-							player.playSound(player.getLocation(), Sound.NOTE_STICKS, 100, 1);
-							player.sendTitle(ChatColor.AQUA + "4", ChatColor.YELLOW + "チーム: " + hashMapTeam.get(player.getUniqueId()));
+							player.playSound(player.getLocation(), Sound.BLOCK_NOTE_XYLOPHONE, 100, 1);
+							player.sendTitle(ChatColor.AQUA + "4", ChatColor.YELLOW + "チーム: " + hashMapTeam.get(player.getUniqueId()), 0, 25, 0);
 						} else if (timesLeft == 3) {
-							player.playSound(player.getLocation(), Sound.NOTE_STICKS, 100, 1);
-							player.sendTitle(ChatColor.BLUE + "3", ChatColor.YELLOW + "チーム: " + hashMapTeam.get(player.getUniqueId()));
+							player.playSound(player.getLocation(), Sound.BLOCK_NOTE_XYLOPHONE, 100, 1);
+							player.sendTitle(ChatColor.BLUE + "3", ChatColor.YELLOW + "チーム: " + hashMapTeam.get(player.getUniqueId()), 0, 25, 0);
 						} else if (timesLeft == 2) {
-							player.playSound(player.getLocation(), Sound.NOTE_STICKS, 100, 1);
-							player.sendTitle(ChatColor.YELLOW + "2", ChatColor.YELLOW + "チーム: " + hashMapTeam.get(player.getUniqueId()));
+							player.playSound(player.getLocation(), Sound.BLOCK_NOTE_XYLOPHONE, 100, 1);
+							player.sendTitle(ChatColor.YELLOW + "2", ChatColor.YELLOW + "チーム: " + hashMapTeam.get(player.getUniqueId()), 0, 25, 0);
 						} else if (timesLeft == 1) {
-							player.playSound(player.getLocation(), Sound.NOTE_STICKS, 100, 1);
-							player.sendTitle(ChatColor.RED + "1", ChatColor.YELLOW + "チーム: " + hashMapTeam.get(player.getUniqueId()));
+							player.playSound(player.getLocation(), Sound.BLOCK_NOTE_XYLOPHONE, 100, 1);
+							player.sendTitle(ChatColor.RED + "1", ChatColor.YELLOW + "チーム: " + hashMapTeam.get(player.getUniqueId()), 0, 25, 0);
 						} else if (timesLeft == 0) {
 							player.setGameMode(GameMode.ADVENTURE);
 							gameStarted = true;
-							player.playSound(player.getLocation(), Sound.ENDERDRAGON_GROWL, 100, 1);
+							player.playSound(player.getLocation(), Sound.ENTITY_ENDERDRAGON_GROWL, 100, 1);
 							if (hashMapTeam.get(player.getUniqueId()) == PlayerTeam.ZOMBIE) {
-								player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + "GO!", ChatColor.YELLOW + "目標: プレイヤーを全員倒すか先にゴールに到達する");
+								player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + "GO!", ChatColor.YELLOW + "目標: プレイヤーを全員倒すか先にゴールに到達する", 0, 40, 0);
 								player.sendMessage(ChatColor.GRAY + "あと12秒後にワープします...");
 								new BukkitRunnable() {
 									@Override
@@ -479,7 +485,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 										item.addUnsafeEnchantment(Enchantment.DURABILITY, 100);
 										item.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 100);
 										player.getInventory().setItem(0, item);
-										Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "give " + player.getName() + " minecraft:stone_axe 1 0 {CanDestroy:[\"minecraft:grass\",\"minecraft:planks\",\"minecraft:dirt\"],HideFlags:1,Unbreakable:1,display:{Name:\"錆びついた斧\"},ench:[{id:32,lvl:10}]}");
+										Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "give " + player.getName() + " minecraft:stone_pickaxe 1 0 {CanDestroy:[\"minecraft:gold_block\"],HideFlags:1,Unbreakable:1,display:{Name:\"錆びついたツルハシ\"},ench:[{id:32,lvl:10}]}");
 										String[] spawnLists = Arrays.asList(mapConfig.getList("spawnPoints.zombie", new ArrayList<String>()).toArray(new String[0])).get(0).split(",");
 										Location location = new Location(Bukkit.getWorld(mapConfig.getString("spawnPoints.world")), Double.parseDouble(spawnLists[0]), Double.parseDouble(spawnLists[1]), Double.parseDouble(spawnLists[2]));
 										if (!player.teleport(location)) {
@@ -490,7 +496,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 								}.runTaskLater(getInstance(), 20*12);
 							} else if (hashMapTeam.get(player.getUniqueId()) == PlayerTeam.PLAYER) {
 								Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "shot give " + player.getName() + " ak-47");
-								player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + "GO!", ChatColor.YELLOW + "目標: ゾンビから逃げ、ゾンビよりも先にゴールに到達する");
+								player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + "GO!", ChatColor.YELLOW + "目標: ゾンビから逃げ、ゾンビよりも先にゴールに到達する", 0, 25, 0);
 								String[] spawnLists = Arrays.asList(mapConfig.getList("spawnPoints.player", new ArrayList<String>()).toArray(new String[0])).get(0).split(",");
 								Location location = new Location(Bukkit.getWorld(mapConfig.getString("spawnPoints.world")), Double.parseDouble(spawnLists[0]), Double.parseDouble(spawnLists[1]), Double.parseDouble(spawnLists[2]));
 								if (!player.teleport(location)) {
@@ -571,54 +577,46 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		String[] spawnLists = Arrays.asList(mapConfig.getList("spawnPoints.zombie", new ArrayList<String>()).toArray(new String[0])).get(checkpoint).split(",");
 		Location location = new Location(Bukkit.getWorld(mapConfig.getString("spawnPoints.world")), Double.parseDouble(spawnLists[0]), Double.parseDouble(spawnLists[1]), Double.parseDouble(spawnLists[2]));
 		event.setRespawnLocation(location);
-		event.getPlayer().sendMessage("" + ChatColor.GREEN + ChatColor.BOLD + "あと5秒でリスポーンします！");
-		event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 100000, 100, false, false));
+		event.getPlayer().setGameMode(GameMode.ADVENTURE);
+		event.getPlayer().setPlayerListName(ChatColor.DARK_GREEN + event.getPlayer().getName());
+		event.getPlayer().getInventory().setHelmet(Utils.createLeatherItemStack(Material.LEATHER_HELMET, 0, 100, 0));
+		event.getPlayer().getInventory().setChestplate(Utils.createLeatherItemStack(Material.LEATHER_CHESTPLATE, 0, 100, 0));
+		event.getPlayer().getInventory().setLeggings(Utils.createLeatherItemStack(Material.LEATHER_LEGGINGS, 0, 100, 0));
+		event.getPlayer().getInventory().setBoots(Utils.createLeatherItemStack(Material.LEATHER_BOOTS, 0, 100, 0));
+		event.getPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(150);
+		event.getPlayer().setHealth(150);
+		event.getPlayer().setHealthScale(40);
 		new BukkitRunnable() {
 			public void run() {
-				event.getPlayer().removePotionEffect(PotionEffectType.SLOW);
-				event.getPlayer().setGameMode(GameMode.ADVENTURE);
-				event.getPlayer().setPlayerListName(ChatColor.DARK_GREEN + event.getPlayer().getName());
-				event.getPlayer().getInventory().setHelmet(Utils.createLeatherItemStack(Material.LEATHER_HELMET, 0, 100, 0));
-				event.getPlayer().getInventory().setChestplate(Utils.createLeatherItemStack(Material.LEATHER_CHESTPLATE, 0, 100, 0));
-				event.getPlayer().getInventory().setLeggings(Utils.createLeatherItemStack(Material.LEATHER_LEGGINGS, 0, 100, 0));
-				event.getPlayer().getInventory().setBoots(Utils.createLeatherItemStack(Material.LEATHER_BOOTS, 0, 100, 0));
-				event.getPlayer().setMaxHealth(150);
-				event.getPlayer().setHealth(150);
-				event.getPlayer().setHealthScale(40);
-				new BukkitRunnable() {
-					public void run() {
-						event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, 100000, 0, false, false));
-						event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 1, false, false));
-						event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 100000, 100, false, false));
-						event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100000, 0, false, false));
-						event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 100000, 0, false, false));
-						ItemStack item = new ItemStack(Material.IRON_SWORD);
-						ItemMeta meta = item.getItemMeta();
-						meta.setDisplayName("" + ChatColor.RESET + ChatColor.WHITE + "ナイフ");
-						item.setItemMeta(meta);
-						item.addUnsafeEnchantment(Enchantment.DURABILITY, 100);
-						item.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 100);
-						event.getPlayer().getInventory().setItem(0, item);
-						Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "give " + event.getPlayer().getName() + " minecraft:stone_axe 1 0 {CanDestroy:[\"minecraft:grass\",\"minecraft:planks\",\"minecraft:dirt\"],HideFlags:1,Unbreakable:1,display:{Name:\"錆びついた斧\"},ench:[{id:32,lvl:10}]}");
-					}
-				}.runTaskLater(getInstance(), 40);
-				if (players == 0 && gameStarted) {
-				endGame("ゾンビ");
-				}
+				event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, 100000, 0, false, false));
+				event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 1, false, false));
+				event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 100000, 100, false, false));
+				event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100000, 0, false, false));
+				event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 100000, 0, false, false));
+				ItemStack item = new ItemStack(Material.IRON_SWORD);
+				ItemMeta meta = item.getItemMeta();
+				meta.setDisplayName("" + ChatColor.RESET + ChatColor.WHITE + "ナイフ");
+				item.setItemMeta(meta);
+				item.addUnsafeEnchantment(Enchantment.DURABILITY, 100);
+				item.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 100);
+				event.getPlayer().getInventory().setItem(0, item);
+				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "give " + event.getPlayer().getName() + " minecraft:stone_pickaxe 1 0 {CanDestroy:[\"minecraft:gold_block\"],HideFlags:1,Unbreakable:1,display:{Name:\"錆びついたツルハシ\"},ench:[{id:32,lvl:10}]}");
 			}
 		}.runTaskLater(this, 20*5);
 	}
 
-	@SuppressWarnings("deprecation")
 	@EventHandler(priority=EventPriority.HIGHEST)
 	public void onPlayerHurt(EntityDamageByEntityEvent event) {
+		Log.debug("Damager: " + event.getDamager().getName());
+		Log.debug("Damaged player: " + event.getEntity().getName());
+		Log.debug("gamestarted: " + gameStarted + ", gameended: " + gameEnded);
 		long time = System.currentTimeMillis();
 		if (event.getEntityType() != EntityType.PLAYER || event.getDamager().getType() != EntityType.PLAYER) return;
 		event.setCancelled(true);
 		if (!gameStarted || gameEnded) return;
-		if (hashMapTeam.get(event.getDamager().getUniqueId()) == PlayerTeam.ZOMBIE && playedTime < 10) return;
-		if (hashMapTeam.get(event.getEntity().getUniqueId()) == PlayerTeam.ZOMBIE) return;
-		if (hashMapTeam.get(event.getDamager().getUniqueId()) == hashMapTeam.get(event.getEntity().getUniqueId())) return;
+		if (hashMapTeam.get(event.getDamager().getUniqueId()) == PlayerTeam.ZOMBIE && playedTime < 12) return; // zombie can't be damaged others if < 12 seconds
+		if (hashMapTeam.get(event.getEntity().getUniqueId()) == PlayerTeam.ZOMBIE) return; // cancel punch player -> zombie
+		if (hashMapTeam.get(event.getDamager().getUniqueId()) == hashMapTeam.get(event.getEntity().getUniqueId())) return; // friendly fire
 		Player player = (Player) event.getEntity();
 		player.getInventory().clear();
 		if (hashMapTeam.get(player.getUniqueId()) == PlayerTeam.PLAYER) {
@@ -637,7 +635,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		player.getInventory().setChestplate(Utils.createLeatherItemStack(Material.LEATHER_CHESTPLATE, 0, 100, 0));
 		player.getInventory().setLeggings(Utils.createLeatherItemStack(Material.LEATHER_LEGGINGS, 0, 100, 0));
 		player.getInventory().setBoots(Utils.createLeatherItemStack(Material.LEATHER_BOOTS, 0, 100, 0));
-		player.setMaxHealth(150);
+		player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(150);
 		player.setHealth(150);
 		player.setHealthScale(40);
 		new BukkitRunnable() {
@@ -654,13 +652,13 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				item.addUnsafeEnchantment(Enchantment.DURABILITY, 100);
 				item.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 100);
 				player.getInventory().setItem(0, item);
-				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "give " + event.getEntity().getName() + " minecraft:stone_axe 1 0 {CanDestroy:[\"minecraft:grass\",\"minecraft:planks\",\"minecraft:dirt\"],HideFlags:1,Unbreakable:1,display:{Name:\"錆びついた斧\"},ench:[{id:32,lvl:10}]}");
+				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "give " + player.getName() + " minecraft:stone_pickaxe 1 0 {CanDestroy:[\"minecraft:gold_block\"],HideFlags:1,Unbreakable:1,display:{Name:\"錆びついたツルハシ\"},ench:[{id:32,lvl:10}]}");
 			}
 		}.runTaskLater(this, 40);
 		for (Player player2 : Bukkit.getOnlinePlayers()) {
-			player2.playSound(player2.getLocation(), Sound.ENDERDRAGON_GROWL, 80, 1); // avoid loud sound, it's 80%!
+			player2.playSound(player2.getLocation(), Sound.ENTITY_ENDERDRAGON_GROWL, 80, 1); // avoid loud sound, it's 80%!
 		}
-		player.sendTitle(ChatColor.DARK_GREEN + "ゾンビチームになった！", "");
+		player.sendTitle(ChatColor.DARK_GREEN + "ゾンビチームになった！", "", 0, 40, 0);
 		Bukkit.broadcastMessage(ChatColor.DARK_GREEN + player.getName() + "が" + event.getDamager().getName() + "によってゾンビにされた。");
 		if (players <= 0 && gameStarted) {
 			endGame("ゾンビ");
@@ -700,22 +698,18 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		}
 		hashMapTeam.remove(event.getPlayer().getUniqueId());
 		if (gameStarted && (zombies == 0 || players == 0)) {
-			// String team = zombies == 0 ? "プレイヤー" : "ゾンビ";
-			// endGame(team);
+			String team = zombies == 0 ? "プレイヤー" : "ゾンビ";
+			endGame(team);
 		}
 	}
 
 	@EventHandler
 	public void onProjectileHit(ProjectileHitEvent event) {
 		long time = System.currentTimeMillis();
-		Location Llocation = new Location(
-				event.getEntity().getLocation().getWorld(),
-				Math.nextUp(event.getEntity().getLocation().getX()),
-				Math.nextUp(event.getEntity().getLocation().getY()),
-				Math.nextUp(event.getEntity().getLocation().getZ()+0.6));
-		Block block = event.getEntity().getWorld().getBlockAt(Llocation);
+		Block block = event.getHitBlock();
+		if (event.getEntity() instanceof Snowball) return;
 		if (block == null) return;
-		int durability = (int) Math.nextUp(Math.min(Constants.materialDurability.getOrDefault(block.getType(), 5)*((double)players/(double)5), 1000));
+		int durability = (int) Math.nextUp(Math.min(Constants.materialDurability.getOrDefault(block.getType(), 5)*((double)players/(double)5), 3000));
 		if (block.getType() == Material.DIRT || block.getType() == Material.GRASS || block.getType() == Material.WOOD) {
 			String location = block.getLocation().getBlockX() + "," + block.getLocation().getBlockY() + "," + block.getLocation().getBlockZ();
 			String wall = (String) locationWall.getOrDefault(location, null);
@@ -736,7 +730,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 					try {
 						protocol.sendServerPacket(player, packet1);
 					} catch (InvocationTargetException e) {
-						e.printStackTrace();
+					e.printStackTrace();
 					}
 				}
 				return;
@@ -855,17 +849,16 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		if (event.getItemDrop().getItemStack().getType() == Material.STONE_AXE) event.setCancelled(true); // Please don't drop axe
 	}
 
-	@SuppressWarnings("deprecation")
 	public void endGame(String team) {
 		gameEnded = true;
 		for (Player player : Bukkit.getOnlinePlayers()) {
-			player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + team + "チームの勝ち！", "");
+			player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + team + "チームの勝ち！", "", 0, 40, 0);
 			new BukkitRunnable() {
 				public void run() {
-					if (fireworked >= 200*Bukkit.getOnlinePlayers().size()) this.cancel();
-					player.playSound(player.getLocation(), Sound.FIREWORK_LAUNCH, 100, 1);
-					//Entity tnt = player.getWorld().spawn(player.getLocation(), TNTPrimed.class);
-					//((TNTPrimed)tnt).setFuseTicks(40);
+					if (fireworked >= 200) this.cancel();
+					player.playSound(player.getLocation(), Sound.ENTITY_FIREWORK_LAUNCH, 100, 1);
+					Entity tnt = player.getWorld().spawn(player.getLocation(), TNTPrimed.class);
+					((TNTPrimed)tnt).setFuseTicks(40);
 					fireworked++;
 				}
 			}.runTaskTimer(getInstance(), 0, 5);
