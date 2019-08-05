@@ -31,7 +31,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Snowball;
@@ -603,10 +602,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				event.getPlayer().getInventory().setItem(0, item);
 				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "give " + event.getPlayer().getName() + " minecraft:stone_pickaxe 1 0 {CanDestroy:[\"minecraft:gold_block\"],HideFlags:1,Unbreakable:1,display:{Name:\"錆びついたツルハシ\"},ench:[{id:32,lvl:10}]}");
 			}
-		}.runTaskLater(this, 40);
-		if (players == 0 && gameStarted) {
-			endGame("ゾンビ");
-		}
+		}.runTaskLater(this, 20*5);
 	}
 
 	@EventHandler(priority=EventPriority.HIGHEST)
@@ -890,18 +886,18 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				sender.sendMessage(ChatColor.RED + "ゲームはまだ開始されていません！");
 				return true;
 			}
-			gameEnded = true;
 			Bukkit.broadcastMessage("" + ChatColor.GOLD + ChatColor.BOLD + "あと10秒で救援が来ます！");
 			new BukkitRunnable() {
 				public void run() {
+					gameEnded = true;
 					Player nearestPlayer = null;
 					List<Player> players = null;
 					if (sender instanceof BlockCommandSender) {
 						nearestPlayer = Utils.targetPFindPlayers(((BlockCommandSender)sender).getBlock().getLocation());
-						players = Utils.targetAFindPlayersWithRange(((BlockCommandSender)sender).getBlock().getLocation(), 7);
+						players = Utils.targetAFindPlayersWithRange(((BlockCommandSender)sender).getBlock().getLocation(), 10);
 					} else if (sender instanceof Player) {
 						nearestPlayer = Utils.targetPFindPlayers(((Player)sender).getLocation());
-						players = Utils.targetAFindPlayersWithRange(((Player)sender).getLocation(), 7);
+						players = Utils.targetAFindPlayersWithRange(((Player)sender).getLocation(), 10);
 					} else {
 						sender.sendMessage(ChatColor.RED + "不明なタイプです: " + sender.toString() + ", Name: " + sender.getName());
 						return;
