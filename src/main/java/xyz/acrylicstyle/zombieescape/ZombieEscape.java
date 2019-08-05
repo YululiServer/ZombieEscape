@@ -34,6 +34,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Snowball;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -609,13 +610,16 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 
 	@EventHandler(priority=EventPriority.HIGHEST)
 	public void onPlayerHurt(EntityDamageByEntityEvent event) {
+		Log.debug("Damager: " + event.getDamager().getName());
+		Log.debug("Damaged player: " + event.getEntity().getName());
+		Log.debug("gamestarted: " + gameStarted + ", gameended: " + gameEnded);
 		long time = System.currentTimeMillis();
 		if (event.getEntityType() != EntityType.PLAYER || event.getDamager().getType() != EntityType.PLAYER) return;
 		event.setCancelled(true);
 		if (!gameStarted || gameEnded) return;
-		if (hashMapTeam.get(event.getDamager().getUniqueId()) == PlayerTeam.ZOMBIE && playedTime < 10) return;
-		if (hashMapTeam.get(event.getEntity().getUniqueId()) == PlayerTeam.ZOMBIE) return;
-		if (hashMapTeam.get(event.getDamager().getUniqueId()) == hashMapTeam.get(event.getEntity().getUniqueId())) return;
+		if (hashMapTeam.get(event.getDamager().getUniqueId()) == PlayerTeam.ZOMBIE && playedTime < 12) return; // zombie can't be damaged others if < 12 seconds
+		if (hashMapTeam.get(event.getEntity().getUniqueId()) == PlayerTeam.ZOMBIE) return; // cancel punch player -> zombie
+		if (hashMapTeam.get(event.getDamager().getUniqueId()) == hashMapTeam.get(event.getEntity().getUniqueId())) return; // friendly fire
 		Player player = (Player) event.getEntity();
 		player.getInventory().clear();
 		if (hashMapTeam.get(player.getUniqueId()) == PlayerTeam.PLAYER) {
@@ -697,8 +701,8 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		}
 		hashMapTeam.remove(event.getPlayer().getUniqueId());
 		if (gameStarted && (zombies == 0 || players == 0)) {
-			// String team = zombies == 0 ? "プレイヤー" : "ゾンビ";
-			// endGame(team);
+			String team = zombies == 0 ? "プレイヤー" : "ゾンビ";
+			endGame(team);
 		}
 	}
 
@@ -706,44 +710,46 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	public void onProjectileHit(ProjectileHitEvent event) {
 		long time = System.currentTimeMillis();
 		Block block = event.getHitBlock();
-		if (block == null) return;
-		int durability = (int) Math.nextUp(Math.min(Constants.materialDurability.getOrDefault(block.getType(), 5)*((double)players/(double)5), 3000));
-		if (block.getType() == Material.DIRT || block.getType() == Material.GRASS || block.getType() == Material.WOOD) {
-			String location = block.getLocation().getBlockX() + "," + block.getLocation().getBlockY() + "," + block.getLocation().getBlockZ();
-			String wall = (String) locationWall.getOrDefault(location, null);
-			Integer state = hashMapBlockState.get(wall) != null ? hashMapBlockState.get(wall) : 0;
-			if (state >= durability) {
-				mapConfig.getStringList("wallLocation." + wall).forEach(blocation -> {
-					String[] blocationArray = blocation.split(",");
-					Block ablock = event.getEntity().getWorld().getBlockAt(Integer.parseInt(blocationArray[0]), Integer.parseInt(blocationArray[1]), Integer.parseInt(blocationArray[2]));
-					ablock.setType(Material.AIR);
-				});
-				block.setType(Material.AIR);
-				hashMapBlockState.remove(wall);
+		if (!(event.getEntity() instanceof Snowball) || event.getHitEntity().getType() != EntityType.PLAYER) {
+			if (block == null) return;
+			int durability = (int) Math.nextUp(Math.min(Constants.materialDurability.getOrDefault(block.getType(), 5)*((double)players/(double)5), 3000));
+			if (block.getType() == Material.DIRT || block.getType() == Material.GRASS || block.getType() == Material.WOOD) {
+				String location = block.getLocation().getBlockX() + "," + block.getLocation().getBlockY() + "," + block.getLocation().getBlockZ();
+				String wall = (String) locationWall.getOrDefault(location, null);
+				Integer state = hashMapBlockState.get(wall) != null ? hashMapBlockState.get(wall) : 0;
+				if (state >= durability) {
+					mapConfig.getStringList("wallLocation." + wall).forEach(blocation -> {
+						String[] blocationArray = blocation.split(",");
+						Block ablock = event.getEntity().getWorld().getBlockAt(Integer.parseInt(blocationArray[0]), Integer.parseInt(blocationArray[1]), Integer.parseInt(blocationArray[2]));
+						ablock.setType(Material.AIR);
+					});
+					block.setType(Material.AIR);
+					hashMapBlockState.remove(wall);
+					PacketContainer packet1 = protocol.createPacket(PacketType.Play.Server.BLOCK_BREAK_ANIMATION);
+					packet1.getBlockPositionModifier().write(0, new BlockPosition(block.getX(), block.getY()-1, block.getZ()));
+					packet1.getIntegers().write(0, new Random().nextInt(2000));
+					packet1.getIntegers().write(1, 0); // remove animation
+					for (Player player : Bukkit.getOnlinePlayers()) {
+						try {
+							protocol.sendServerPacket(player, packet1);
+						} catch (InvocationTargetException e) {
+							e.printStackTrace();
+						}
+					}
+					return;
+				}
+				hashMapBlockState.put(wall, state+1);
 				PacketContainer packet1 = protocol.createPacket(PacketType.Play.Server.BLOCK_BREAK_ANIMATION);
-				packet1.getBlockPositionModifier().write(0, new BlockPosition(block.getX(), block.getY()-1, block.getZ()));
+				packet1.getBlockPositionModifier().write(0, new BlockPosition(block.getX(), block.getY(), block.getZ()));
 				packet1.getIntegers().write(0, new Random().nextInt(2000));
-				packet1.getIntegers().write(1, 0); // remove animation
+				packet1.getIntegers().write(1, (state+1)*3);
 				for (Player player : Bukkit.getOnlinePlayers()) {
 					try {
 						protocol.sendServerPacket(player, packet1);
 					} catch (InvocationTargetException e) {
 						e.printStackTrace();
+						e.getCause().printStackTrace();
 					}
-				}
-				return;
-			}
-			hashMapBlockState.put(wall, state+1);
-			PacketContainer packet1 = protocol.createPacket(PacketType.Play.Server.BLOCK_BREAK_ANIMATION);
-			packet1.getBlockPositionModifier().write(0, new BlockPosition(block.getX(), block.getY(), block.getZ()));
-			packet1.getIntegers().write(0, new Random().nextInt(2000));
-			packet1.getIntegers().write(1, (state+1)*3);
-			for (Player player : Bukkit.getOnlinePlayers()) {
-				try {
-					protocol.sendServerPacket(player, packet1);
-				} catch (InvocationTargetException e) {
-					e.printStackTrace();
-					e.getCause().printStackTrace();
 				}
 			}
 		}
