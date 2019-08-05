@@ -18,12 +18,12 @@ public class ZombieEscapeTest {
 	@Test
 	public void durabilityTest() {
 		int players = 5;
-		Assert.assertEquals("Is wood wall durability is 100 if 5 players", 100, (int) Math.nextUp(Math.min(Constants.materialDurability.getOrDefault(Material.WOOD, 5)*((double)players/(double)5), 1000)));
+		Assert.assertEquals("Is wood wall durability is 300 if 5 players", 300, (int) Math.nextUp(Math.min(Constants.materialDurability.getOrDefault(Material.WOOD, 5)*((double)players/(double)5), 1000)));
 	}
 
 	@Test
 	public void durabilityTest1000() {
 		int players = 1;
-		Assert.assertEquals("Is wood wall durability is 1000 if 1 player", 1000, (int) Math.nextUp(Math.min(Constants.materialDurability.getOrDefault(Material.BEDROCK, 5)*((double)players/(double)5), 1000)));
+		Assert.assertEquals("Is bedrock wall durability is 3000 if 1 player", 3000, (int) Math.nextUp(Math.min(Constants.materialDurability.getOrDefault(Material.BEDROCK, 5)*((double)players/(double)5), 1000)));
 	}
 }
