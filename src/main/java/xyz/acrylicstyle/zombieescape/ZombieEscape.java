@@ -74,6 +74,8 @@ import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.BlockPosition;
 
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import xyz.acrylicstyle.tomeito_core.providers.ConfigProvider;
 import xyz.acrylicstyle.tomeito_core.utils.Log;
 import xyz.acrylicstyle.zombieescape.commands.Sponsor;
@@ -246,7 +248,8 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 					if (lockActionBar.getOrDefault(player.getUniqueId(), false)) continue;
 					int maxHealth = (int) player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue();
 					int health = (int) player.getHealth();
-					ActionBar.setActionBarWithoutException(player, "" + ChatColor.RED + health + "/" + maxHealth + "❤");
+					//ActionBar.setActionBarWithoutException(player, "" + ChatColor.RED + health + "/" + maxHealth + "❤");
+					player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("" + ChatColor.RED + health + "/" + maxHealth + "❤"));
 				}
 			}
 		};
@@ -702,12 +705,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	@EventHandler
 	public void onProjectileHit(ProjectileHitEvent event) {
 		long time = System.currentTimeMillis();
-		Location Llocation = new Location(
-				event.getEntity().getLocation().getWorld(),
-				Math.nextUp(event.getEntity().getLocation().getX()),
-				Math.nextUp(event.getEntity().getLocation().getY()),
-				Math.nextUp(event.getEntity().getLocation().getZ()+0.6));
-		Block block = event.getEntity().getWorld().getBlockAt(Llocation);
+		Block block = event.getHitBlock();
 		if (block == null) return;
 		int durability = (int) Math.nextUp(Math.min(Constants.materialDurability.getOrDefault(block.getType(), 5)*((double)players/(double)5), 1000));
 		if (block.getType() == Material.DIRT || block.getType() == Material.GRASS || block.getType() == Material.WOOD) {
