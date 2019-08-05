@@ -208,6 +208,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		World world = Bukkit.getWorld(mapConfig.getString("spawnPoints.world", "world"));
 		new BukkitRunnable() {
 			public void run() {
+				event.getPlayer().setCollidable(false);
 				event.getPlayer().teleport(world.getSpawnLocation());
 			}
 		}.runTask(this);
