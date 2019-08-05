@@ -22,8 +22,8 @@ public class ZombieEscapeTest {
 	}
 
 	@Test
-	public void durabilityTest1000() {
+	public void durabilityTest3000() {
 		int players = 1;
-		Assert.assertEquals("Is bedrock wall durability is 3000 if 1 player", 3000, (int) Math.nextUp(Math.min(Constants.materialDurability.getOrDefault(Material.BEDROCK, 5)*((double)players/(double)5), 1000)));
+		Assert.assertEquals("Is bedrock wall durability is 3000 if 1 player", 3000, (int) Math.nextUp(Math.min(Constants.materialDurability.getOrDefault(Material.BEDROCK, 5)*((double)players/(double)5), 3000)));
 	}
 }
