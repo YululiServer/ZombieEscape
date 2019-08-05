@@ -857,7 +857,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + team + "チームの勝ち！", "");
 			new BukkitRunnable() {
 				public void run() {
-					if (fireworked >= 200) this.cancel();
+					if (fireworked >= 200*Bukkit.getOnlinePlayers().size()) this.cancel();
 					player.playSound(player.getLocation(), Sound.FIREWORK_LAUNCH, 100, 1);
 					Entity tnt = player.getWorld().spawn(player.getLocation(), TNTPrimed.class);
 					((TNTPrimed)tnt).setFuseTicks(40);
@@ -888,10 +888,10 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				sender.sendMessage(ChatColor.RED + "ゲームはまだ開始されていません！");
 				return true;
 			}
-			gameEnded = true;
 			Bukkit.broadcastMessage("" + ChatColor.GOLD + ChatColor.BOLD + "あと10秒で救援が来ます！");
 			new BukkitRunnable() {
 				public void run() {
+					gameEnded = true;
 					Player nearestPlayer = null;
 					List<Player> players = null;
 					if (sender instanceof BlockCommandSender) {
