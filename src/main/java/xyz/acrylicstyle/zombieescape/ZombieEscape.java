@@ -31,6 +31,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Damageable;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -706,11 +707,14 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		}
 	}
 
-	@EventHandler(ignoreCancelled=true, priority=EventPriority.LOWEST)
+	@EventHandler(ignoreCancelled=true, priority=EventPriority.HIGHEST)
 	public void onProjectileHit(ProjectileHitEvent event) {
+		if (event.getHitEntity() != null && event.getHitEntity().getType() == EntityType.PLAYER) {
+			((Damageable)event.getHitEntity()).damage(3.0);
+			event.getHitEntity().setVelocity(event.getHitEntity().getLocation().getDirection().multiply(-0.5));
+			return;
+		}
 		long time = System.currentTimeMillis();
-		Bukkit.broadcastMessage("ProjectileHitEvent"); // TODO: remove this
-		Log.debug("ProjectileHitEvent");
 		Block block = event.getHitBlock();
 		if (block == null) return;
 		int durability = (int) Math.nextUp(Math.min(Constants.materialDurability.getOrDefault(block.getType(), 5)*((double)players/(double)5), 3000));
