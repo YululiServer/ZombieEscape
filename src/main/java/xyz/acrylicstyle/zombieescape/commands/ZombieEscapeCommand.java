@@ -9,7 +9,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 import xyz.acrylicstyle.zombieescape.utils.Utils;
 
@@ -30,12 +29,10 @@ public class ZombieEscapeCommand implements CommandExecutor {
 			} else {
 				String args2 = "";
 				for (String arg : args) args2 += " " + arg;
-				((Player) sender).performCommand("bukkit:help ZombieEscape" + args2);
+				Bukkit.dispatchCommand(sender, "bukkit:help ZombieEscape" + args2);
 			}
 		} else {
-			String args2 = "";
-			for (String arg : args) args2 += " " + arg;
-			((Player) sender).performCommand("bukkit:help ZombieEscape" + args2);
+			Bukkit.dispatchCommand(sender, "bukkit:help ZombieEscape");
 			return true;
 		}
 		return true;
