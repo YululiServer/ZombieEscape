@@ -164,16 +164,11 @@ public final class Utils {
 	}
 
 	public static ItemStack createLeatherItemStack(Material material, int red, int green, int blue) {
-		long time = System.nanoTime();
 		ItemStack item = new ItemStack(material);
 		LeatherArmorMeta lam = (LeatherArmorMeta) item.getItemMeta();
 		lam.setColor(Color.fromRGB(red, green, blue));
 		item.setItemMeta(lam);
 		item.addUnsafeEnchantment(Enchantment.DURABILITY, 100);
-		if (ZombieEscape.debug) {
-			long end = System.nanoTime()-time;
-			Log.debug("createLeatherItemStack() took " + end + "ns");
-		}
 		return item;
 	}
 
