@@ -34,7 +34,6 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Snowball;
-import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -705,6 +704,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 
 	@EventHandler
 	public void onProjectileHit(ProjectileHitEvent event) {
+		Log.info("omg projectilehit");
 		long time = System.currentTimeMillis();
 		Block block = event.getHitBlock();
 		if (event.getEntity() instanceof Snowball) return;
@@ -855,10 +855,10 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + team + "チームの勝ち！", "", 0, 40, 0);
 			new BukkitRunnable() {
 				public void run() {
-					if (fireworked >= 200) this.cancel();
+					if (fireworked*Bukkit.getOnlinePlayers().size() >= 40) this.cancel();
 					player.playSound(player.getLocation(), Sound.ENTITY_FIREWORK_LAUNCH, 100, 1);
-					Entity tnt = player.getWorld().spawn(player.getLocation(), TNTPrimed.class);
-					((TNTPrimed)tnt).setFuseTicks(40);
+					//TNTPrimed tnt = player.getWorld().spawn(player.getLocation(), TNTPrimed.class);
+					//tnt.setFuseTicks(40);
 					fireworked++;
 				}
 			}.runTaskTimer(getInstance(), 0, 5);

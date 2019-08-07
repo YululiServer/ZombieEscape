@@ -47,7 +47,7 @@ public final class Utils {
 	 * @param sender CommandSender
 	 * @return false if they're not player, true if they're player
 	 */
-	public static <T> boolean senderCheck(CommandSender sender, Class<T> trueIf) {
+	public static <T extends CommandSender> boolean senderCheck(CommandSender sender, Class<T> trueIf) {
 		if (!(trueIf.isInstance(sender))) {
 			sender.sendMessage(ChatColor.RED + "This command must be run from in-game.");
 			return false;
