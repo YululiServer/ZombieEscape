@@ -607,6 +607,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 
 	@EventHandler(priority=EventPriority.HIGHEST)
 	public void onPlayerHurt(EntityDamageByEntityEvent event) {
+		// TODO: debug message here
 		Log.debug("Damager: " + event.getDamager().getName());
 		Log.debug("Damaged player: " + event.getEntity().getName());
 		Log.debug("gamestarted: " + gameStarted + ", gameended: " + gameEnded);
@@ -704,9 +705,10 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		}
 	}
 
-	@EventHandler
+	@EventHandler(ignoreCancelled=true, priority=EventPriority.LOW)
 	public void onProjectileHit(ProjectileHitEvent event) {
 		long time = System.currentTimeMillis();
+		Bukkit.broadcastMessage("hit"); // TODO: remove this
 		Block block = event.getHitBlock();
 		if (block == null) return;
 		int durability = (int) Math.nextUp(Math.min(Constants.materialDurability.getOrDefault(block.getType(), 5)*((double)players/(double)5), 3000));
@@ -763,17 +765,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		String location = block.getLocation().getBlockX() + "," + block.getLocation().getBlockY() + "," + block.getLocation().getBlockZ();
 		String wall = (String) locationWall.getOrDefault(location, null);
 		hashMapBlockState.remove(wall);
-		PacketContainer packet1 = protocol.createPacket(PacketType.Play.Server.BLOCK_BREAK_ANIMATION);
-		packet1.getBlockPositionModifier().write(0, new BlockPosition(block.getX(), block.getY(), block.getZ()));
-		packet1.getIntegers().write(0, new Random().nextInt(2000));
-		packet1.getIntegers().write(1, 0); // remove animation
-		for (Player player : Bukkit.getOnlinePlayers()) {
-			try {
-				protocol.sendServerPacket(player, packet1);
-			} catch (InvocationTargetException e) {
-				e.printStackTrace();
-			}
-		}
 		if (debug) {
 			long end = System.currentTimeMillis()-time;
 			Log.debug("onBlockBreak() took " + end + "ms");

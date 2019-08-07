@@ -15,7 +15,6 @@ import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
 
 import xyz.acrylicstyle.tomeito_core.providers.ConfigProvider;
-import xyz.acrylicstyle.tomeito_core.utils.Log;
 import xyz.acrylicstyle.zombieescape.PlayerTeam;
 import xyz.acrylicstyle.zombieescape.ZombieEscape;
 import xyz.acrylicstyle.zombieescape.utils.Utils;
@@ -156,9 +155,6 @@ public class ZombieEscapeGameUtil {
 			File maps = new File("./plugins/ZombieEscape/maps/");
 			List<String> files = new ArrayList<String>();
 			for (File file : maps.listFiles()) files.add(file.getName().replaceAll(".yml", ""));
-			files.forEach(test -> {
-				Log.debug(test);
-			});
 			if (!files.contains(args[0])) {
 				sender.sendMessage(ChatColor.RED + "指定されたマップは存在しません。");
 				return true;
