@@ -607,6 +607,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 
 	@EventHandler(priority=EventPriority.HIGHEST)
 	public void onPlayerHurt(EntityDamageByEntityEvent event) {
+		Log.debug("EntityDamageByEntityEvent");
 		// TODO: debug message here
 		Log.debug("Damager: " + event.getDamager().getName());
 		Log.debug("Damaged player: " + event.getEntity().getName());
@@ -672,7 +673,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 
 	@EventHandler(priority=EventPriority.HIGHEST)
 	public void onEntityDamage(EntityDamageEvent event) {
-		Log.info("onEntityDamage");
+		Log.info("EntityDamageEvent");
 		if (event.getEntityType() != EntityType.PLAYER) return;
 		if (!gameStarted || gameEnded) event.setCancelled(true);
 		if (event.getCause() == DamageCause.FALL) event.setCancelled(true);
@@ -708,7 +709,8 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	@EventHandler(ignoreCancelled=true, priority=EventPriority.LOWEST)
 	public void onProjectileHit(ProjectileHitEvent event) {
 		long time = System.currentTimeMillis();
-		Bukkit.broadcastMessage("hit"); // TODO: remove this
+		Bukkit.broadcastMessage("ProjectileHitEvent"); // TODO: remove this
+		Log.debug("ProjectileHitEvent");
 		Block block = event.getHitBlock();
 		if (block == null) return;
 		int durability = (int) Math.nextUp(Math.min(Constants.materialDurability.getOrDefault(block.getType(), 5)*((double)players/(double)5), 3000));
