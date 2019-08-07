@@ -33,7 +33,6 @@ import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Snowball;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -206,6 +205,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		long time = System.currentTimeMillis();
 		if (!gameStarted && timesLeft >= 7) players = players + 1;
 		World world = Bukkit.getWorld(mapConfig.getString("spawnPoints.world", "world"));
+		world.setGameRuleValue("announceAdvancements", "false");
 		new BukkitRunnable() {
 			public void run() {
 				event.getPlayer().setCollidable(false);
@@ -438,7 +438,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 									hashMapTeam.put(player.getUniqueId(), PlayerTeam.PLAYER);
 									teams.get(hashMapTeam.get(player.getUniqueId()).toString()).setAllowFriendlyFire(false);
 									teams.get(hashMapTeam.get(player.getUniqueId()).toString()).addEntry(player.getName());
-									player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(150);
+									player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(1);
 									player.setHealth(1);
 									player.setHealthScale(1);
 									player.getInventory().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
@@ -495,6 +495,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 								}.runTaskLater(getInstance(), 20*12);
 							} else if (hashMapTeam.get(player.getUniqueId()) == PlayerTeam.PLAYER) {
 								Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "shot give " + player.getName() + " ak-47");
+								player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(1.0);
 								player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + "GO!", ChatColor.YELLOW + "目標: ゾンビから逃げ、ゾンビよりも先にゴールに到達する", 0, 25, 0);
 								String[] spawnLists = Arrays.asList(mapConfig.getList("spawnPoints.player", new ArrayList<String>()).toArray(new String[0])).get(0).split(",");
 								Location location = new Location(Bukkit.getWorld(mapConfig.getString("spawnPoints.world")), Double.parseDouble(spawnLists[0]), Double.parseDouble(spawnLists[1]), Double.parseDouble(spawnLists[2]));
@@ -670,6 +671,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 
 	@EventHandler(priority=EventPriority.HIGHEST)
 	public void onEntityDamage(EntityDamageEvent event) {
+		Log.info("onEntityDamage");
 		if (event.getEntityType() != EntityType.PLAYER) return;
 		if (!gameStarted || gameEnded) event.setCancelled(true);
 		if (event.getCause() == DamageCause.FALL) event.setCancelled(true);
@@ -704,10 +706,8 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 
 	@EventHandler
 	public void onProjectileHit(ProjectileHitEvent event) {
-		Log.info("omg projectilehit");
 		long time = System.currentTimeMillis();
 		Block block = event.getHitBlock();
-		if (event.getEntity() instanceof Snowball) return;
 		if (block == null) return;
 		int durability = (int) Math.nextUp(Math.min(Constants.materialDurability.getOrDefault(block.getType(), 5)*((double)players/(double)5), 3000));
 		if (block.getType() == Material.DIRT || block.getType() == Material.GRASS || block.getType() == Material.WOOD) {
