@@ -705,7 +705,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		}
 	}
 
-	@EventHandler(ignoreCancelled=true, priority=EventPriority.LOW)
+	@EventHandler(ignoreCancelled=true, priority=EventPriority.LOWEST)
 	public void onProjectileHit(ProjectileHitEvent event) {
 		long time = System.currentTimeMillis();
 		Bukkit.broadcastMessage("hit"); // TODO: remove this
