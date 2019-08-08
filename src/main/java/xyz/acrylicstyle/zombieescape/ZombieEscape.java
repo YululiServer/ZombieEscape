@@ -709,6 +709,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 
 	@EventHandler(ignoreCancelled=true, priority=EventPriority.HIGHEST)
 	public void onProjectileHit(ProjectileHitEvent event) {
+		Log.debug("is HitEntity null?:" + (event.getHitEntity() == null));
 		if (event.getHitEntity() != null && event.getHitEntity().getType() == EntityType.PLAYER) {
 			((Damageable)event.getHitEntity()).damage(3.0);
 			event.getHitEntity().setVelocity(event.getHitEntity().getLocation().getDirection().multiply(-0.5));
