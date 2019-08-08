@@ -34,6 +34,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -606,7 +607,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		}.runTaskLater(this, 20*5);
 	}
 
-	@EventHandler(priority=EventPriority.HIGHEST)
+	@EventHandler(priority=EventPriority.HIGHEST, ignoreCancelled=false)
 	public void onPlayerHurt(EntityDamageByEntityEvent event) {
 		Log.debug("EntityDamageByEntityEvent");
 		// TODO: debug message here
@@ -614,7 +615,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		Log.debug("Damaged player: " + event.getEntity().getName());
 		Log.debug("gamestarted: " + gameStarted + ", gameended: " + gameEnded);
 		long time = System.currentTimeMillis();
-		if (event.getEntityType() != EntityType.PLAYER || event.getDamager().getType() != EntityType.PLAYER) return;
+		if (!(event.getDamager() instanceof Projectile)) if (event.getEntityType() != EntityType.PLAYER || event.getDamager().getType() != EntityType.PLAYER) return;
 		event.setCancelled(true);
 		if (!gameStarted || gameEnded) return;
 		if (hashMapTeam.get(event.getDamager().getUniqueId()) == PlayerTeam.ZOMBIE && playedTime < 12) return; // zombie can't be damaged others if < 12 seconds
@@ -707,7 +708,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		}
 	}
 
-	@EventHandler(ignoreCancelled=true, priority=EventPriority.HIGHEST)
+	@EventHandler(ignoreCancelled=false, priority=EventPriority.HIGHEST)
 	public void onProjectileHit(ProjectileHitEvent event) {
 		Log.debug("is HitEntity null?:" + (event.getHitEntity() == null));
 		if (event.getHitEntity() != null && event.getHitEntity().getType() == EntityType.PLAYER) {
