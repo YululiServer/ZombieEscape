@@ -179,7 +179,7 @@ public final class Utils {
 		event.setMessage(event.getMessage().replaceAll(":thumbsup:", ChatColor.GREEN + "👍"));
 		event.setMessage(event.getMessage().replaceAll(":thumbsdown:", ChatColor.RED + "👎"));
 		if (event.getMessage().startsWith("!") || ZombieEscape.gameEnded || !ZombieEscape.gameStarted) {
-			event.setMessage(event.getMessage().replaceFirst("!", ""));
+			if (event.getMessage().startsWith("!")) event.setMessage(event.getMessage().replaceFirst("!", ""));
 			event.setFormat(ChatColor.RED + "[All] " + teamname + " " + event.getPlayer().getName() + ChatColor.RESET + ChatColor.WHITE + ": " + event.getMessage());
 		} else {
 			ZombieEscape.hashMapTeam.forEach((uuid, team) -> {
