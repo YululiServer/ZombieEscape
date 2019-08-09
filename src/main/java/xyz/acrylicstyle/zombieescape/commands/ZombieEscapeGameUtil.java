@@ -210,7 +210,7 @@ public class ZombieEscapeGameUtil {
 					ZombieEscape.mapConfig.getStringList("wallLocation." + args[0]).forEach(blocation -> {
 						String[] blocationArray = blocation.split(",");
 						Block ablock = ps.getWorld().getBlockAt(Integer.parseInt(blocationArray[0]), Integer.parseInt(blocationArray[1]), Integer.parseInt(blocationArray[2]));
-						ablock.getWorld().spawnParticle(Particle.EXPLOSION_HUGE, ablock.getLocation(), 2, ablock.getState().getData());
+						ablock.getWorld().spawnParticle(Particle.EXPLOSION_HUGE, ablock.getLocation(), 2);
 						ablock.setType(Material.AIR);
 					});
 				}
