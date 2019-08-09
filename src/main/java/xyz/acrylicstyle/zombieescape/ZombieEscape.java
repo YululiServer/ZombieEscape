@@ -557,6 +557,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 							scoreboard.resetScores(okString);
 							scoreboard.resetScores(koString);
 							scoreboard.resetScores(koString + ChatColor.AQUA + " <-" + ChatColor.AQUA + " [P]");
+							scoreboard.resetScores(okString + ChatColor.AQUA + " <-" + ChatColor.AQUA + " [P]");
 							scoreboard.resetScores(okString + ChatColor.AQUA + " <-" + ChatColor.DARK_GREEN + " [Z]");
 							scoreboard.resetScores(okString + ChatColor.AQUA + " <-" + ChatColor.DARK_GREEN + " [Z]" + ChatColor.AQUA + " [P]");
 							if (zombiePassedcp) {
