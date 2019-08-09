@@ -484,9 +484,8 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 										item.addUnsafeEnchantment(Enchantment.DURABILITY, 100);
 										item.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 100);
 										player.getInventory().setItem(0, item);
-										// TODO: test here
-										//Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "give " + player.getName() + " minecraft:stone_axe 1 0 {CanDestroy:[\"minecraft:planks\",\"minecraft:dirt\",\"minecraft:grass\"],HideFlags:1,Unbreakable:1,display:{Name:\"錆びついた斧\"},ench:[{id:32,lvl:10}]}");
-										//Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "give " + player.getName() + " minecraft:stone_pickaxe 1 0 {CanDestroy:[\"minecraft:gold_block\"],HideFlags:1,Unbreakable:1,display:{Name:\"錆びついたツルハシ\"},ench:[{id:32,lvl:10}]}");
+										Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "give " + player.getName() + " minecraft:stone_axe 1 0 {CanDestroy:[\"minecraft:planks\",\"minecraft:dirt\",\"minecraft:grass\"],HideFlags:1,Unbreakable:1,display:{Name:\"錆びついた斧\"},ench:[{id:32,lvl:10}]}");
+										Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "give " + player.getName() + " minecraft:stone_pickaxe 1 0 {CanDestroy:[\"minecraft:gold_block\"],HideFlags:1,Unbreakable:1,display:{Name:\"錆びついたツルハシ\"},ench:[{id:32,lvl:10}]}");
 										String[] spawnLists = Arrays.asList(mapConfig.getList("spawnPoints.zombie", new ArrayList<String>()).toArray(new String[0])).get(0).split(",");
 										Location location = new Location(Bukkit.getWorld(mapConfig.getString("spawnPoints.world")), Double.parseDouble(spawnLists[0]), Double.parseDouble(spawnLists[1]), Double.parseDouble(spawnLists[2]));
 										if (!player.teleport(location)) {
@@ -623,9 +622,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	@EventHandler(priority=EventPriority.HIGHEST)
 	public void onPlayerHurt(EntityDamageByEntityEvent event) {
 		Log.debug("EntityDamageByEntityEvent");
-		// TODO: debug message here
-		Log.debug("Damager: " + event.getDamager().getName());
-		Log.debug("Damaged player: " + event.getEntity().getName());
+		// TODO: remove me
 		long time = System.currentTimeMillis();
 		if (!(event.getDamager() instanceof Projectile)) if (event.getEntityType() != EntityType.PLAYER || event.getDamager().getType() != EntityType.PLAYER) return;
 		event.setCancelled(true);
