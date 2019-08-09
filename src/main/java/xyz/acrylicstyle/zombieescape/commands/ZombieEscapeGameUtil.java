@@ -174,8 +174,6 @@ public class ZombieEscapeGameUtil {
 
 		@Override
 		public boolean onCommand(final CommandSender sender, Command command, String label, String[] args) {
-			if (!Utils.senderCheck(sender)) return true;
-			Player ps = (Player) sender;
 			if (args.length <= 1) {
 				sender.sendMessage(ChatColor.RED + "使用法: /destroywall <壁のID> <壁破壊までの時間(秒)>");
 				return true;
@@ -191,7 +189,7 @@ public class ZombieEscapeGameUtil {
 				public void run() {
 					ZombieEscape.mapConfig.getStringList("wallLocation." + args[0]).forEach(blocation -> {
 						String[] blocationArray = blocation.split(",");
-						Block ablock = ps.getWorld().getBlockAt(Integer.parseInt(blocationArray[0]), Integer.parseInt(blocationArray[1]), Integer.parseInt(blocationArray[2]));
+						Block ablock = Bukkit.getWorld(ZombieEscape.mapConfig.getString("spawnPoints.world", "world")).getBlockAt(Integer.parseInt(blocationArray[0]), Integer.parseInt(blocationArray[1]), Integer.parseInt(blocationArray[2]));
 						ablock.getWorld().spawnParticle(Particle.EXPLOSION_HUGE, ablock.getLocation(), 2);
 						ablock.setType(Material.AIR);
 						ablock.getWorld().playSound(ablock.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 10, 1);
