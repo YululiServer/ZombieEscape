@@ -543,14 +543,14 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 							if (playerIncp) status += ChatColor.AQUA + " [P]";
 							scoreboard.resetScores(okString);
 							scoreboard.resetScores(koString);
-							scoreboard.resetScores(koString + ChatColor.AQUA + "<-" + ChatColor.AQUA + " [P]");
-							scoreboard.resetScores(okString + ChatColor.AQUA + "<-" + ChatColor.DARK_GREEN + " [Z]");
-							scoreboard.resetScores(okString + ChatColor.AQUA + "<-" + ChatColor.DARK_GREEN + " [Z]" + ChatColor.AQUA + " [P]");
+							scoreboard.resetScores(koString + ChatColor.AQUA + " <-" + ChatColor.AQUA + " [P]");
+							scoreboard.resetScores(okString + ChatColor.AQUA + " <-" + ChatColor.DARK_GREEN + " [Z]");
+							scoreboard.resetScores(okString + ChatColor.AQUA + " <-" + ChatColor.DARK_GREEN + " [Z]" + ChatColor.AQUA + " [P]");
 							if (zombiePassedcp) {
-								Score score = objective3.getScore(okString + (status == "" ? "" : ChatColor.AQUA + "<-" + status));
+								Score score = objective3.getScore(okString + (status == "" ? "" : ChatColor.AQUA + " <-" + status));
 								score.setScore(-i);
 							} else {
-								Score score = objective3.getScore(koString + (status == "" ? "" : ChatColor.AQUA + "<-" + status));
+								Score score = objective3.getScore(koString + (status == "" ? "" : ChatColor.AQUA + " <-" + status));
 								score.setScore(-i);
 							}
 						}
