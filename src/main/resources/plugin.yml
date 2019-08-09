@@ -5,7 +5,7 @@ depend: [ProtocolLib]
 
 commands:
   zombieescape:
-    description: "Zombie Escape"
+    description: "§cこのプラグインはエラーが発生しています。コンソールを確認してください。"
     usage: /<command>
   setsponsor:
     description: "Add a new sponsored player."
@@ -71,3 +71,11 @@ commands:
   vote:
     description: "Vote for map!"
     usage: /<command> <map>
+  destroywall:
+    description: "Destroy wall with count down."
+    usage: /<command> <wall> <countdown in seconds>
+    permission: zombieescape.destroywall
+  crash:
+    description: "Crashes this plugin. Needs restart if you wish re-enable plugin."
+    usage: /<command>
+    permission: zombieescape.danger

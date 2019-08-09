@@ -151,8 +151,11 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			zec = new ZombieEscapeConfig();
 			zegu = new ZombieEscapeGameUtil();
 		} catch (Exception e) {
+			Log.error("Failed to initialize commands! Showing errors below and disabling plugin.");
 			e.printStackTrace();
 			e.getCause().printStackTrace();
+			Bukkit.getPluginManager().disablePlugin(this);
+			return;
 		}
 		if (sponsor != null && zec != null && zegu != null) {
 			Bukkit.getPluginCommand("setsponsor").setExecutor(sponsor.new SetSponsor());
@@ -170,7 +173,16 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			Bukkit.getPluginCommand("check").setExecutor(zegu.new CheckConfig());
 			Bukkit.getPluginCommand("setstatus").setExecutor(zegu.new SetStatus());
 			Bukkit.getPluginCommand("vote").setExecutor(zegu.new Vote());
+			Bukkit.getPluginCommand("destroywall").setExecutor(zegu.new DestroyWall());
 			Bukkit.getPluginCommand("zombieescape").setExecutor(new ZombieEscapeCommand());
+			Bukkit.getPluginCommand("crash").setExecutor(new CommandExecutor() {
+				@Override
+				public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+					Log.warn(sender.getName() + " requested to crash itself, disabling plugin.");
+					Bukkit.getPluginManager().disablePlugin(getInstance());
+					return true;
+				}
+			});
 		} else {
 			Bukkit.getLogger().severe("[ZombieEscape] Unable to register commands! Commands are disabled.");
 		}
@@ -724,7 +736,8 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			if (hashMapTeam.get(event.getHitEntity().getUniqueId()) != PlayerTeam.ZOMBIE) return;
 			Damageable d = (Damageable) event.getHitEntity();
 			d.damage(10.0);
-			d.setVelocity(d.getVelocity().multiply(3));
+			//d.setVelocity(d.getVelocity().multiply(3));
+			d.setVelocity(event.getEntity().getLocation().getDirection().multiply(2));
 			return;
 		}
 		long time = System.currentTimeMillis();

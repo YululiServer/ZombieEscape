@@ -7,12 +7,16 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.block.Block;
 import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import xyz.acrylicstyle.tomeito_core.providers.ConfigProvider;
 import xyz.acrylicstyle.zombieescape.PlayerTeam;
@@ -181,6 +185,37 @@ public class ZombieEscapeGameUtil {
 			}
 			ZombieEscape.hashMapVote.put(ps.getUniqueId(), args[0]);
 			sender.sendMessage(ChatColor.GREEN + mapConfig.getString("mapname") + " に投票しました。");
+			return true;
+		}
+	}
+
+	public final class DestroyWall implements CommandExecutor {
+		@Override
+		public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+			if (!Utils.senderCheck(sender)) return true;
+			Player ps = (Player) sender;
+			if (args.length <= 1) {
+				sender.sendMessage(ChatColor.RED + "使用法: /destroywall <壁のID> <壁破壊までの時間(秒)>");
+				return true;
+			}
+			int countdown = 0;
+			try {
+				countdown = Integer.parseInt(args[1]);
+			} catch(NumberFormatException e) {
+				sender.sendMessage(ChatColor.RED + "時間は数値にしてください。");
+				return true;
+			}
+			new BukkitRunnable() {
+				public void run() {
+					ZombieEscape.mapConfig.getStringList("wallLocation." + args[0]).forEach(blocation -> {
+						String[] blocationArray = blocation.split(",");
+						Block ablock = ps.getWorld().getBlockAt(Integer.parseInt(blocationArray[0]), Integer.parseInt(blocationArray[1]), Integer.parseInt(blocationArray[2]));
+						ablock.getWorld().spawnParticle(Particle.EXPLOSION_HUGE, ablock.getLocation(), 2, ablock.getState().getData());
+						ablock.setType(Material.AIR);
+					});
+				}
+			}.runTaskLater(ZombieEscape.getProvidingPlugin(ZombieEscape.class), 20*countdown);
+			sender.sendMessage(ChatColor.GREEN + "壁を破壊しました。");
 			return true;
 		}
 	}
