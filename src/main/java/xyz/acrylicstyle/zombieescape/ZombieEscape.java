@@ -655,9 +655,8 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 
 	@EventHandler(priority=EventPriority.HIGHEST)
 	public void onPlayerHurt(EntityDamageByEntityEvent event) {
-		Log.debug("EntityDamageByEntityEvent");
-		// TODO: remove me
 		long time = System.currentTimeMillis();
+		if (hashMapTeam.get(event.getEntity().getUniqueId()) == PlayerTeam.PLAYER && event.getDamager() instanceof Snowball) return;
 		if (!(event.getDamager() instanceof Projectile)) if (event.getEntityType() != EntityType.PLAYER || event.getDamager().getType() != EntityType.PLAYER) return;
 		event.setCancelled(true);
 		if (!gameStarted || gameEnded) return;
