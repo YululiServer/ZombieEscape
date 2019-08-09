@@ -34,6 +34,7 @@ import org.bukkit.entity.Damageable;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Snowball;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -644,11 +645,12 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		if (hashMapTeam.get(event.getEntity().getUniqueId()) == PlayerTeam.ZOMBIE) return; // cancel punch player -> zombie
 		if (hashMapTeam.get(event.getDamager().getUniqueId()) == hashMapTeam.get(event.getEntity().getUniqueId())) return; // friendly fire
 		Player player = (Player) event.getEntity();
-		player.getInventory().clear();
 		if (hashMapTeam.get(player.getUniqueId()) == PlayerTeam.PLAYER) {
+			if (event.getDamager() instanceof Snowball) return;
 			players = players - 1;
 			zombies = zombies + 1;
 		}
+		player.getInventory().clear();
 		hashMapTeam.remove(player.getUniqueId());
 		hashMapTeam.put(player.getUniqueId(), PlayerTeam.ZOMBIE);
 		final Objective objective = hashMapScoreboard.get(player.getUniqueId()).getObjective("scoreboard");
