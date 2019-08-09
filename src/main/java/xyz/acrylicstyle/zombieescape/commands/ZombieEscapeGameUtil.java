@@ -24,27 +24,6 @@ import xyz.acrylicstyle.zombieescape.ZombieEscape;
 import xyz.acrylicstyle.zombieescape.utils.Utils;
 
 public class ZombieEscapeGameUtil {
-	public final class Suicide implements CommandExecutor {
-		@Override
-		public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-			if (!(sender instanceof Player)) {
-				sender.sendMessage(ChatColor.RED + "This command must be run from in-game.");
-				return true;
-			}
-			if (!ZombieEscape.gameStarted) {
-				sender.sendMessage(ChatColor.RED + "まだゲームは開始されていません！");
-				return true;
-			}
-			if (ZombieEscape.gameStarted && ZombieEscape.playedTime < 10) {
-				sender.sendMessage(ChatColor.RED + "まだこのコマンドは使用できません！");
-				return true;
-			}
-			sender.sendMessage(ChatColor.RED + "このコマンドは無効化されています。");
-			//((Player) sender).setHealth(0.0);
-			return true;
-		}
-	}
-
 	public final class SetCheckpoint implements CommandExecutor { // /setcp from command block or something
 		@Override
 		public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {

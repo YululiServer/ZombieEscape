@@ -30,9 +30,6 @@ commands:
     usage: /<command> <0, 1, 2, 3, ...>
     aliases: ["cp", "checkpoint"]
     permission: zombieescape.setcp
-  suicide:
-    description: "Kills yourself."
-    usage: /<command>
   startgame:
     description: "Starts game."
     usage: /<command>

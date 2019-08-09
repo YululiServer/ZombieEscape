@@ -167,7 +167,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			Bukkit.getPluginCommand("deletewall").setExecutor(zec.new DeleteWall());
 			Bukkit.getPluginCommand("setmapname").setExecutor(zec.new SetMapName());
 			Bukkit.getPluginCommand("setmap").setExecutor(zec.new SetMap());
-			Bukkit.getPluginCommand("suicide").setExecutor(zegu.new Suicide());
 			Bukkit.getPluginCommand("setcp").setExecutor(zegu.new SetCheckpoint());
 			Bukkit.getPluginCommand("startgame").setExecutor(zegu.new StartGame());
 			Bukkit.getPluginCommand("endgame").setExecutor(new EndGame());
