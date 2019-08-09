@@ -2,12 +2,14 @@
 package xyz.acrylicstyle.zombieescape;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -29,18 +31,29 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Damageable;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType.SlotType;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -53,8 +66,11 @@ import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
 
+import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
+import com.comphenix.protocol.events.PacketContainer;
+import com.comphenix.protocol.wrappers.BlockPosition;
 
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -549,7 +565,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		}.runTaskTimer(this, 0, 20);
 	}
 
-	/*
 	@EventHandler
 	public synchronized void onPlayerDeath(final PlayerDeathEvent event) {
 		if (event.getEntityType() != EntityType.PLAYER) return;
@@ -603,7 +618,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		}.runTaskLater(this, 20*5);
 	}
 
-	/*
 	@EventHandler(priority=EventPriority.HIGHEST)
 	public void onPlayerHurt(EntityDamageByEntityEvent event) {
 		Log.debug("EntityDamageByEntityEvent");
@@ -678,7 +692,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		if (event.getCause() == DamageCause.FALL) event.setCancelled(true);
 		if (hashMapTeam.get(event.getEntity().getUniqueId()) == PlayerTeam.PLAYER && event.getCause() == DamageCause.PROJECTILE) event.setCancelled(true);
 	}
-	*/
 
 	@EventHandler
 	public synchronized void onPlayerLeft(PlayerQuitEvent event) {
@@ -706,7 +719,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		}
 	}
 
-	/*
 	@EventHandler(priority=EventPriority.HIGHEST)
 	public void onProjectileHit(ProjectileHitEvent event) {
 		Log.debug("is HitEntity null?:" + (event.getHitEntity() == null));
@@ -763,9 +775,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			Log.debug("onProjectileHit() took " + end + "ms");
 		}
 	}
-	*/
 
-	/*
 	@EventHandler
 	public void onBlockBreak(BlockBreakEvent event) {
 		long time = System.currentTimeMillis();
@@ -779,7 +789,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			Log.debug("onBlockBreak() took " + end + "ms");
 		}
 	}
-	*/
 
 	@EventHandler(priority=EventPriority.LOWEST)
 	public void onPlayerLogin(PlayerLoginEvent event) {
@@ -818,7 +827,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		}
 	}
 
-	/*
 	@EventHandler
 	public void onInventoryClick(InventoryClickEvent event) { if (event.getSlotType() == SlotType.ARMOR) event.setCancelled(true); }
 
@@ -843,7 +851,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		if (event.getItemDrop().getItemStack().getType() == Material.STONE_PICKAXE) event.setCancelled(true); // Please don't drop pickaxe
 		if (event.getItemDrop().getItemStack().getType() == Material.STONE_AXE) event.setCancelled(true); // Please don't drop axe
 	}
-	*/
 
 	public void endGame(String team) {
 		gameEnded = true;
