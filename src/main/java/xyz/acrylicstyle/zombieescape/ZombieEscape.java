@@ -31,14 +31,10 @@ import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -606,6 +602,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		}.runTaskLater(this, 20*5);
 	}
 
+	/*
 	@EventHandler(priority=EventPriority.HIGHEST)
 	public void onPlayerHurt(EntityDamageByEntityEvent event) {
 		Log.debug("EntityDamageByEntityEvent");
@@ -680,6 +677,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		if (event.getCause() == DamageCause.FALL) event.setCancelled(true);
 		if (hashMapTeam.get(event.getEntity().getUniqueId()) == PlayerTeam.PLAYER && event.getCause() == DamageCause.PROJECTILE) event.setCancelled(true);
 	}
+	*/
 
 	@EventHandler
 	public void onPlayerLeft(PlayerQuitEvent event) {
