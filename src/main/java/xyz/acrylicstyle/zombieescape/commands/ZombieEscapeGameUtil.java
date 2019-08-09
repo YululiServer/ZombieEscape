@@ -223,6 +223,7 @@ public class ZombieEscapeGameUtil {
 				public void run() {
 					ZombieEscape.ongoingEvent = "あと" + count + "秒で壁破壊";
 					if (count <= 0) {
+						ZombieEscape.ongoingEvent = null;
 						this.cancel();
 						return;
 					}
