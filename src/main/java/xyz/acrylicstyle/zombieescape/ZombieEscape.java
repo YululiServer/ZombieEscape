@@ -200,16 +200,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	}
 
 	@EventHandler
-	public void onProjectileHitTest(ProjectileHitEvent event) {
-		Bukkit.broadcastMessage("ProjectileHitEvent: is EntityHit: " + (event.getHitEntity() != null));
-	}
-
-	@EventHandler
-	public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
-		Bukkit.broadcastMessage("EntityDamageByEntityEvent: " + event.getEntityType().toString() + " got damage by " + event.getDamager().toString());
-	}
-
-	@EventHandler
 	public synchronized void onPlayerJoin(final PlayerJoinEvent event) {
 		long time = System.currentTimeMillis();
 		if (!gameStarted && timesLeft >= 7) players = players + 1;
@@ -721,7 +711,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 
 	@EventHandler(priority=EventPriority.HIGHEST)
 	public void onProjectileHit(ProjectileHitEvent event) {
-		Log.debug("is HitEntity null?:" + (event.getHitEntity() == null));
 		if (event.getHitEntity() != null && event.getHitEntity().getType() == EntityType.PLAYER) {
 			((Damageable)event.getHitEntity()).damage(3.0);
 			event.getHitEntity().setVelocity(event.getHitEntity().getLocation().getDirection().multiply(-0.5));
