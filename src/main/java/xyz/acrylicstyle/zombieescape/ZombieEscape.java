@@ -743,11 +743,11 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				});
 				block.setType(Material.AIR);
 				hashMapBlockState.remove(wall);
-				block.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, block.getLocation(), 10);
+				block.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, block.getLocation(), 30);
 				return;
 			}
 			hashMapBlockState.put(wall, state+1);
-			block.getWorld().spawnParticle(Particle.BLOCK_CRACK, block.getLocation(), 1);
+			block.getWorld().spawnParticle(Particle.BLOCK_CRACK, block.getLocation(), 2, block.getState().getData());
 		}
 		if (debug) {
 			long end = System.currentTimeMillis()-time;
