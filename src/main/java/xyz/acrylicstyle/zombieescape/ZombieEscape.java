@@ -210,6 +210,10 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		return this;
 	}
 
+	/*public static void doBossBarTick(BossBar bossbar, int countdownInSecond) {
+		bossbar.setProgress();
+	}*/
+
 	@EventHandler
 	public synchronized void onPlayerJoin(final PlayerJoinEvent event) {
 		long time = System.currentTimeMillis();
