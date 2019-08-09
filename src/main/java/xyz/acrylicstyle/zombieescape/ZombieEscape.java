@@ -461,6 +461,25 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 							player.playSound(player.getLocation(), Sound.BLOCK_NOTE_PLING, 100, 1);
 							player.sendTitle(ChatColor.GREEN + "5", ChatColor.YELLOW + "チーム: " + hashMapTeam.get(player.getUniqueId()), 0, 25, 0);
 						} else if (timesLeft == 4) {
+							if (zombies == 0) {
+								listZombies.add(player.getUniqueId().toString());
+								hashMapOriginZombie.put(player.getUniqueId(), true);
+								hashMapTeam.put(player.getUniqueId(), PlayerTeam.ZOMBIE);
+								zombies = zombies+1;
+								Score score6 = objective.getScore(ChatColor.GREEN + "    チーム: " + ChatColor.DARK_GREEN + "ゾンビ");
+								score6.setScore(6);
+								player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(250);
+								player.setHealth(500);
+								player.setHealthScale(40);
+								player.getInventory().setHelmet(Utils.createLeatherItemStack(Material.LEATHER_HELMET, 0, 100, 0));
+								player.getInventory().setChestplate(Utils.createLeatherItemStack(Material.LEATHER_CHESTPLATE, 0, 100, 0));
+								player.getInventory().setLeggings(Utils.createLeatherItemStack(Material.LEATHER_LEGGINGS, 0, 100, 0));
+								player.getInventory().setBoots(Utils.createLeatherItemStack(Material.LEATHER_BOOTS, 0, 100, 0));
+								player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100000, 0, false, false));
+								player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 100000, 0, false, false));
+								player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 100000, 100, false, false));
+								player.setPlayerListName(ChatColor.DARK_GREEN + player.getName());
+							}
 							player.playSound(player.getLocation(), Sound.BLOCK_NOTE_PLING, 100, 1);
 							player.sendTitle(ChatColor.AQUA + "4", ChatColor.YELLOW + "チーム: " + hashMapTeam.get(player.getUniqueId()), 0, 25, 0);
 						} else if (timesLeft == 3) {
