@@ -35,6 +35,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -194,7 +195,12 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 
 	@EventHandler
 	public void onProjectileHitTest(ProjectileHitEvent event) {
-		Bukkit.broadcastMessage("Hit, is EntityHit: " + (event.getHitEntity() != null));
+		Bukkit.broadcastMessage("ProjectileHitEvent: is EntityHit: " + (event.getHitEntity() != null));
+	}
+
+	@EventHandler
+	public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
+		Bukkit.broadcastMessage("EntityDamageByEntityEvent: " + event.getEntityType().toString() + " got damage by " + event.getDamager().toString());
 	}
 
 	@EventHandler
