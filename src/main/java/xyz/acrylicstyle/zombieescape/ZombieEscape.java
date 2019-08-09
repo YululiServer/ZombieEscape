@@ -30,7 +30,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Damageable;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -756,13 +755,14 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 
 	@EventHandler(priority=EventPriority.HIGHEST)
 	public void onProjectileHit(ProjectileHitEvent event) {
+		/*
 		if (event.getHitEntity() != null) {
 			if (hashMapTeam.get(event.getHitEntity().getUniqueId()) != PlayerTeam.ZOMBIE) return;
 			Damageable d = (Damageable) event.getHitEntity();
-			d.damage(10.0);
+			d.damage(7.0);
 			d.setVelocity(event.getEntity().getLocation().getDirection().multiply(1));
 			return;
-		}
+		}*/
 		long time = System.currentTimeMillis();
 		Block block = event.getHitBlock();
 		if (block == null) return;
