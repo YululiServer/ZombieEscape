@@ -432,7 +432,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 									Score score6 = objective.getScore(ChatColor.GREEN + "    チーム: " + ChatColor.DARK_GREEN + "ゾンビ");
 									score6.setScore(6);
 									player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(250);
-									player.setHealth(500);
+									player.setHealth(250);
 									player.setHealthScale(40);
 									player.getInventory().setHelmet(Utils.createLeatherItemStack(Material.LEATHER_HELMET, 0, 100, 0));
 									player.getInventory().setChestplate(Utils.createLeatherItemStack(Material.LEATHER_CHESTPLATE, 0, 100, 0));
@@ -469,7 +469,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 								Score score6 = objective.getScore(ChatColor.GREEN + "    チーム: " + ChatColor.DARK_GREEN + "ゾンビ");
 								score6.setScore(6);
 								player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(250);
-								player.setHealth(500);
+								player.setHealth(250);
 								player.setHealthScale(40);
 								player.getInventory().setHelmet(Utils.createLeatherItemStack(Material.LEATHER_HELMET, 0, 100, 0));
 								player.getInventory().setChestplate(Utils.createLeatherItemStack(Material.LEATHER_CHESTPLATE, 0, 100, 0));
