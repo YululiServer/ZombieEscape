@@ -98,8 +98,8 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	 */
 	public static HashMap<UUID, String> hashMapVote = new HashMap<UUID, String>();
 	public static Map<String, Object> locationWall = null;
-	public static List<UUID> previousZombies = null;
-	public static List<UUID> listZombies = new ArrayList<UUID>();
+	public static List<String> previousZombies = null;
+	public static List<String> listZombies = new ArrayList<String>();
 	public static String mapName = null;
 	public static ScoreboardManager manager = null;
 	public static ProtocolManager protocol = null;
@@ -178,7 +178,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		maxCheckpoints = Math.min(mapConfig.getStringList("spawnPoints.player").size(), mapConfig.getStringList("spawnPoints.zombie").size());
 		locationWall = ConfigProvider.getConfigSectionValue(mapConfig.get("locationWall", new HashMap<String, Object>()), true);
 		List<?> list = config.getList("previousZombies") != null ? config.getList("previousZombies") : new ArrayList<String>();
-		previousZombies = Arrays.asList(list.toArray(new UUID[0]));
+		previousZombies = Arrays.asList(list.toArray(new String[0]));
 		Bukkit.getLogger().info("[ZombieEscape] Enabled Zombie Escape");
 	}
 
@@ -410,8 +410,8 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 							}
 							board.resetScores(playerMessage);
 							if (hashMapTeam.get(event.getPlayer().getUniqueId()) != PlayerTeam.SPECTATOR) {
-								if ((((int) Math.round((double) Bukkit.getOnlinePlayers().size() / (double) 10) - zombies) >= 0) && !previousZombies.contains(player.getUniqueId())) {
-									listZombies.add(player.getUniqueId());
+								if ((((int) Math.round((double) Bukkit.getOnlinePlayers().size() / (double) 10) - zombies) >= 0) && !previousZombies.contains(player.getUniqueId().toString())) {
+									listZombies.add(player.getUniqueId().toString());
 									hashMapOriginZombie.put(player.getUniqueId(), true);
 									hashMapTeam.put(player.getUniqueId(), PlayerTeam.ZOMBIE);
 									zombies = zombies+1;
