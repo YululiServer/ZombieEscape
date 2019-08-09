@@ -220,6 +220,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		new BukkitRunnable() {
 			public void run() {
 				event.getPlayer().teleport(world.getSpawnLocation());
+				event.getPlayer().setGameMode(GameMode.ADVENTURE);
 			}
 		}.runTask(this);
 		hashMapTeam.put(event.getPlayer().getUniqueId(), PlayerTeam.PLAYER);
@@ -461,6 +462,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 							player.playSound(player.getLocation(), Sound.BLOCK_NOTE_PLING, 100, 1);
 							player.sendTitle(ChatColor.GREEN + "5", ChatColor.YELLOW + "チーム: " + hashMapTeam.get(player.getUniqueId()), 0, 25, 0);
 						} else if (timesLeft == 4) {
+							player.setGameMode(GameMode.ADVENTURE);
 							if (zombies == 0) {
 								listZombies.add(player.getUniqueId().toString());
 								hashMapOriginZombie.put(player.getUniqueId(), true);
