@@ -173,11 +173,8 @@ public final class Utils {
 	}
 
 	public static void chat(AsyncPlayerChatEvent event, PlayerTeam pteam, String teamname) {
-		event.setMessage(event.getMessage().replaceAll("<3", ChatColor.RED + "❤"));
-		event.setMessage(event.getMessage().replaceAll(":peace:", ChatColor.GREEN + "✌"));
-		event.setMessage(event.getMessage().replaceAll(":thinking:", ChatColor.YELLOW + "🤔"));
-		event.setMessage(event.getMessage().replaceAll(":thumbsup:", ChatColor.GREEN + "👍"));
-		event.setMessage(event.getMessage().replaceAll(":thumbsdown:", ChatColor.RED + "👎"));
+		event.setMessage(event.getMessage().replaceAll("<3", ChatColor.RED + "❤" + ChatColor.RESET));
+		event.setMessage(event.getMessage().replaceAll(":peace:", ChatColor.GREEN + "✌" + ChatColor.RESET));
 		if (event.getMessage().startsWith("!") || ZombieEscape.gameEnded || !ZombieEscape.gameStarted) {
 			if (event.getMessage().startsWith("!")) event.setMessage(event.getMessage().replaceFirst("!", ""));
 			event.setFormat(ChatColor.RED + "[All] " + teamname + " " + event.getPlayer().getName() + ChatColor.RESET + ChatColor.WHITE + ": " + event.getMessage());
