@@ -444,9 +444,9 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 								} else {
 									players = players+1;
 									hashMapTeam.put(player.getUniqueId(), PlayerTeam.PLAYER);
-									player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(2);
-									player.setHealth(2);
-									player.setHealthScale(2);
+									//player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(2);
+									//player.setHealth(2);
+									//player.setHealthScale(2);
 									player.getInventory().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
 									player.getInventory().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
 									player.getInventory().setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
@@ -737,7 +737,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			if (hashMapTeam.get(event.getHitEntity().getUniqueId()) != PlayerTeam.ZOMBIE) return;
 			Damageable d = (Damageable) event.getHitEntity();
 			d.damage(10.0);
-			d.setVelocity(d.getVelocity().multiply(-0.5));
+			d.setVelocity(d.getVelocity().multiply(-2));
 			return;
 		}
 		long time = System.currentTimeMillis();
