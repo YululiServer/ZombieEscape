@@ -431,7 +431,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 									zombies = zombies+1;
 									Score score6 = objective.getScore(ChatColor.GREEN + "    チーム: " + ChatColor.DARK_GREEN + "ゾンビ");
 									score6.setScore(6);
-									player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(500);
+									player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(250);
 									player.setHealth(500);
 									player.setHealthScale(40);
 									player.getInventory().setHelmet(Utils.createLeatherItemStack(Material.LEATHER_HELMET, 0, 100, 0));
@@ -509,7 +509,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 								}.runTaskLater(getInstance(), 20*12);
 							} else if (hashMapTeam.get(player.getUniqueId()) == PlayerTeam.PLAYER) {
 								Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "shot give " + player.getName() + " ak-47");
-								player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(2);
+								//player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(2);
 								player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + "GO!", ChatColor.YELLOW + "目標: ゾンビから逃げ、ゾンビよりも先にゴールに到達する", 0, 25, 0);
 								String[] spawnLists = Arrays.asList(mapConfig.getList("spawnPoints.player", new ArrayList<String>()).toArray(new String[0])).get(0).split(",");
 								Location location = new Location(Bukkit.getWorld(mapConfig.getString("spawnPoints.world")), Double.parseDouble(spawnLists[0]), Double.parseDouble(spawnLists[1]), Double.parseDouble(spawnLists[2]));
@@ -874,6 +874,8 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	}
 
 	public final class EndGame implements CommandExecutor {
+		private int count = 0;
+
 		@Override
 		public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 			if (sender instanceof ConsoleCommandSender) {
@@ -912,6 +914,18 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 					return;
 				}
 			}.runTaskLater(getInstance(), 20*10);
+			count = 10;
+			new BukkitRunnable() {
+				public void run() {
+					ZombieEscape.ongoingEvent = "あと" + count + "秒で脱出！";
+					if (count <= 0) {
+						ZombieEscape.ongoingEvent = null;
+						this.cancel();
+						return;
+					}
+					count--;
+				}
+			}.runTaskTimer(ZombieEscape.getProvidingPlugin(ZombieEscape.class), 0, 20);
 			return true;
 		}
 	}
