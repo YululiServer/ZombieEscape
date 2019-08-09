@@ -866,6 +866,8 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		if (event.getItemDrop().getItemStack().getType() == Material.STONE_AXE) event.setCancelled(true); // Please don't drop axe
 	}
 
+	private int shutdownCount = 0;
+
 	public void endGame(String team) {
 		gameEnded = true;
 		for (Player player : Bukkit.getOnlinePlayers()) {
@@ -890,6 +892,18 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		};
 		Timer timer = new Timer();
 		timer.schedule(task, 1000*15);
+		shutdownCount = 15;
+		new BukkitRunnable() {
+			public void run() {
+				ZombieEscape.ongoingEvent = "あと" + shutdownCount + "秒でサーバー再起動";
+				if (shutdownCount <= 0) {
+					ZombieEscape.ongoingEvent = null;
+					this.cancel();
+					return;
+				}
+				shutdownCount--;
+			}
+		}.runTaskTimer(ZombieEscape.getProvidingPlugin(ZombieEscape.class), 0, 20);
 	}
 
 	public final class EndGame implements CommandExecutor {
