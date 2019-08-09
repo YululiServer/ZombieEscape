@@ -120,6 +120,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	public static boolean debug = false;
 	public static boolean playersReset = false;
 	public static boolean gameEnded = false;
+	public static String ongoingEvent = null;
 
 	@Override
 	public void onEnable() {
@@ -258,7 +259,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 					int maxHealth = (int) player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue();
 					int health = (int) player.getHealth();
 					//ActionBar.setActionBarWithoutException(player, "" + ChatColor.RED + health + "/" + maxHealth + "❤");
-					player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("" + ChatColor.RED + health + "/" + maxHealth + "❤"));
+					player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("" + ChatColor.RED + health + "/" + maxHealth + "❤" + (ongoingEvent == null ? "" : ChatColor.GREEN + " | " + ChatColor.AQUA + ongoingEvent)));
 				}
 			}
 		};

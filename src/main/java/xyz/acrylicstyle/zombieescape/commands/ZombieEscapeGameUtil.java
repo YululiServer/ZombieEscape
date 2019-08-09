@@ -190,6 +190,8 @@ public class ZombieEscapeGameUtil {
 	}
 
 	public final class DestroyWall implements CommandExecutor {
+		private int count = 0;
+
 		@Override
 		public boolean onCommand(final CommandSender sender, Command command, String label, String[] args) {
 			if (!Utils.senderCheck(sender)) return true;
@@ -216,6 +218,17 @@ public class ZombieEscapeGameUtil {
 					sender.sendMessage(ChatColor.GREEN + "壁を破壊しました。");
 				}
 			}.runTaskLater(ZombieEscape.getProvidingPlugin(ZombieEscape.class), 20*countdown);
+			count = countdown;
+			new BukkitRunnable() {
+				public void run() {
+					ZombieEscape.ongoingEvent = "あと" + count + "秒で壁破壊";
+					if (count <= 0) {
+						this.cancel();
+						return;
+					}
+					count--;
+				}
+			}.runTaskTimer(ZombieEscape.getProvidingPlugin(ZombieEscape.class), 0, 20);
 			return true;
 		}
 	}
