@@ -2,14 +2,12 @@
 package xyz.acrylicstyle.zombieescape;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -31,7 +29,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Damageable;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -68,11 +65,8 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
 import org.bukkit.scoreboard.Team;
 
-import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
-import com.comphenix.protocol.events.PacketContainer;
-import com.comphenix.protocol.wrappers.BlockPosition;
 
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -713,6 +707,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		}
 	}
 
+	/*
 	@EventHandler(priority=EventPriority.HIGHEST)
 	public void onProjectileHit(ProjectileHitEvent event) {
 		Log.debug("is HitEntity null?:" + (event.getHitEntity() == null));
@@ -769,6 +764,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			Log.debug("onProjectileHit() took " + end + "ms");
 		}
 	}
+	*/
 
 	@EventHandler
 	public void onBlockBreak(BlockBreakEvent event) {
