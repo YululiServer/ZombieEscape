@@ -18,6 +18,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
@@ -722,8 +723,8 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 
 	@EventHandler(priority=EventPriority.HIGHEST)
 	public void onProjectileHit(ProjectileHitEvent event) {
-		if (hashMapTeam.get(event.getHitEntity().getUniqueId()) != PlayerTeam.ZOMBIE) return;
 		if (event.getHitEntity() != null) {
+			if (hashMapTeam.get(event.getHitEntity().getUniqueId()) != PlayerTeam.ZOMBIE) return;
 			Damageable d = (Damageable) event.getHitEntity();
 			d.damage(10.0);
 			d.setVelocity(d.getVelocity().multiply(3));
@@ -745,11 +746,11 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				});
 				block.setType(Material.AIR);
 				hashMapBlockState.remove(wall);
-				// TODO: block break particle here
+				block.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, block.getLocation(), 10);
 				return;
 			}
 			hashMapBlockState.put(wall, state+1);
-			// also here
+			block.getWorld().spawnParticle(Particle.BLOCK_CRACK, block.getLocation(), 1);
 		}
 		if (debug) {
 			long end = System.currentTimeMillis()-time;
