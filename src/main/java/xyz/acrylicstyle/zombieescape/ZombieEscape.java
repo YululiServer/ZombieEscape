@@ -31,6 +31,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Damageable;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -415,8 +416,8 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 									zombies = zombies+1;
 									Score score6 = objective.getScore(ChatColor.GREEN + "    チーム: " + ChatColor.DARK_GREEN + "ゾンビ");
 									score6.setScore(6);
-									player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(150);
-									player.setHealth(150);
+									player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(500);
+									player.setHealth(500);
 									player.setHealthScale(40);
 									player.getInventory().setHelmet(Utils.createLeatherItemStack(Material.LEATHER_HELMET, 0, 100, 0));
 									player.getInventory().setChestplate(Utils.createLeatherItemStack(Material.LEATHER_CHESTPLATE, 0, 100, 0));
@@ -475,8 +476,9 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 										item.addUnsafeEnchantment(Enchantment.DURABILITY, 100);
 										item.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 100);
 										player.getInventory().setItem(0, item);
-										Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "give " + player.getName() + " minecraft:stone_axe 1 0 {CanDestroy:[\"minecraft:planks\",\"minecraft:dirt\",\"minecraft:grass\"],HideFlags:1,Unbreakable:1,display:{Name:\"錆びついた斧\"},ench:[{id:32,lvl:10}]}");
-										Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "give " + player.getName() + " minecraft:stone_pickaxe 1 0 {CanDestroy:[\"minecraft:gold_block\"],HideFlags:1,Unbreakable:1,display:{Name:\"錆びついたツルハシ\"},ench:[{id:32,lvl:10}]}");
+										// TODO: test here
+										//Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "give " + player.getName() + " minecraft:stone_axe 1 0 {CanDestroy:[\"minecraft:planks\",\"minecraft:dirt\",\"minecraft:grass\"],HideFlags:1,Unbreakable:1,display:{Name:\"錆びついた斧\"},ench:[{id:32,lvl:10}]}");
+										//Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "give " + player.getName() + " minecraft:stone_pickaxe 1 0 {CanDestroy:[\"minecraft:gold_block\"],HideFlags:1,Unbreakable:1,display:{Name:\"錆びついたツルハシ\"},ench:[{id:32,lvl:10}]}");
 										String[] spawnLists = Arrays.asList(mapConfig.getList("spawnPoints.zombie", new ArrayList<String>()).toArray(new String[0])).get(0).split(",");
 										Location location = new Location(Bukkit.getWorld(mapConfig.getString("spawnPoints.world")), Double.parseDouble(spawnLists[0]), Double.parseDouble(spawnLists[1]), Double.parseDouble(spawnLists[2]));
 										if (!player.teleport(location)) {
@@ -502,7 +504,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 					}
 					if (hasEnoughPlayers && timesLeft >= 0 && settingsCheck) timesLeft--;
 				} else if (gameStarted) {
-					if (debug) Log.debug("Players: " + players + ", Zombies: " + zombies);
 					if (playedTime >= gameTime) {
 						endGame("ゾンビ");
 						this.cancel();
@@ -607,7 +608,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		// TODO: debug message here
 		Log.debug("Damager: " + event.getDamager().getName());
 		Log.debug("Damaged player: " + event.getEntity().getName());
-		Log.debug("gamestarted: " + gameStarted + ", gameended: " + gameEnded);
 		long time = System.currentTimeMillis();
 		if (!(event.getDamager() instanceof Projectile)) if (event.getEntityType() != EntityType.PLAYER || event.getDamager().getType() != EntityType.PLAYER) return;
 		event.setCancelled(true);
@@ -650,6 +650,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				item.addUnsafeEnchantment(Enchantment.DURABILITY, 100);
 				item.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 100);
 				player.getInventory().setItem(0, item);
+				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "give " + player.getName() + " minecraft:stone_axe 1 0 {CanDestroy:[\"minecraft:planks\",\"minecraft:dirt\",\"minecraft:grass\"],HideFlags:1,Unbreakable:1,display:{Name:\"錆びついた斧\"},ench:[{id:32,lvl:10}]}");
 				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "give " + player.getName() + " minecraft:stone_pickaxe 1 0 {CanDestroy:[\"minecraft:gold_block\"],HideFlags:1,Unbreakable:1,display:{Name:\"錆びついたツルハシ\"},ench:[{id:32,lvl:10}]}");
 			}
 		}.runTaskLater(this, 40);
@@ -704,6 +705,12 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 
 	@EventHandler(priority=EventPriority.HIGHEST)
 	public void onProjectileHit(ProjectileHitEvent event) {
+		if (event.getHitEntity() != null) {
+			Damageable d = (Damageable) event.getHitEntity();
+			d.damage(3.0);
+			d.setVelocity(d.getLocation().multiply(-0.5).toVector());
+			return;
+		}
 		long time = System.currentTimeMillis();
 		Block block = event.getHitBlock();
 		if (block == null) return;
