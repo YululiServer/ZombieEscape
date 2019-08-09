@@ -161,8 +161,8 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		} else {
 			Bukkit.getLogger().severe("[ZombieEscape] Unable to register commands! Commands are disabled.");
 		}
-		teams.put("zombie", manager.getNewScoreboard().registerNewTeam("zombie"));
-		teams.put("player", manager.getNewScoreboard().registerNewTeam("player"));
+		//teams.put("zombie", manager.getNewScoreboard().registerNewTeam("zombie"));
+		//teams.put("player", manager.getNewScoreboard().registerNewTeam("player"));
 		Bukkit.getPluginManager().registerEvents(this, this);
 		Utils.checkConfig();
 		maxCheckpoints = Math.min(mapConfig.getStringList("spawnPoints.player").size(), mapConfig.getStringList("spawnPoints.zombie").size());
@@ -413,8 +413,8 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 									hashMapOriginZombie.put(player.getUniqueId(), true);
 									hashMapTeam.put(player.getUniqueId(), PlayerTeam.ZOMBIE);
 									zombies = zombies+1;
-									teams.get(hashMapTeam.get(player.getUniqueId()).toString()).setAllowFriendlyFire(false);
-									teams.get(hashMapTeam.get(player.getUniqueId()).toString()).addEntry(player.getName());
+									//teams.get(hashMapTeam.get(player.getUniqueId()).toString()).setAllowFriendlyFire(false);
+									//teams.get(hashMapTeam.get(player.getUniqueId()).toString()).addEntry(player.getName());
 									Score score6 = objective.getScore(ChatColor.GREEN + "    チーム: " + ChatColor.DARK_GREEN + "ゾンビ");
 									score6.setScore(6);
 									player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(150);
@@ -431,8 +431,8 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 								} else {
 									players = players+1;
 									hashMapTeam.put(player.getUniqueId(), PlayerTeam.PLAYER);
-									teams.get(hashMapTeam.get(player.getUniqueId()).toString()).setAllowFriendlyFire(false);
-									teams.get(hashMapTeam.get(player.getUniqueId()).toString()).addEntry(player.getName());
+									//teams.get(hashMapTeam.get(player.getUniqueId()).toString()).setAllowFriendlyFire(false);
+									//teams.get(hashMapTeam.get(player.getUniqueId()).toString()).addEntry(player.getName());
 									player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(1);
 									player.setHealth(1);
 									player.setHealthScale(1);
