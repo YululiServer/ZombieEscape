@@ -737,7 +737,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			if (hashMapTeam.get(event.getHitEntity().getUniqueId()) != PlayerTeam.ZOMBIE) return;
 			Damageable d = (Damageable) event.getHitEntity();
 			d.damage(10.0);
-			d.setVelocity(d.getVelocity().multiply(-2));
+			d.setVelocity(d.getVelocity().multiply(2));
 			return;
 		}
 		long time = System.currentTimeMillis();
