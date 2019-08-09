@@ -192,7 +192,7 @@ public class ZombieEscapeGameUtil {
 						Block ablock = Bukkit.getWorld(ZombieEscape.mapConfig.getString("spawnPoints.world", "world")).getBlockAt(Integer.parseInt(blocationArray[0]), Integer.parseInt(blocationArray[1]), Integer.parseInt(blocationArray[2]));
 						ablock.getWorld().spawnParticle(Particle.EXPLOSION_HUGE, ablock.getLocation(), 2);
 						ablock.setType(Material.AIR);
-						ablock.getWorld().playSound(ablock.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 10, 1);
+						ablock.getWorld().playSound(ablock.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 5, 1);
 					});
 					sender.sendMessage(ChatColor.GREEN + "壁を破壊しました。");
 				}
