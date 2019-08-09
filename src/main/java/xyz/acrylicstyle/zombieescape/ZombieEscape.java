@@ -31,7 +31,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Damageable;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -175,8 +174,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		} else {
 			Bukkit.getLogger().severe("[ZombieEscape] Unable to register commands! Commands are disabled.");
 		}
-		//teams.put("zombie", manager.getNewScoreboard().registerNewTeam("zombie"));
-		//teams.put("player", manager.getNewScoreboard().registerNewTeam("player"));
 		Bukkit.getPluginManager().registerEvents(this, this);
 		Utils.checkConfig();
 		maxCheckpoints = Math.min(mapConfig.getStringList("spawnPoints.player").size(), mapConfig.getStringList("spawnPoints.zombie").size());
@@ -416,8 +413,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 									hashMapOriginZombie.put(player.getUniqueId(), true);
 									hashMapTeam.put(player.getUniqueId(), PlayerTeam.ZOMBIE);
 									zombies = zombies+1;
-									//teams.get(hashMapTeam.get(player.getUniqueId()).toString()).setAllowFriendlyFire(false);
-									//teams.get(hashMapTeam.get(player.getUniqueId()).toString()).addEntry(player.getName());
 									Score score6 = objective.getScore(ChatColor.GREEN + "    チーム: " + ChatColor.DARK_GREEN + "ゾンビ");
 									score6.setScore(6);
 									player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(150);
@@ -434,8 +429,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 								} else {
 									players = players+1;
 									hashMapTeam.put(player.getUniqueId(), PlayerTeam.PLAYER);
-									//teams.get(hashMapTeam.get(player.getUniqueId()).toString()).setAllowFriendlyFire(false);
-									//teams.get(hashMapTeam.get(player.getUniqueId()).toString()).addEntry(player.getName());
 									player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(1);
 									player.setHealth(1);
 									player.setHealthScale(1);
@@ -449,19 +442,19 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 									player.setPlayerListName(ChatColor.AQUA + player.getName());
 								}
 							}
-							player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BELL, 100, 1);
+							player.playSound(player.getLocation(), Sound.BLOCK_NOTE_PLING, 100, 1);
 							player.sendTitle(ChatColor.GREEN + "5", ChatColor.YELLOW + "チーム: " + hashMapTeam.get(player.getUniqueId()), 0, 25, 0);
 						} else if (timesLeft == 4) {
-							player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BELL, 100, 1);
+							player.playSound(player.getLocation(), Sound.BLOCK_NOTE_PLING, 100, 1);
 							player.sendTitle(ChatColor.AQUA + "4", ChatColor.YELLOW + "チーム: " + hashMapTeam.get(player.getUniqueId()), 0, 25, 0);
 						} else if (timesLeft == 3) {
-							player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BELL, 100, 1);
+							player.playSound(player.getLocation(), Sound.BLOCK_NOTE_PLING, 100, 1);
 							player.sendTitle(ChatColor.BLUE + "3", ChatColor.YELLOW + "チーム: " + hashMapTeam.get(player.getUniqueId()), 0, 25, 0);
 						} else if (timesLeft == 2) {
-							player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BELL, 100, 1);
+							player.playSound(player.getLocation(), Sound.BLOCK_NOTE_PLING, 100, 1);
 							player.sendTitle(ChatColor.YELLOW + "2", ChatColor.YELLOW + "チーム: " + hashMapTeam.get(player.getUniqueId()), 0, 25, 0);
 						} else if (timesLeft == 1) {
-							player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BELL, 100, 1);
+							player.playSound(player.getLocation(), Sound.BLOCK_NOTE_PLING, 100, 1);
 							player.sendTitle(ChatColor.RED + "1", ChatColor.YELLOW + "チーム: " + hashMapTeam.get(player.getUniqueId()), 0, 25, 0);
 						} else if (timesLeft == 0) {
 							player.setGameMode(GameMode.ADVENTURE);
@@ -711,11 +704,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 
 	@EventHandler(priority=EventPriority.HIGHEST)
 	public void onProjectileHit(ProjectileHitEvent event) {
-		if (event.getHitEntity() != null && event.getHitEntity().getType() == EntityType.PLAYER) {
-			((Damageable)event.getHitEntity()).damage(3.0);
-			event.getHitEntity().setVelocity(event.getHitEntity().getLocation().getDirection().multiply(-0.5));
-			return;
-		}
 		long time = System.currentTimeMillis();
 		Block block = event.getHitBlock();
 		if (block == null) return;
