@@ -2,14 +2,12 @@
 package xyz.acrylicstyle.zombieescape;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -66,11 +64,8 @@ import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
 
-import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
-import com.comphenix.protocol.events.PacketContainer;
-import com.comphenix.protocol.wrappers.BlockPosition;
 
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -92,35 +87,38 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	public static HashMap<UUID, String> hashMapLastScore4 = new HashMap<UUID, String>();
 	public static HashMap<UUID, String> hashMapLastScore8 = new HashMap<UUID, String>();
 	public static HashMap<String, Integer> hashMapBlockState = new HashMap<String, Integer>();
+	public static HashMap<String, Integer> hashMapVotes = new HashMap<String, Integer>();
+	public static HashMap<UUID, Boolean> lockActionBar = new HashMap<UUID, Boolean>();
 	/**
 	 * Not in use.
 	 */
 	public static HashMap<UUID, Boolean> hashMapOriginZombie = new HashMap<UUID, Boolean>();
-	public static HashMap<UUID, Boolean> lockActionBar = new HashMap<UUID, Boolean>();
 	/**
 	 * Player, Map name
 	 */
 	public static HashMap<UUID, String> hashMapVote = new HashMap<UUID, String>();
-	public static HashMap<String, Integer> hashMapVotes = new HashMap<String, Integer>();
+	public static Map<String, Object> locationWall = null;
+	public static List<UUID> previousZombies = null;
+	public static List<UUID> listZombies = new ArrayList<UUID>();
 	public static String mapName = null;
 	public static ScoreboardManager manager = null;
 	public static ProtocolManager protocol = null;
 	public static volatile int zombies = 0;
 	public static volatile int players = 0;
 	public static int timesLeft = 180;
+	public static int gameTime = 1800; // 30 minutes
+	public static int playedTime = 0;
+	public static int zombieCheckpoint = 0;
+	public static int playerCheckpoint = 0;
+	public static int maxCheckpoints = 0;
+	public static int fireworked = 0;
 	public static boolean timerStarted = false;
 	public static boolean hasEnoughPlayers = false;
 	public static boolean settingsCheck = false;
 	public static boolean gameStarted = false;
 	public static boolean debug = false;
 	public static boolean playersReset = false;
-	public static int gameTime = 1800; // 30 minutes
-	public static int playedTime = 0;
-	public static int checkpoint = 0;
-	public static int maxCheckpoints = 0;
-	public static int fireworked = 0;
 	public static boolean gameEnded = false;
-	public static Map<String, Object> locationWall = null;
 
 	@Override
 	public void onEnable() {
@@ -179,6 +177,8 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		Utils.checkConfig();
 		maxCheckpoints = Math.min(mapConfig.getStringList("spawnPoints.player").size(), mapConfig.getStringList("spawnPoints.zombie").size());
 		locationWall = ConfigProvider.getConfigSectionValue(mapConfig.get("locationWall", new HashMap<String, Object>()), true);
+		List<?> list = config.getList("previousZombies") != null ? config.getList("previousZombies") : new ArrayList<String>();
+		previousZombies = Arrays.asList(list.toArray(new UUID[0]));
 		Bukkit.getLogger().info("[ZombieEscape] Enabled Zombie Escape");
 	}
 
@@ -410,7 +410,8 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 							}
 							board.resetScores(playerMessage);
 							if (hashMapTeam.get(event.getPlayer().getUniqueId()) != PlayerTeam.SPECTATOR) {
-								if (((int) Math.round((double) Bukkit.getOnlinePlayers().size() / (double) 10) - zombies) >= 0) {
+								if ((((int) Math.round((double) Bukkit.getOnlinePlayers().size() / (double) 10) - zombies) >= 0) && !previousZombies.contains(player.getUniqueId())) {
+									listZombies.add(player.getUniqueId());
 									hashMapOriginZombie.put(player.getUniqueId(), true);
 									hashMapTeam.put(player.getUniqueId(), PlayerTeam.ZOMBIE);
 									zombies = zombies+1;
@@ -449,6 +450,12 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 							player.playSound(player.getLocation(), Sound.BLOCK_NOTE_PLING, 100, 1);
 							player.sendTitle(ChatColor.AQUA + "4", ChatColor.YELLOW + "チーム: " + hashMapTeam.get(player.getUniqueId()), 0, 25, 0);
 						} else if (timesLeft == 3) {
+							try {
+								ConfigProvider.setThenSave("previousZombies", listZombies, "ZombieEscape");
+							} catch (IOException | InvalidConfigurationException e) {
+								e.printStackTrace();
+								Log.error("Error while saving previous zombies!");
+							}
 							player.playSound(player.getLocation(), Sound.BLOCK_NOTE_PLING, 100, 1);
 							player.sendTitle(ChatColor.BLUE + "3", ChatColor.YELLOW + "チーム: " + hashMapTeam.get(player.getUniqueId()), 0, 25, 0);
 						} else if (timesLeft == 2) {
@@ -527,13 +534,23 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 						for (int i = 1; i < maxCheckpoints; i++) {
 							String okString = ChatColor.RED + "✕ チェックポイント" + i;
 							String koString = ChatColor.GREEN + "✓ チェックポイント" + i;
-							if (checkpoint >= i) {
-								scoreboard.resetScores(koString);
-								Score score = objective3.getScore(okString);
+							boolean zombiePassedcp = zombieCheckpoint >= i;
+							boolean zombieIncp = zombieCheckpoint == i;
+							//boolean playerPassedcp = playerCheckpoint >= i;
+							boolean playerIncp = playerCheckpoint == i;
+							String status = "";
+							if (zombieIncp) status += ChatColor.DARK_GREEN + " [Z]";
+							if (playerIncp) status += ChatColor.AQUA + " [P]";
+							scoreboard.resetScores(okString);
+							scoreboard.resetScores(koString);
+							scoreboard.resetScores(koString + ChatColor.AQUA + "<-" + ChatColor.AQUA + " [P]");
+							scoreboard.resetScores(okString + ChatColor.AQUA + "<-" + ChatColor.DARK_GREEN + " [Z]");
+							scoreboard.resetScores(okString + ChatColor.AQUA + "<-" + ChatColor.DARK_GREEN + " [Z]" + ChatColor.AQUA + " [P]");
+							if (zombiePassedcp) {
+								Score score = objective3.getScore(okString + (status == "" ? "" : ChatColor.AQUA + "<-" + status));
 								score.setScore(-i);
 							} else {
-								scoreboard.resetScores(okString);
-								Score score = objective3.getScore(koString);
+								Score score = objective3.getScore(koString + (status == "" ? "" : ChatColor.AQUA + "<-" + status));
 								score.setScore(-i);
 							}
 						}
@@ -567,7 +584,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 
 	@EventHandler
 	public void onPlayerRespawn(PlayerRespawnEvent event) {
-		String[] spawnLists = Arrays.asList(mapConfig.getList("spawnPoints.zombie", new ArrayList<String>()).toArray(new String[0])).get(checkpoint).split(",");
+		String[] spawnLists = Arrays.asList(mapConfig.getList("spawnPoints.zombie", new ArrayList<String>()).toArray(new String[0])).get(zombieCheckpoint).split(",");
 		Location location = new Location(Bukkit.getWorld(mapConfig.getString("spawnPoints.world")), Double.parseDouble(spawnLists[0]), Double.parseDouble(spawnLists[1]), Double.parseDouble(spawnLists[2]));
 		event.setRespawnLocation(location);
 		event.getPlayer().setGameMode(GameMode.ADVENTURE);
@@ -705,6 +722,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 
 	@EventHandler(priority=EventPriority.HIGHEST)
 	public void onProjectileHit(ProjectileHitEvent event) {
+		if (hashMapTeam.get(event.getHitEntity().getUniqueId()) != PlayerTeam.ZOMBIE) return;
 		if (event.getHitEntity() != null) {
 			Damageable d = (Damageable) event.getHitEntity();
 			d.damage(10.0);
@@ -727,32 +745,11 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				});
 				block.setType(Material.AIR);
 				hashMapBlockState.remove(wall);
-				PacketContainer packet1 = protocol.createPacket(PacketType.Play.Server.BLOCK_BREAK_ANIMATION);
-				packet1.getBlockPositionModifier().write(0, new BlockPosition(block.getX(), block.getY()-1, block.getZ()));
-				packet1.getIntegers().write(0, new Random().nextInt(2000));
-				packet1.getIntegers().write(1, 0); // remove animation
-				for (Player player : Bukkit.getOnlinePlayers()) {
-					try {
-						protocol.sendServerPacket(player, packet1);
-					} catch (InvocationTargetException e) {
-					e.printStackTrace();
-					}
-				}
+				// TODO: block break particle here
 				return;
 			}
 			hashMapBlockState.put(wall, state+1);
-			PacketContainer packet1 = protocol.createPacket(PacketType.Play.Server.BLOCK_BREAK_ANIMATION);
-			packet1.getBlockPositionModifier().write(0, new BlockPosition(block.getX(), block.getY(), block.getZ()));
-			packet1.getIntegers().write(0, new Random().nextInt(2000));
-			packet1.getIntegers().write(1, (state+1)*3);
-			for (Player player : Bukkit.getOnlinePlayers()) {
-				try {
-					protocol.sendServerPacket(player, packet1);
-				} catch (InvocationTargetException e) {
-					e.printStackTrace();
-					e.getCause().printStackTrace();
-				}
-			}
+			// also here
 		}
 		if (debug) {
 			long end = System.currentTimeMillis()-time;
