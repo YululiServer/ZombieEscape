@@ -191,7 +191,7 @@ public class ZombieEscapeGameUtil {
 
 	public final class DestroyWall implements CommandExecutor {
 		@Override
-		public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+		public boolean onCommand(final CommandSender sender, Command command, String label, String[] args) {
 			if (!Utils.senderCheck(sender)) return true;
 			Player ps = (Player) sender;
 			if (args.length <= 1) {
@@ -213,9 +213,9 @@ public class ZombieEscapeGameUtil {
 						ablock.getWorld().spawnParticle(Particle.EXPLOSION_HUGE, ablock.getLocation(), 2);
 						ablock.setType(Material.AIR);
 					});
+					sender.sendMessage(ChatColor.GREEN + "壁を破壊しました。");
 				}
 			}.runTaskLater(ZombieEscape.getProvidingPlugin(ZombieEscape.class), 20*countdown);
-			sender.sendMessage(ChatColor.GREEN + "壁を破壊しました。");
 			return true;
 		}
 	}
