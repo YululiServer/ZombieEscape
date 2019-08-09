@@ -52,7 +52,6 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
-import org.bukkit.scoreboard.Team;
 
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
@@ -82,7 +81,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	 */
 	public static HashMap<UUID, Boolean> hashMapOriginZombie = new HashMap<UUID, Boolean>();
 	public static HashMap<UUID, Boolean> lockActionBar = new HashMap<UUID, Boolean>();
-	public static HashMap<String, Team> teams = new HashMap<String, Team>();
 	/**
 	 * Player, Map name
 	 */
@@ -203,7 +201,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		world.setGameRuleValue("announceAdvancements", "false");
 		new BukkitRunnable() {
 			public void run() {
-				event.getPlayer().setCollidable(false);
 				event.getPlayer().teleport(world.getSpawnLocation());
 			}
 		}.runTask(this);
