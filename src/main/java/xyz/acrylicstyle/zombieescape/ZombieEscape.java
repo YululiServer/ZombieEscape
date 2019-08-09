@@ -653,7 +653,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		}.runTaskLater(this, 20*5);
 	}
 
-	@EventHandler(priority=EventPriority.HIGHEST)
+	@EventHandler(priority=EventPriority.LOWEST)
 	public void onPlayerHurt(EntityDamageByEntityEvent event) {
 		long time = System.currentTimeMillis();
 		if (hashMapTeam.get(event.getEntity().getUniqueId()) == PlayerTeam.PLAYER && event.getDamager() instanceof Snowball) return;
