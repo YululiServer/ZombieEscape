@@ -707,8 +707,8 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	public void onProjectileHit(ProjectileHitEvent event) {
 		if (event.getHitEntity() != null) {
 			Damageable d = (Damageable) event.getHitEntity();
-			d.damage(3.0);
-			d.setVelocity(d.getLocation().multiply(-0.5).toVector());
+			d.damage(10.0);
+			d.setVelocity(d.getVelocity().multiply(3));
 			return;
 		}
 		long time = System.currentTimeMillis();
