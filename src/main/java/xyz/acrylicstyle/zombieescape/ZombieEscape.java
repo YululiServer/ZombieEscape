@@ -757,6 +757,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				block.setType(Material.AIR);
 				hashMapBlockState.remove(wall);
 				block.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, block.getLocation(), 30);
+				block.getWorld().playSound(block.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 100, 1);
 				return;
 			}
 			hashMapBlockState.put(wall, state+1);
