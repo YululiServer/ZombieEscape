@@ -195,7 +195,7 @@ public final class Utils {
 
 	private static double progress = 0;
 
-	public static void doBossBarTick(BossBar bossbar, double countdownInSecond) {
+	public static void doBossBarTick(BossBar bossbar, double countdownInSecond, String eventId) {
 		final double max = 20 * countdownInSecond;
 		progress = max;
 		for (Player player : Bukkit.getOnlinePlayers()) bossbar.addPlayer(player);
@@ -206,7 +206,7 @@ public final class Utils {
 					this.cancel();
 					return;
 				}
-				bossbar.setTitle(ChatColor.AQUA + ZombieEscape.ongoingEvent);
+				bossbar.setTitle(ChatColor.AQUA + ZombieEscape.ongoingEventMap.get(eventId));
 				bossbar.setProgress(progress/max); // double / double => double
 				progress--;
 			}

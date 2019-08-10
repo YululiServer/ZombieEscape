@@ -203,16 +203,16 @@ public class ZombieEscapeGameUtil {
 			count = countdown;
 			new BukkitRunnable() {
 				public void run() {
-					ZombieEscape.ongoingEvent = "あと" + count + "秒で壁破壊";
+					ZombieEscape.ongoingEventMap.put(args[0], "あと" + count + "秒で壁破壊");
 					if (count <= 0) {
-						ZombieEscape.ongoingEvent = null;
+						ZombieEscape.ongoingEventMap.remove(args[0]);
 						this.cancel();
 						return;
 					}
 					count--;
 				}
 			}.runTaskTimer(ZombieEscape.getProvidingPlugin(ZombieEscape.class), 0, 20);
-			Utils.doBossBarTick(Bukkit.createBossBar(ZombieEscape.ongoingEvent, BarColor.GREEN, BarStyle.SOLID, BarFlag.DARKEN_SKY), countdown);
+			Utils.doBossBarTick(Bukkit.createBossBar(args[0], BarColor.GREEN, BarStyle.SOLID, BarFlag.DARKEN_SKY), countdown, args[0]);
 			return true;
 		}
 	}

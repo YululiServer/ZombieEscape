@@ -121,6 +121,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	public static boolean playersReset = false;
 	public static boolean gameEnded = false;
 	public static String ongoingEvent = null;
+	public static Map<String, String> ongoingEventMap = new HashMap<String, String>();
 
 	@Override
 	public void onEnable() {
