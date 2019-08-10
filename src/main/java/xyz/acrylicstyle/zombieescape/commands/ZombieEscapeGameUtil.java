@@ -3,7 +3,9 @@ package xyz.acrylicstyle.zombieescape.commands;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -173,7 +175,7 @@ public class ZombieEscapeGameUtil {
 	}
 
 	public final class DestroyWall implements CommandExecutor {
-		private int count = 0;
+		private Map<String, Integer> count = new HashMap<String, Integer>();
 
 		@Override
 		public boolean onCommand(final CommandSender sender, Command command, String label, String[] args) {
@@ -200,16 +202,16 @@ public class ZombieEscapeGameUtil {
 					sender.sendMessage(ChatColor.GREEN + "壁を破壊しました。");
 				}
 			}.runTaskLater(ZombieEscape.getProvidingPlugin(ZombieEscape.class), 20*countdown);
-			count = countdown+1;
+			count.put(args[0], countdown);
 			new BukkitRunnable() {
 				public void run() {
 					ZombieEscape.ongoingEventMap.put(args[0], "あと" + count + "秒で壁破壊");
-					if (count <= 0) {
+					if (count.get(args[0]) <= 0) {
 						ZombieEscape.ongoingEventMap.remove(args[0]);
 						this.cancel();
 						return;
 					}
-					count--;
+					count.put(args[0], count.get(args[0])-1);
 				}
 			}.runTaskTimer(ZombieEscape.getProvidingPlugin(ZombieEscape.class), 0, 20);
 			Utils.doBossBarTick(Bukkit.createBossBar(args[0], BarColor.GREEN, BarStyle.SOLID, BarFlag.DARKEN_SKY), countdown, args[0]);
