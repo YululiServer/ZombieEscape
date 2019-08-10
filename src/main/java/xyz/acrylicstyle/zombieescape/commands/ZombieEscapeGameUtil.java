@@ -212,7 +212,7 @@ public class ZombieEscapeGameUtil {
 					count--;
 				}
 			}.runTaskTimer(ZombieEscape.getProvidingPlugin(ZombieEscape.class), 0, 20);
-			Utils.doBossBarTick(Bukkit.createBossBar(ZombieEscape.ongoingEvent, BarColor.GREEN, BarStyle.SOLID, (BarFlag) null), countdown);
+			Utils.doBossBarTick(Bukkit.createBossBar(ZombieEscape.ongoingEvent, BarColor.GREEN, BarStyle.SOLID, BarFlag.DARKEN_SKY), countdown);
 			return true;
 		}
 	}
