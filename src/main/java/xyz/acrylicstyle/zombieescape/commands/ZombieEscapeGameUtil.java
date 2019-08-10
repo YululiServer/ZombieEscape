@@ -200,7 +200,7 @@ public class ZombieEscapeGameUtil {
 					sender.sendMessage(ChatColor.GREEN + "壁を破壊しました。");
 				}
 			}.runTaskLater(ZombieEscape.getProvidingPlugin(ZombieEscape.class), 20*countdown);
-			count = countdown;
+			count = countdown+20;
 			new BukkitRunnable() {
 				public void run() {
 					ZombieEscape.ongoingEventMap.put(args[0], "あと" + count + "秒で壁破壊");
