@@ -157,7 +157,7 @@ public final class Utils {
 			Log.info("distance: " + loc.distance(p.getLocation()));
 			if (!(ZombieEscape.hashMapTeam.get(p.getUniqueId()) == PlayerTeam.PLAYER)) continue;
 			double distanceSqrd = loc.distance(p.getLocation());
-			if (distanceSqrd > 7) continue;
+			if (distanceSqrd > 10) continue;
 			if(distanceSqrd < lastDistance){
 				lastDistance = distanceSqrd;
 				nearestPlayer = p;
@@ -214,7 +214,6 @@ public final class Utils {
 					progress.put(eventId, progress.get(eventId)-1);
 				} catch(Exception e) {
 					e.printStackTrace();
-					e.getCause().printStackTrace();
 					progress.remove(eventId);
 					bossbar.removeAll();
 					this.cancel(); // probably already ended bossbar
