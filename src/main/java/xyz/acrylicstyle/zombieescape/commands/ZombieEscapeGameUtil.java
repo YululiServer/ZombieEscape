@@ -11,6 +11,9 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarFlag;
+import org.bukkit.boss.BarStyle;
 import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -209,6 +212,7 @@ public class ZombieEscapeGameUtil {
 					count--;
 				}
 			}.runTaskTimer(ZombieEscape.getProvidingPlugin(ZombieEscape.class), 0, 20);
+			Utils.doBossBarTick(Bukkit.createBossBar(ZombieEscape.ongoingEvent, BarColor.GREEN, BarStyle.SOLID, (BarFlag) null), countdown);
 			return true;
 		}
 	}

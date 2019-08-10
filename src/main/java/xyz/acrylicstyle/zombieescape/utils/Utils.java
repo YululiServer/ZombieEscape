@@ -13,6 +13,7 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.boss.BossBar;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.enchantments.Enchantment;
@@ -22,6 +23,7 @@ import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import xyz.acrylicstyle.tomeito_core.providers.ConfigProvider;
 import xyz.acrylicstyle.tomeito_core.utils.Log;
@@ -189,5 +191,25 @@ public final class Utils {
 			});
 			event.setCancelled(true);
 		}
+	}
+
+	private static double progress = 0;
+
+	public static void doBossBarTick(BossBar bossbar, double countdownInSecond) {
+		final double max = 20 * countdownInSecond;
+		progress = max;
+		for (Player player : Bukkit.getOnlinePlayers()) bossbar.addPlayer(player);
+		new BukkitRunnable() {
+			public void run() {
+				if (progress <= 0) {
+					bossbar.removeAll();
+					this.cancel();
+					return;
+				}
+				bossbar.setTitle(ChatColor.AQUA + ZombieEscape.ongoingEvent);
+				bossbar.setProgress(progress/max); // double / double => double
+				progress--;
+			}
+		}.runTaskTimer(ZombieEscape.getProvidingPlugin(ZombieEscape.class), 0, 1);
 	}
 }
