@@ -202,15 +202,23 @@ public final class Utils {
 		for (Player player : Bukkit.getOnlinePlayers()) bossbar.addPlayer(player);
 		new BukkitRunnable() {
 			public void run() {
-				if (progress.get(eventId) <= 0) {
+				try {
+					if (progress.get(eventId) <= 0) {
+						progress.remove(eventId);
+						bossbar.removeAll();
+						this.cancel();
+						return;
+					}
+					bossbar.setTitle(ChatColor.AQUA + ZombieEscape.ongoingEventMap.get(eventId));
+					bossbar.setProgress(progress.get(eventId)/max); // double / double => double
+					progress.put(eventId, progress.get(eventId)-1);
+				} catch(Exception e) {
+					e.printStackTrace();
+					e.getCause().printStackTrace();
 					progress.remove(eventId);
 					bossbar.removeAll();
-					this.cancel();
-					return;
+					this.cancel(); // probably already ended bossbar
 				}
-				bossbar.setTitle(ChatColor.AQUA + ZombieEscape.ongoingEventMap.get(eventId));
-				bossbar.setProgress(progress.get(eventId)/max); // double / double => double
-				progress.put(eventId, progress.get(eventId)-1);
 			}
 		}.runTaskTimer(ZombieEscape.getProvidingPlugin(ZombieEscape.class), 0, 1);
 	}
