@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -193,22 +194,23 @@ public final class Utils {
 		}
 	}
 
-	private static double progress = 0;
+	private static Map<String, Double> progress = new HashMap<String, Double>();
 
 	public static void doBossBarTick(BossBar bossbar, double countdownInSecond, String eventId) {
 		final double max = 20 * countdownInSecond;
-		progress = max;
+		progress.put(eventId, max);
 		for (Player player : Bukkit.getOnlinePlayers()) bossbar.addPlayer(player);
 		new BukkitRunnable() {
 			public void run() {
-				if (progress <= 0) {
+				if (progress.get(eventId) <= 0) {
+					progress.remove(eventId);
 					bossbar.removeAll();
 					this.cancel();
 					return;
 				}
 				bossbar.setTitle(ChatColor.AQUA + ZombieEscape.ongoingEventMap.get(eventId));
-				bossbar.setProgress(progress/max); // double / double => double
-				progress--;
+				bossbar.setProgress(progress.get(eventId)/max); // double / double => double
+				progress.put(eventId, progress.get(eventId)-1);
 			}
 		}.runTaskTimer(ZombieEscape.getProvidingPlugin(ZombieEscape.class), 0, 1);
 	}
