@@ -23,6 +23,9 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarFlag;
+import org.bukkit.boss.BarStyle;
 import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -210,6 +213,8 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	public ZombieEscape getInstance() {
 		return this;
 	}
+
+	private int count = 0;
 
 	@EventHandler
 	public synchronized void onPlayerJoin(final PlayerJoinEvent event) {
@@ -506,6 +511,18 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 							if (hashMapTeam.get(player.getUniqueId()) == PlayerTeam.ZOMBIE) {
 								player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + "GO!", ChatColor.YELLOW + "目標: プレイヤーを全員倒すか先にゴールに到達する", 0, 40, 0);
 								player.sendMessage(ChatColor.GRAY + "あと12秒後にワープします...");
+								new BukkitRunnable() {
+									public void run() {
+										ZombieEscape.ongoingEventMap.put("zombieRelease", "あと" + count + "秒で壁破壊");
+										if (count <= 0) {
+											ZombieEscape.ongoingEventMap.remove("zombieRelease");
+											this.cancel();
+											return;
+										}
+										count--;
+									}
+								}.runTaskTimer(getInstance(), 0, 20);
+								Utils.doBossBarTick(Bukkit.createBossBar("zombieRelease", BarColor.GREEN, BarStyle.SOLID, BarFlag.DARKEN_SKY), count, "zombieRelease");
 								new BukkitRunnable() {
 									@Override
 									public void run() {
