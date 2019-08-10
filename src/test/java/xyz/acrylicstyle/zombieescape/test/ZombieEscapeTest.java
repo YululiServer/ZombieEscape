@@ -17,8 +17,8 @@ public class ZombieEscapeTest {
 
 	@Test
 	public void durabilityTest() {
-		int players = 5;
-		Assert.assertEquals("Is wood wall durability is 200 if 5 players", 200, (int) Math.nextUp(Math.min(Constants.materialDurability.getOrDefault(Material.WOOD, 5)*((double)players/(double)5), 3000)));
+		int players = 1;
+		Assert.assertEquals("Is wood wall durability is 30 if 1 players", 30, (int) Math.nextUp(Math.min(Constants.materialDurability.getOrDefault(Material.WOOD, 5)*((double)players/(double)5), 3000)));
 	}
 
 	@Test
