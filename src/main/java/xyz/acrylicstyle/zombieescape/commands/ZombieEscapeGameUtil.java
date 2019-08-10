@@ -183,6 +183,9 @@ public class ZombieEscapeGameUtil {
 				sender.sendMessage(ChatColor.RED + "使用法: /destroywall <壁のID> <壁破壊までの時間(秒)>");
 				return true;
 			}
+			if (sender instanceof BlockCommandSender) {
+				((BlockCommandSender)sender).getBlock().setType(Material.AIR);
+			}
 			int countdown = 0;
 			try {
 				countdown = Integer.parseInt(args[1]);
@@ -205,7 +208,7 @@ public class ZombieEscapeGameUtil {
 			count.put(args[0], countdown);
 			new BukkitRunnable() {
 				public void run() {
-					ZombieEscape.ongoingEventMap.put(args[0], "あと" + count + "秒で壁破壊");
+					ZombieEscape.ongoingEventMap.put(args[0], "あと" + count.get(args[0]) + "秒で壁破壊");
 					if (count.get(args[0]) <= 0) {
 						ZombieEscape.ongoingEventMap.remove(args[0]);
 						this.cancel();
