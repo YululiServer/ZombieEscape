@@ -511,9 +511,10 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 							if (hashMapTeam.get(player.getUniqueId()) == PlayerTeam.ZOMBIE) {
 								player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + "GO!", ChatColor.YELLOW + "目標: プレイヤーを全員倒すか先にゴールに到達する", 0, 40, 0);
 								player.sendMessage(ChatColor.GRAY + "あと12秒後にワープします...");
+								count = 12;
 								new BukkitRunnable() {
 									public void run() {
-										ZombieEscape.ongoingEventMap.put("zombieRelease", "あと" + count + "秒で壁破壊");
+										ZombieEscape.ongoingEventMap.put("zombieRelease", "あと" + count + "秒でゾンビ解放");
 										if (count <= 0) {
 											ZombieEscape.ongoingEventMap.remove("zombieRelease");
 											this.cancel();
