@@ -228,6 +228,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			public void run() {
 				event.getPlayer().teleport(world.getSpawnLocation());
 				event.getPlayer().setGameMode(GameMode.ADVENTURE);
+				event.getPlayer().setResourcePack("https://um.acrylicstyle.xyz/162158118117/410047095/ZombieEscape.zip");
 			}
 		}.runTask(this);
 		hashMapTeam.put(event.getPlayer().getUniqueId(), PlayerTeam.PLAYER);
