@@ -208,7 +208,7 @@ public class ZombieEscapeGameUtil {
 			count.put(args[0], countdown);
 			new BukkitRunnable() {
 				public void run() {
-					ZombieEscape.ongoingEventMap.put(args[0], "あと" + count.get(args[0]) + "秒で壁破壊");
+					ZombieEscape.ongoingEventMap.put(args[0], "あと" + count.get(args[0]) + "秒で壁(" + args[0] + ")破壊");
 					if (count.get(args[0]) <= 0) {
 						ZombieEscape.ongoingEventMap.remove(args[0]);
 						this.cancel();

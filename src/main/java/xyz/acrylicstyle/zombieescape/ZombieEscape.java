@@ -54,6 +54,7 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
@@ -101,6 +102,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	 * Player, Map name
 	 */
 	public static HashMap<UUID, String> hashMapVote = new HashMap<UUID, String>();
+	public static HashMap<UUID, Boolean> respawnWait = new HashMap<UUID, Boolean>();
 	public static Map<String, Object> locationWall = null;
 	public static List<String> previousZombies = null;
 	public static List<String> listZombies = new ArrayList<String>();
@@ -684,11 +686,11 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		event.getPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(150);
 		event.getPlayer().setHealth(150);
 		event.getPlayer().setHealthScale(40);
-		event.getPlayer().addPotionEffect(PotionEffectType.SLOW.createEffect(100000, 100), true);
 		event.getPlayer().sendMessage("" + ChatColor.GREEN + ChatColor.BOLD + "あと5秒でリスポーンします！");
+		respawnWait.put(event.getPlayer().getUniqueId(), true);
 		new BukkitRunnable() {
 			public void run() {
-				event.getPlayer().removePotionEffect(PotionEffectType.SLOW);
+				respawnWait.remove(event.getPlayer().getUniqueId());
 				event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, 100000, 0, false, false));
 				event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 1, false, false));
 				event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 100000, 100, false, false));
@@ -705,6 +707,11 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "give " + event.getPlayer().getName() + " minecraft:stone_pickaxe 1 0 {CanDestroy:[\"minecraft:gold_block\",\"minecraft:cobblestone\"],HideFlags:1,Unbreakable:1,display:{Name:\"錆びついたツルハシ\"},ench:[{id:32,lvl:10}]}");
 			}
 		}.runTaskLater(this, 20*5);
+	}
+
+	@EventHandler
+	public void onPlayerMove(PlayerMoveEvent event) {
+		if (respawnWait.getOrDefault(event.getPlayer().getUniqueId(), false)) event.setCancelled(true);
 	}
 
 	@EventHandler(priority=EventPriority.LOWEST)
