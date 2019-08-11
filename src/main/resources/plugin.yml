@@ -5,8 +5,8 @@ depend: [ProtocolLib]
 
 commands:
   zombieescape:
-    description: "§cこのプラグインはエラーが発生しています。コンソールを確認してください。"
-    usage: /<command>
+    description: "Zombie Escape"
+    usage: /<command> [reload/page]
   setsponsor:
     description: "Add a new sponsored player."
     usage: /<command> <player>
