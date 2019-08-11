@@ -125,6 +125,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	public static boolean debug = false;
 	public static boolean playersReset = false;
 	public static boolean gameEnded = false;
+	public static boolean once = false;
 	public static String ongoingEvent = null;
 	public static Map<String, String> ongoingEventMap = new HashMap<String, String>();
 
@@ -549,19 +550,22 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 							if (hashMapTeam.get(player.getUniqueId()) == PlayerTeam.ZOMBIE) {
 								player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + "GO!", ChatColor.YELLOW + "目標: プレイヤーを全員倒すか先にゴールに到達する", 0, 40, 0);
 								player.sendMessage(ChatColor.GRAY + "あと12秒後にワープします...");
-								count = 12;
-								new BukkitRunnable() {
-									public void run() {
-										ZombieEscape.ongoingEventMap.put("zombieRelease", "あと" + count + "秒でゾンビ解放");
-										if (count <= 0) {
-											ZombieEscape.ongoingEventMap.remove("zombieRelease");
-											this.cancel();
-											return;
+								if (!once) {
+									once = true;
+									count = 12;
+									new BukkitRunnable() {
+										public void run() {
+											ZombieEscape.ongoingEventMap.put("zombieRelease", "あと" + count + "秒でゾンビ解放");
+											if (count <= 0) {
+												ZombieEscape.ongoingEventMap.remove("zombieRelease");
+												this.cancel();
+												return;
+											}
+											count--;
 										}
-										count--;
-									}
-								}.runTaskTimer(getInstance(), 0, 20);
-								Utils.doBossBarTick(Bukkit.createBossBar("zombieRelease", BarColor.GREEN, BarStyle.SOLID, BarFlag.DARKEN_SKY), count, "zombieRelease");
+									}.runTaskTimer(getInstance(), 0, 20);
+									Utils.doBossBarTick(Bukkit.createBossBar("zombieRelease", BarColor.GREEN, BarStyle.SOLID, BarFlag.DARKEN_SKY), count, "zombieRelease");
+								}
 								new BukkitRunnable() {
 									@Override
 									public void run() {
