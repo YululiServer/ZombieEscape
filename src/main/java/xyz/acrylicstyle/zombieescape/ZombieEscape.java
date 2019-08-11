@@ -357,10 +357,42 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 					event.getPlayer().sendMessage(ChatColor.BLUE + "--------------------------------------------------");
 				}
 				if (gameStarted || timesLeft < 6) {
-					event.getPlayer().sendMessage(ChatColor.RED + "ゲームはすでに開始しています！");
-					event.getPlayer().setGameMode(GameMode.SPECTATOR);
-					event.getPlayer().setPlayerListName(ChatColor.WHITE + event.getPlayer().getName());
-					hashMapTeam.put(event.getPlayer().getUniqueId(), PlayerTeam.SPECTATOR);
+					Player player = event.getPlayer();
+					zombies = zombies + 1;
+					player.getInventory().clear();
+					hashMapTeam.remove(player.getUniqueId());
+					hashMapTeam.put(player.getUniqueId(), PlayerTeam.ZOMBIE);
+					final Objective objective = hashMapScoreboard.get(player.getUniqueId()).getObjective("scoreboard");
+					Score score6 = objective.getScore(ChatColor.GREEN + "    チーム: " + ChatColor.DARK_GREEN + "ゾンビ");
+					objective.getScoreboard().resetScores(ChatColor.GREEN + "    チーム: " + ChatColor.AQUA + "プレイヤー");
+					score6.setScore(6);
+					player.setGameMode(GameMode.ADVENTURE);
+					player.setPlayerListName(ChatColor.DARK_GREEN + player.getName());
+					player.getInventory().setHelmet(Utils.createLeatherItemStack(Material.LEATHER_HELMET, 0, 100, 0));
+					player.getInventory().setChestplate(Utils.createLeatherItemStack(Material.LEATHER_CHESTPLATE, 0, 100, 0));
+					player.getInventory().setLeggings(Utils.createLeatherItemStack(Material.LEATHER_LEGGINGS, 0, 100, 0));
+					player.getInventory().setBoots(Utils.createLeatherItemStack(Material.LEATHER_BOOTS, 0, 100, 0));
+					player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(150);
+					player.setHealth(150);
+					player.setHealthScale(40);
+					new BukkitRunnable() {
+						public void run() {
+							player.addPotionEffect(PotionEffectType.HUNGER.createEffect(100000, 0));
+							player.addPotionEffect(PotionEffectType.SATURATION.createEffect(100000, 1));
+							player.addPotionEffect(PotionEffectType.INCREASE_DAMAGE.createEffect(100000, 100));
+							player.addPotionEffect(PotionEffectType.SPEED.createEffect(100000, 0));
+							player.addPotionEffect(PotionEffectType.JUMP.createEffect(100000, 0));
+							ItemStack item = new ItemStack(Material.IRON_SWORD);
+							ItemMeta meta = item.getItemMeta();
+							meta.setDisplayName("" + ChatColor.RESET + ChatColor.WHITE + "ナイフ");
+							item.setItemMeta(meta);
+							item.addUnsafeEnchantment(Enchantment.DURABILITY, 100);
+							item.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 100);
+							player.getInventory().setItem(0, item);
+							Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "give " + player.getName() + " minecraft:stone_axe 1 0 {CanDestroy:[\"minecraft:planks\",\"minecraft:dirt\",\"minecraft:grass\"],HideFlags:1,Unbreakable:1,display:{Name:\"錆びついた斧\"},ench:[{id:32,lvl:10}]}");
+							Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "give " + player.getName() + " minecraft:stone_pickaxe 1 0 {CanDestroy:[\"minecraft:gold_block\",\"minecraft:cobblestone\"],HideFlags:1,Unbreakable:1,display:{Name:\"錆びついたツルハシ\"},ench:[{id:32,lvl:10}]}");
+						}
+					}.runTaskLater(getInstance(), 40);
 					return;
 				}
 			}
