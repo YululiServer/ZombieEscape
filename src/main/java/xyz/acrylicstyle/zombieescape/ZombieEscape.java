@@ -1012,7 +1012,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + team + "チームの勝ち！", "", 0, 40, 0);
 			new BukkitRunnable() {
 				public void run() {
-					if (fireworked*Bukkit.getOnlinePlayers().size() >= 40) this.cancel();
+					if (fireworked*Bukkit.getOnlinePlayers().size() >= 40*Bukkit.getOnlinePlayers().size()) this.cancel();
 					player.playSound(player.getLocation(), Sound.ENTITY_FIREWORK_LAUNCH, 100, 1);
 					//TNTPrimed tnt = player.getWorld().spawn(player.getLocation(), TNTPrimed.class);
 					//tnt.setFuseTicks(40);
