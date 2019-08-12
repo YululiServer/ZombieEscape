@@ -669,9 +669,11 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 					for (Player player : Bukkit.getOnlinePlayers()) {
 						final Scoreboard scoreboard = hashMapScoreboard.get(player.getUniqueId());
 						if (playedTime <= 1) {
-							String[] keys = votes.keySet().toArray(new String[0]);
+							File maps = new File("./plugins/ZombieEscape/maps/");
+							File[] keys = maps.listFiles();
 							for (int i = 0; i < keys.length; i++) {
-								String thisMapName = keys[i];
+								String key = keys[i].getName().replaceAll(".yml", "");
+								String thisMapName = key;
 								ConfigProvider map = null;
 								try {
 									map = new ConfigProvider("./plugins/ZombieEscape/maps/" + thisMapName + ".yml");
