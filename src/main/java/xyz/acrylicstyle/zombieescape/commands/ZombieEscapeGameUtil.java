@@ -187,6 +187,10 @@ public class ZombieEscapeGameUtil {
 				sender.sendMessage(ChatColor.RED + "使用法: /vote <マップ名>");
 				return true;
 			}
+			if (ZombieEscape.gameStarted) {
+				sender.sendMessage(ChatColor.RED + "ゲームはすでに開始されています！");
+				return true;
+			}
 			File maps = new File("./plugins/ZombieEscape/maps/");
 			List<String> files = new ArrayList<String>();
 			for (File file : maps.listFiles()) files.add(file.getName().replaceAll(".yml", ""));
