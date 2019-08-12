@@ -87,6 +87,7 @@ import xyz.acrylicstyle.zombieescape.utils.Utils;
 
 public class ZombieEscape extends JavaPlugin implements Listener {
 	public final static int mininumPlayers = 2;
+	public static ConfigProvider finalMapConfig = null;
 	public static ConfigProvider config = null;
 	public static ConfigProvider mapConfig = null;
 	public static HashMap<UUID, Scoreboard> hashMapScoreboard = new HashMap<UUID, Scoreboard>();
@@ -142,6 +143,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			config = new ConfigProvider("./plugins/ZombieEscape/config.yml");
 			mapName = config.getString("map", "world");
 			mapConfig = new ConfigProvider("./plugins/ZombieEscape/maps/" + mapName + ".yml");
+			finalMapConfig = new ConfigProvider("./plugins/ZombieEscape/maps/" + mapName + ".yml");
 			debug = config.getBoolean("debug", false);
 			defmapString = ChatColor.GREEN + "    デフォルトマップ: " + ChatColor.translateAlternateColorCodes('&', mapConfig.getString("mapname", "???"));
 		} catch (IOException | InvalidConfigurationException e1) {
@@ -471,7 +473,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 							score6.setScore(6);
 						}
 						// <----- team
-						// vote ----->
+						// vote -----> #FIXME: voted but mapConfig is seems strange
 						if (timesLeft >= 11) {
 							hashMapVote.values().forEach(vote -> {
 								votes.put(vote, votes.getOrDefault(vote, 0)+1);
@@ -508,7 +510,13 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 								}
 							});
 							if (mostVotedMap == null) mostVotedMap = mapName; // default map
-							mapConfig = ConfigProvider.initWithoutException("./plugins/ZombieEscape/maps/" + mostVotedMap + ".yml");
+							try {
+								mapConfig = new ConfigProvider("./plugins/ZombieEscape/maps/" + mostVotedMap + ".yml");
+							} catch (IOException | InvalidConfigurationException e) {
+								Log.error("Error while loading config:");
+								e.printStackTrace();
+								e.getCause().printStackTrace();
+							}
 							player.sendMessage(ChatColor.GREEN + "マップは" + ChatColor.AQUA + mapConfig.getString("mapname", "???") + ChatColor.GREEN + "になりました。");
 							World world = Bukkit.getWorld(mapConfig.getString("spawnPoints.world", "world"));
 							world.setGameRuleValue("announceAdvancements", "false");
