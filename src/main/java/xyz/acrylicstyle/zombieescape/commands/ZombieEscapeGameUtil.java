@@ -152,7 +152,7 @@ public class ZombieEscapeGameUtil {
 		private Inventory inventory;
 
 		public void initialize() {
-			this.inventory = Utils.initializeItems(Bukkit.createInventory(this, 27));
+			this.inventory = Utils.initializeItems(Bukkit.createInventory(this, 27, "投票"));
 			this.init = true;
 		}
 
@@ -172,6 +172,7 @@ public class ZombieEscapeGameUtil {
 
 		@EventHandler
 		public void onInventoryClick(InventoryClickEvent e) {
+			if (!e.getView().getTopInventory().getTitle().equalsIgnoreCase("投票")) return;
 			Bukkit.dispatchCommand(((Player)e.getWhoClicked()), "vote " + e.getCurrentItem().getItemMeta().getLore().get(0));
 			e.setCancelled(true);
 			e.getWhoClicked().closeInventory();

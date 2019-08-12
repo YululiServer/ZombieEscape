@@ -146,7 +146,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		} catch (IOException | InvalidConfigurationException e1) {
 			e1.printStackTrace();
 			e1.getCause().printStackTrace();
-			Bukkit.getLogger().severe("[ZombieEscape] Failed to load config, disabling plugin.");
+			Log.error("Failed to load config, disabling plugin.");
 			Bukkit.getPluginManager().disablePlugin(this);
 			return;
 		}
@@ -171,8 +171,9 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			Bukkit.getPluginManager().disablePlugin(this);
 			return;
 		}
+		VoteGui votegui = null;
 		if (sponsor != null && zec != null && zegu != null) {
-			VoteGui votegui = zegu.new VoteGui();
+			votegui = zegu.new VoteGui();
 			votegui.initialize();
 			Bukkit.getPluginCommand("setsponsor").setExecutor(sponsor.new SetSponsor());
 			Bukkit.getPluginCommand("removesponsor").setExecutor(sponsor.new RemoveSponsor());
@@ -200,15 +201,16 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				}
 			});
 		} else {
-			Bukkit.getLogger().severe("[ZombieEscape] Unable to register commands! Commands are disabled.");
+			Log.error("Unable to register some commands! Commands are disabled.");
 		}
 		Bukkit.getPluginManager().registerEvents(this, this);
+		if (votegui != null) Bukkit.getPluginManager().registerEvents(votegui, this);
 		Utils.checkConfig();
 		maxCheckpoints = Math.min(mapConfig.getStringList("spawnPoints.player").size(), mapConfig.getStringList("spawnPoints.zombie").size());
 		locationWall = ConfigProvider.getConfigSectionValue(mapConfig.get("locationWall", new HashMap<String, Object>()), true);
 		List<?> list = config.getList("previousZombies") != null ? config.getList("previousZombies") : new ArrayList<String>();
 		previousZombies = Arrays.asList(list.toArray(new String[0]));
-		Bukkit.getLogger().info("[ZombieEscape] Enabled Zombie Escape");
+		Log.info("Enabled Zombie Escape");
 	}
 
 	@EventHandler

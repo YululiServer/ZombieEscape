@@ -24,6 +24,7 @@ import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -238,10 +239,12 @@ public final class Utils {
 			} catch (IOException | InvalidConfigurationException e) {
 				e.printStackTrace();
 			}
-			item.getItemMeta().setDisplayName(ChatColor.AQUA + map.getString("mapname", "???"));
+			ItemMeta meta = item.getItemMeta();
+			meta.setDisplayName(ChatColor.AQUA + map.getString("mapname", "???"));
 			lore.add(keys[0]);
-			item.getItemMeta().setLore(lore);
-			inv.addItem(item);
+			meta.setLore(lore);
+			item.setItemMeta(meta);
+			inv.setItem(i, item);
 		}
 		return inv;
 	}
