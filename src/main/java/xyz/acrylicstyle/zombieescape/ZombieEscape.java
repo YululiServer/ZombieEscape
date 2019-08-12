@@ -120,6 +120,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	public static int playerCheckpoint = 0;
 	public static int maxCheckpoints = 0;
 	public static int fireworked = 0;
+	public static int mostVotes = 0;
 	public static boolean timerStarted = false;
 	public static boolean hasEnoughPlayers = false;
 	public static boolean settingsCheck = false;
@@ -129,6 +130,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	public static boolean gameEnded = false;
 	public static boolean once = false;
 	public static String ongoingEvent = null;
+	public static String mostVotedMap = null;
 	public static Map<String, String> ongoingEventMap = new HashMap<String, String>();
 
 	@Override
@@ -230,13 +232,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		if (!gameStarted && timesLeft >= 7) players = players + 1;
 		World world = Bukkit.getWorld(mapConfig.getString("spawnPoints.world", "world"));
 		world.setGameRuleValue("announceAdvancements", "false");
-		new BukkitRunnable() {
-			public void run() {
-				event.getPlayer().teleport(world.getSpawnLocation());
-				event.getPlayer().setGameMode(GameMode.ADVENTURE);
-				event.getPlayer().setResourcePack("https%3A%2F%2Fum.acrylicstyle.xyz%2F162158118117%2F410047095%2FZombieEscape.zip	");
-			}
-		}.runTask(this);
 		hashMapTeam.put(event.getPlayer().getUniqueId(), PlayerTeam.PLAYER);
 		lockActionBar.put(event.getPlayer().getUniqueId(), false);
 		new BukkitRunnable() {
@@ -338,7 +333,9 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		event.getPlayer().setHealthScale(20);
 		new BukkitRunnable() {
 			public void run() {
+				event.getPlayer().teleport(world.getSpawnLocation());
 				event.getPlayer().setGameMode(GameMode.ADVENTURE);
+				event.getPlayer().setResourcePack("https%3A%2F%2Fum.acrylicstyle.xyz%2F162158118117%2F410047095%2FZombieEscape.zip");
 				event.getPlayer().sendMessage(ChatColor.BLUE + "--------------------------------------------------");
 				event.getPlayer().sendMessage(ChatColor.DARK_GREEN + "          - Zombie Escape -");
 				event.getPlayer().sendMessage("");
@@ -468,22 +465,39 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 						}
 						// <----- team
 						// vote ----->
-						hashMapVote.values().forEach(vote -> {
-							votes.put(vote, votes.getOrDefault(vote, 0)+1);
-						});
-						String[] keys = votes.keySet().toArray(new String[0]);
-						for (int i = 0; i < keys.length; i++) {
-							String thisMapName = keys[i];
-							ConfigProvider map = null;
-							try {
-								map = new ConfigProvider("./plugins/ZombieEscape/maps/" + thisMapName + ".yml");
-							} catch (IOException | InvalidConfigurationException e) {
-								e.printStackTrace();
-							}
-							Score score = objective.getScore(ChatColor.GREEN + "    マップ投票: " + map.getString("mapname", "???"));
-							score.setScore(-votes.get(thisMapName));
-						};
-						votes = new HashMap<String, Integer>(); // re-intialize this map because there's no HashMap#removeAll()
+						if (timesLeft >= 11) {
+							hashMapVote.values().forEach(vote -> {
+								votes.put(vote, votes.getOrDefault(vote, 0)+1);
+							});
+							String[] keys = votes.keySet().toArray(new String[0]);
+							for (int i = 0; i < keys.length; i++) {
+								String thisMapName = keys[i];
+								ConfigProvider map = null;
+								try {
+									map = new ConfigProvider("./plugins/ZombieEscape/maps/" + thisMapName + ".yml");
+								} catch (IOException | InvalidConfigurationException e) {
+									e.printStackTrace();
+								}
+								Score score = objective.getScore(ChatColor.GREEN + "    マップ投票: " + map.getString("mapname", "???"));
+								score.setScore(-votes.get(thisMapName));
+							};
+							votes = new HashMap<String, Integer>(); // re-intialize this map because there's no HashMap#removeAll()
+						}
+						if (timesLeft == 10) {
+							votes = new HashMap<String, Integer>();
+							Bukkit.broadcastMessage(ChatColor.GREEN + "マップ投票を締め切りました。");
+							hashMapVote.values().forEach(vote -> {
+								votes.put(vote, votes.getOrDefault(vote, 0)+1);
+							});
+							votes.forEach((name, count) -> {
+								if (mostVotes < count) {
+									mostVotes = count;
+									mostVotedMap = name;
+								}
+							});
+							ConfigProvider mapConfig = ConfigProvider.initWithoutException("./plugins/ZombieEscape/maps/" + mapName + ".yml");
+							Bukkit.broadcastMessage(ChatColor.GREEN + "マップは" + ChatColor.AQUA + mapConfig.getString("mapname", "???") + ChatColor.GREEN + "になりました。");
+						}
 						// <----- vote
 						/* do not edit this line */ player.setScoreboard(hashMapScoreboard.get(player.getUniqueId()));
 						if (timesLeft == 5) {

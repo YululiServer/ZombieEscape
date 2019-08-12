@@ -101,7 +101,7 @@ public class ZombieEscapeGameUtil {
 				sender.sendMessage(ChatColor.RED + "プレイヤー数が最低人数に満たないため、開始できません。");
 				return true;
 			}
-			ZombieEscape.timesLeft = 6;
+			ZombieEscape.timesLeft = 11;
 			return true;
 		}
 	}
