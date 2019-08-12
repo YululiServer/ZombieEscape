@@ -904,7 +904,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		} else if (hashMapTeam.get(event.getPlayer().getUniqueId()) == PlayerTeam.PLAYER) {
 			Utils.chat(event, PlayerTeam.PLAYER, ChatColor.AQUA + "[P]");
 		} else {
-			Utils.chat(event, PlayerTeam.SPECTATOR, ChatColor.GRAY + "[S]");
+			Utils.chat(event, PlayerTeam.SPECTATOR, ChatColor.GRAY + "[S]", true);
 		}
 	}
 

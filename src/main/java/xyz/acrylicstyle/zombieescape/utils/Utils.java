@@ -176,9 +176,13 @@ public final class Utils {
 	}
 
 	public static void chat(AsyncPlayerChatEvent event, PlayerTeam pteam, String teamname) {
+		chat(event, pteam, teamname, false);
+	}
+
+	public static void chat(AsyncPlayerChatEvent event, PlayerTeam pteam, String teamname, boolean alwaysAll) {
 		event.setMessage(event.getMessage().replaceAll("<3", ChatColor.RED + "❤" + ChatColor.RESET));
 		event.setMessage(event.getMessage().replaceAll(":peace:", ChatColor.GREEN + "✌" + ChatColor.RESET));
-		if (event.getMessage().startsWith("!") || ZombieEscape.gameEnded || !ZombieEscape.gameStarted) {
+		if (event.getMessage().startsWith("!") || ZombieEscape.gameEnded || !ZombieEscape.gameStarted || alwaysAll) {
 			if (event.getMessage().startsWith("!")) event.setMessage(event.getMessage().replaceFirst("!", ""));
 			event.setFormat(ChatColor.RED + "[All] " + teamname + " " + event.getPlayer().getName() + ChatColor.RESET + ChatColor.WHITE + ": " + event.getMessage());
 		} else {
