@@ -251,4 +251,12 @@ public final class Utils {
 		}
 		return inv;
 	}
+
+	public static ItemStack generateVoteItem() {
+		ItemStack item = new ItemStack(Material.EMPTY_MAP);
+		ItemMeta meta = item.getItemMeta();
+		meta.setDisplayName(ChatColor.GREEN + "マップ投票");
+		item.setItemMeta(meta);
+		return item;
+	}
 }

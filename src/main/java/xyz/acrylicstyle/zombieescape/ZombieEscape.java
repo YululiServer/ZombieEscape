@@ -337,8 +337,10 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		event.getPlayer().setHealthScale(20);
 		new BukkitRunnable() {
 			public void run() {
+				event.getPlayer().getInventory().clear();
 				event.getPlayer().teleport(world.getSpawnLocation());
 				event.getPlayer().setGameMode(GameMode.ADVENTURE);
+				event.getPlayer().getInventory().addItem(Utils.generateVoteItem());
 				event.getPlayer().setResourcePack("https%3A%2F%2Fum.acrylicstyle.xyz%2F162158118117%2F410047095%2FZombieEscape.zip");
 				event.getPlayer().sendMessage(ChatColor.BLUE + "--------------------------------------------------");
 				event.getPlayer().sendMessage(ChatColor.DARK_GREEN + "          - Zombie Escape -");
@@ -499,6 +501,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 							votes = new HashMap<String, Integer>(); // re-intialize this map because there's no HashMap#removeAll()
 						}
 						if (timesLeft == 10) {
+							player.getInventory().clear();
 							votes = new HashMap<String, Integer>();
 							scoreboard.resetScores(defmapString);
 							player.sendMessage(ChatColor.GREEN + "マップ投票を締め切りました。");

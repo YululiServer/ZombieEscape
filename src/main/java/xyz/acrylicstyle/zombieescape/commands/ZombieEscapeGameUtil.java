@@ -24,7 +24,9 @@ import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -177,6 +179,17 @@ public class ZombieEscapeGameUtil {
 			Bukkit.dispatchCommand(((Player)e.getWhoClicked()), "vote " + e.getCurrentItem().getItemMeta().getLore().get(0));
 			e.setCancelled(true);
 			e.getWhoClicked().closeInventory();
+		}
+
+		@EventHandler
+		public void onPlayerInteract(PlayerInteractEvent e) {
+			if (e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK) {
+				if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.EMPTY_MAP) {
+					e.setCancelled(true);
+					e.getPlayer().getInventory().clear();
+					e.getPlayer().getInventory().addItem(Utils.generateVoteItem());
+				}
+			}
 		}
 	}
 
