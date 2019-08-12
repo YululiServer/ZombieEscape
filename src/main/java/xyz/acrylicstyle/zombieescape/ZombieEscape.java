@@ -469,11 +469,22 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 						}
 						// <----- team
 						// vote ----->
+						String[] keys = votes.keySet().toArray(new String[0]);
+						for (int i = 0; i < keys.length; i++) {
+							String thisMapName = keys[i];
+							ConfigProvider map = null;
+							try {
+								map = new ConfigProvider("./plugins/ZombieEscape/maps/" + thisMapName + ".yml");
+							} catch (IOException | InvalidConfigurationException e) {
+								e.printStackTrace();
+							}
+							scoreboard.resetScores(ChatColor.GREEN + "    マップ投票: " + map.getString("mapname", "???"));
+						};
 						if (timesLeft >= 11) {
 							hashMapVote.values().forEach(vote -> {
 								votes.put(vote, votes.getOrDefault(vote, 0)+1);
 							});
-							String[] keys = votes.keySet().toArray(new String[0]);
+							// String[] keys = votes.keySet().toArray(new String[0]);
 							for (int i = 0; i < keys.length; i++) {
 								String thisMapName = keys[i];
 								ConfigProvider map = null;
