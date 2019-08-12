@@ -185,6 +185,7 @@ public class ZombieEscapeGameUtil {
 		public void onPlayerInteract(PlayerInteractEvent e) {
 			if (e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK) {
 				if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.EMPTY_MAP) {
+					e.getPlayer().openInventory(inventory);
 					e.setCancelled(true);
 					e.getPlayer().getInventory().clear();
 					e.getPlayer().getInventory().addItem(Utils.generateVoteItem());
