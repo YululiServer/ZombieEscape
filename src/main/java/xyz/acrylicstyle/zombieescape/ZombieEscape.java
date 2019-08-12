@@ -480,9 +480,10 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 							} catch (IOException | InvalidConfigurationException e) {
 								e.printStackTrace();
 							}
-							Score score = objective.getScore(ChatColor.GREEN + map.getString("mapname", "???"));
-							score.setScore(votes.get(thisMapName));
+							Score score = objective.getScore(ChatColor.GREEN + "    マップ投票: " + map.getString("mapname", "???"));
+							score.setScore(-votes.get(thisMapName));
 						};
+						votes = new HashMap<String, Integer>(); // re-intialize this map because there's no HashMap#removeAll()
 						// <----- vote
 						/* do not edit this line */ player.setScoreboard(hashMapScoreboard.get(player.getUniqueId()));
 						if (timesLeft == 5) {
@@ -646,7 +647,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 								} catch (IOException | InvalidConfigurationException e) {
 									e.printStackTrace();
 								}
-								scoreboard.resetScores(ChatColor.GREEN + map.getString("mapname", "???"));
+								scoreboard.resetScores(ChatColor.GREEN + "    マップ投票: " + map.getString("mapname", "???"));
 							};
 						}
 						Objective objective3 = scoreboard.getObjective(DisplaySlot.SIDEBAR);

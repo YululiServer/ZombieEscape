@@ -204,6 +204,7 @@ public class ZombieEscapeGameUtil {
 				sender.sendMessage(ChatColor.RED + "指定されたマップのワールドはこのサーバーには存在しません。");
 				return true;
 			}
+			ZombieEscape.hashMapVote.remove(ps.getUniqueId());
 			ZombieEscape.hashMapVote.put(ps.getUniqueId(), args[0]);
 			sender.sendMessage(ChatColor.GREEN + mapConfig.getString("mapname") + " に投票しました。");
 			return true;
