@@ -22,6 +22,11 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import xyz.acrylicstyle.tomeito_core.providers.ConfigProvider;
@@ -139,6 +144,37 @@ public class ZombieEscapeGameUtil {
 			}
 			sender.sendMessage(ChatColor.GREEN + args[0] + "を" + args[1] + "に設定しました。");
 			return true;
+		}
+	}
+
+	public final class VoteGui implements CommandExecutor, InventoryHolder, Listener {
+		private boolean init = false;
+		private Inventory inventory;
+
+		public void initialize() {
+			this.inventory = Utils.initializeItems(Bukkit.createInventory(this, 27));
+			this.init = true;
+		}
+
+		@Override
+		public Inventory getInventory() {
+			return this.inventory;
+		}
+
+		@Override
+		public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+			if (!Utils.senderCheck(sender)) return true;
+			if (!this.init) this.initialize();
+			Player ps = (Player) sender;
+			ps.openInventory(inventory);
+			return true;
+		}
+
+		@EventHandler
+		public void onInventoryClick(InventoryClickEvent e) {
+			Bukkit.dispatchCommand(((Player)e.getWhoClicked()), "vote " + e.getCurrentItem().getItemMeta().getLore().get(0));
+			e.setCancelled(true);
+			e.getWhoClicked().closeInventory();
 		}
 	}
 

@@ -22,6 +22,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -224,5 +225,24 @@ public final class Utils {
 				}
 			}
 		}.runTaskTimer(ZombieEscape.getProvidingPlugin(ZombieEscape.class), 0, 1);
+	}
+
+	public static Inventory initializeItems(Inventory inv) {
+		String[] keys = ZombieEscape.votes.keySet().toArray(new String[0]);
+		for (int i = 0; i < keys.length; i++) {
+			ItemStack item = new ItemStack(Material.DIAMOND);
+			List<String> lore = new ArrayList<String>();
+			ConfigProvider map = null;
+			try {
+				map = new ConfigProvider("./plugins/ZombieEscape/maps/" + keys[i] + ".yml");
+			} catch (IOException | InvalidConfigurationException e) {
+				e.printStackTrace();
+			}
+			item.getItemMeta().setDisplayName(ChatColor.AQUA + map.getString("mapname", "???"));
+			lore.add(keys[0]);
+			item.getItemMeta().setLore(lore);
+			inv.addItem(item);
+		}
+		return inv;
 	}
 }

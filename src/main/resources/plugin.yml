@@ -68,6 +68,9 @@ commands:
   vote:
     description: "Vote for map!"
     usage: /<command> <map>
+  votemap:
+    description: "Vote for map with GUI!"
+    usage: /<command>
   destroywall:
     description: "Destroy wall with count down."
     usage: /<command> <wall> <countdown in seconds>

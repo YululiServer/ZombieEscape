@@ -181,6 +181,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			Bukkit.getPluginCommand("check").setExecutor(zegu.new CheckConfig());
 			Bukkit.getPluginCommand("setstatus").setExecutor(zegu.new SetStatus());
 			Bukkit.getPluginCommand("vote").setExecutor(zegu.new Vote());
+			Bukkit.getPluginCommand("votemap").setExecutor(zegu.new VoteGui());
 			Bukkit.getPluginCommand("destroywall").setExecutor(zegu.new DestroyWall());
 			Bukkit.getPluginCommand("zombieescape").setExecutor(new ZombieEscapeCommand());
 			Bukkit.getPluginCommand("crash").setExecutor(new CommandExecutor() {
@@ -468,7 +469,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 							votes.put(vote, votes.getOrDefault(vote, 0)+1);
 						});
 						String[] keys = votes.keySet().toArray(new String[0]);
-						for (int i = 0; i <= keys.length; i++) {
+						for (int i = 0; i < keys.length; i++) {
 							String thisMapName = keys[i];
 							ConfigProvider map = null;
 							try {
