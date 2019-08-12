@@ -3,21 +3,22 @@ package xyz.acrylicstyle.zombieescape;
 import java.util.Locale;
 
 public enum PlayerTeam {
-	/**
-	 * Represents ZOMBIE, returns "zombie" if called {@link #toString()}
-	 */
-	ZOMBIE,
-	/**
-	 * Represents PLAYER, returns "player" if called {@link #toString()}
-	 */
-	PLAYER,
-	/**
-	 * Represents SPECTATOR mode, returns "spectator" if called {@link #toString()}
-	 */
-	SPECTATOR;
+	ZOMBIE("ゾンビ"),
+	PLAYER("プレイヤー"),
+	SPECTATOR("スペクテイター");
 
 	@Override
-	public String toString() {
-		return super.toString().toLowerCase(Locale.ROOT);
+	public final String toString() {
+		return this.name;
 	}
+
+	private PlayerTeam(String stringName) {
+		this.name = stringName;
+	}
+
+	private PlayerTeam() {
+		this.name = this.toString().toLowerCase(Locale.ROOT);
+	}
+
+	private final String name;
 }
