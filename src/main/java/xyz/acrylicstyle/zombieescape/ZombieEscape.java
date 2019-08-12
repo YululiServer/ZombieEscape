@@ -1,6 +1,7 @@
 // *Warning* Bugged string may be found while decompiling this source!
 package xyz.acrylicstyle.zombieescape;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -471,32 +472,24 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 						}
 						// <----- team
 						// vote ----->
-						String[] keys = votes.keySet().toArray(new String[0]);
-						for (int i = 0; i < keys.length; i++) {
-							String thisMapName = keys[i];
-							ConfigProvider map = null;
-							try {
-								map = new ConfigProvider("./plugins/ZombieEscape/maps/" + thisMapName + ".yml");
-							} catch (IOException | InvalidConfigurationException e) {
-								e.printStackTrace();
-							}
-							scoreboard.resetScores(ChatColor.GREEN + "    マップ投票: " + map.getString("mapname", "???"));
-						};
 						if (timesLeft >= 11) {
 							hashMapVote.values().forEach(vote -> {
 								votes.put(vote, votes.getOrDefault(vote, 0)+1);
 							});
-							// String[] keys = votes.keySet().toArray(new String[0]);
+							File maps = new File("./plugins/ZombieEscape/maps/");
+							File[] keys = maps.listFiles();
 							for (int i = 0; i < keys.length; i++) {
-								String thisMapName = keys[i];
+								String key = keys[i].getName().replaceAll(".yml", "");
+								String thisMapName = key;
 								ConfigProvider map = null;
 								try {
 									map = new ConfigProvider("./plugins/ZombieEscape/maps/" + thisMapName + ".yml");
 								} catch (IOException | InvalidConfigurationException e) {
 									e.printStackTrace();
 								}
+								scoreboard.resetScores(ChatColor.GREEN + "    マップ投票: " + map.getString("mapname", "???"));
 								Score score = objective3.getScore(ChatColor.GREEN + "    マップ投票: " + map.getString("mapname", "???"));
-								score.setScore(-votes.get(thisMapName));
+								score.setScore(-votes.getOrDefault(thisMapName, 0));
 							};
 							votes = new HashMap<String, Integer>(); // re-intialize this map because there's no HashMap#removeAll()
 						}
