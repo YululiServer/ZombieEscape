@@ -1,5 +1,6 @@
 package xyz.acrylicstyle.zombieescape.utils;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -229,19 +230,21 @@ public final class Utils {
 	}
 
 	public static Inventory initializeItems(Inventory inv) {
-		String[] keys = ZombieEscape.votes.keySet().toArray(new String[0]);
+		File maps = new File("./plugins/ZombieEscape/maps/");
+		File[] keys = maps.listFiles();
 		for (int i = 0; i < keys.length; i++) {
+			String key = keys[i].getName().replaceAll(".yml", "");
 			ItemStack item = new ItemStack(Material.DIAMOND);
 			List<String> lore = new ArrayList<String>();
 			ConfigProvider map = null;
 			try {
-				map = new ConfigProvider("./plugins/ZombieEscape/maps/" + keys[i] + ".yml");
+				map = new ConfigProvider("./plugins/ZombieEscape/maps/" + key + ".yml");
 			} catch (IOException | InvalidConfigurationException e) {
 				e.printStackTrace();
 			}
 			ItemMeta meta = item.getItemMeta();
 			meta.setDisplayName(ChatColor.AQUA + map.getString("mapname", "???"));
-			lore.add(keys[0]);
+			lore.add(key);
 			meta.setLore(lore);
 			item.setItemMeta(meta);
 			inv.setItem(i, item);
