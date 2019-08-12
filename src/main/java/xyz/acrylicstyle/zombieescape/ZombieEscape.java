@@ -495,7 +495,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 									mostVotedMap = name;
 								}
 							});
-							ConfigProvider mapConfig = ConfigProvider.initWithoutException("./plugins/ZombieEscape/maps/" + mapName + ".yml");
+							mapConfig = ConfigProvider.initWithoutException("./plugins/ZombieEscape/maps/" + mapName + ".yml");
 							Bukkit.broadcastMessage(ChatColor.GREEN + "マップは" + ChatColor.AQUA + mapConfig.getString("mapname", "???") + ChatColor.GREEN + "になりました。");
 						}
 						// <----- vote
