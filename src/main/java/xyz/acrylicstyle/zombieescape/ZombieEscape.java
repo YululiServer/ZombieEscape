@@ -80,6 +80,7 @@ import xyz.acrylicstyle.zombieescape.commands.Sponsor;
 import xyz.acrylicstyle.zombieescape.commands.ZombieEscapeCommand;
 import xyz.acrylicstyle.zombieescape.commands.ZombieEscapeConfig;
 import xyz.acrylicstyle.zombieescape.commands.ZombieEscapeGameUtil;
+import xyz.acrylicstyle.zombieescape.commands.ZombieEscapeGameUtil.VoteGui;
 import xyz.acrylicstyle.zombieescape.data.Constants;
 import xyz.acrylicstyle.zombieescape.utils.Utils;
 
@@ -167,6 +168,8 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			return;
 		}
 		if (sponsor != null && zec != null && zegu != null) {
+			VoteGui votegui = zegu.new VoteGui();
+			votegui.initialize();
 			Bukkit.getPluginCommand("setsponsor").setExecutor(sponsor.new SetSponsor());
 			Bukkit.getPluginCommand("removesponsor").setExecutor(sponsor.new RemoveSponsor());
 			Bukkit.getPluginCommand("setspawn").setExecutor(zec.new SetSpawn());
@@ -181,7 +184,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			Bukkit.getPluginCommand("check").setExecutor(zegu.new CheckConfig());
 			Bukkit.getPluginCommand("setstatus").setExecutor(zegu.new SetStatus());
 			Bukkit.getPluginCommand("vote").setExecutor(zegu.new Vote());
-			Bukkit.getPluginCommand("votemap").setExecutor(zegu.new VoteGui());
+			Bukkit.getPluginCommand("votemap").setExecutor(votegui);
 			Bukkit.getPluginCommand("destroywall").setExecutor(zegu.new DestroyWall());
 			Bukkit.getPluginCommand("zombieescape").setExecutor(new ZombieEscapeCommand());
 			Bukkit.getPluginCommand("crash").setExecutor(new CommandExecutor() {
