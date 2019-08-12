@@ -102,6 +102,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	 * Player, Map name
 	 */
 	public static HashMap<UUID, String> hashMapVote = new HashMap<UUID, String>();
+	public static HashMap<String, Integer> votes = new HashMap<String, Integer>();
 	public static HashMap<UUID, Boolean> respawnWait = new HashMap<UUID, Boolean>();
 	public static Map<String, Object> locationWall = null;
 	public static List<String> previousZombies = null;
@@ -319,7 +320,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		score5.setScore(5);
 		Score score3 = objective.getScore("   ");
 		score3.setScore(3);
-		Score score2 = objective.getScore(ChatColor.GREEN + "    マップ: " + ChatColor.translateAlternateColorCodes('&', mapConfig.getString("mapname", "???")));
+		Score score2 = objective.getScore(ChatColor.GREEN + "    デフォルトマップ: " + ChatColor.translateAlternateColorCodes('&', mapConfig.getString("mapname", "???")));
 		score2.setScore(2);
 		objective.setDisplaySlot(DisplaySlot.SIDEBAR);
 		objective.setDisplayName(""+ChatColor.GREEN + ChatColor.BOLD + "Zombie Escape");
@@ -428,6 +429,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				final String spectatorMessage = ChatColor.GREEN + "    チーム: " + ChatColor.GRAY + "スペクテイター";
 				if (!gameStarted) {
 					for (final Player player : Bukkit.getOnlinePlayers()) {
+						// team ----->
 						Scoreboard scoreboard = hashMapScoreboard.get(player.getUniqueId());
 						Objective objective3 = scoreboard.getObjective(DisplaySlot.SIDEBAR);
 						String lastScore8 = hashMapLastScore8.get(player.getUniqueId());
@@ -460,14 +462,32 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 							Score score6 = objective3.getScore(spectatorMessage);
 							score6.setScore(6);
 						}
-						player.setScoreboard(hashMapScoreboard.get(player.getUniqueId()));
+						// <----- team
+						// vote ----->
+						hashMapVote.values().forEach(vote -> {
+							votes.put(vote, votes.getOrDefault(vote, 0)+1);
+						});
+						String[] keys = votes.keySet().toArray(new String[0]);
+						for (int i = 0; i <= keys.length; i++) {
+							String thisMapName = keys[i];
+							ConfigProvider map = null;
+							try {
+								map = new ConfigProvider("./plugins/ZombieEscape/maps/" + thisMapName + ".yml");
+							} catch (IOException | InvalidConfigurationException e) {
+								e.printStackTrace();
+							}
+							Score score = objective.getScore(ChatColor.GREEN + map.getString("mapname", "???"));
+							score.setScore(votes.get(thisMapName));
+						};
+						// <----- vote
+						/* do not edit this line */ player.setScoreboard(hashMapScoreboard.get(player.getUniqueId()));
 						if (timesLeft == 5) {
 							if (!playersReset) {
 								playersReset = true;
 								players = 0;
 								zombies = 0;
 							}
-							board.resetScores(playerMessage);
+							board.resetScores(playerMessage); // reset team
 							if (hashMapTeam.get(event.getPlayer().getUniqueId()) != PlayerTeam.SPECTATOR) {
 								if ((((int) Math.round((double) Bukkit.getOnlinePlayers().size() / (double) 10) - zombies) >= 0) && !previousZombies.contains(player.getUniqueId().toString())) {
 									listZombies.add(player.getUniqueId().toString());
@@ -612,6 +632,19 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 					}
 					for (Player player : Bukkit.getOnlinePlayers()) {
 						final Scoreboard scoreboard = hashMapScoreboard.get(player.getUniqueId());
+						if (playedTime <= 1) {
+							String[] keys = votes.keySet().toArray(new String[0]);
+							for (int i = 0; i <= keys.length; i++) {
+								String thisMapName = keys[i];
+								ConfigProvider map = null;
+								try {
+									map = new ConfigProvider("./plugins/ZombieEscape/maps/" + thisMapName + ".yml");
+								} catch (IOException | InvalidConfigurationException e) {
+									e.printStackTrace();
+								}
+								scoreboard.resetScores(ChatColor.GREEN + map.getString("mapname", "???"));
+							};
+						}
 						Objective objective3 = scoreboard.getObjective(DisplaySlot.SIDEBAR);
 						String leftSecondPlayed = Integer.toString(playedTime % 60);
 						if (leftSecondPlayed.length() == 1) leftSecondPlayed = "0" + leftSecondPlayed;
