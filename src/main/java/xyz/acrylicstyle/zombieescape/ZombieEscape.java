@@ -510,12 +510,8 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 								}
 							});
 							if (mostVotedMap == null) mostVotedMap = mapName; // default map
-							try {
-								mapConfig.load("./plugins/ZombieEscape/maps/" + mostVotedMap + ".yml");
-							} catch (IOException | InvalidConfigurationException e) {
-								Log.error("error?");
-								e.printStackTrace();
-							}
+							mapName = mostVotedMap;
+							Utils.reload();
 							Log.debug("mapConfig: "+ mapConfig); // TODO: debug message here FIXME: voted but mapConfig is seems strange
 							Log.debug("mostVotedMap: " + mostVotedMap);
 							player.sendMessage(ChatColor.GREEN + "マップは" + ChatColor.AQUA + mapConfig.getString("mapname", "???") + ChatColor.GREEN + "になりました。");

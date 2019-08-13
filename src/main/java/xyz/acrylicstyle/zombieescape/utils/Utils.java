@@ -80,7 +80,6 @@ public final class Utils {
 	 */
 	public static void reload() {
 		ZombieEscape.config.reloadWithoutException();
-		ZombieEscape.mapName = ZombieEscape.config.getString("map", "world");
 		try {
 			ZombieEscape.mapConfig = new ConfigProvider("./plugins/ZombieEscape/maps/" + ZombieEscape.mapName + ".yml");
 		} catch (IOException | InvalidConfigurationException e) {
