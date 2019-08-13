@@ -512,8 +512,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 							if (mostVotedMap == null) mostVotedMap = mapName; // default map
 							mapName = mostVotedMap;
 							Utils.reload();
-							Log.debug("mapConfig: "+ mapConfig); // TODO: debug message here FIXME: voted but mapConfig is seems strange
-							Log.debug("mostVotedMap: " + mostVotedMap);
 							player.sendMessage(ChatColor.GREEN + "マップは" + ChatColor.AQUA + mapConfig.getString("mapname", "???") + ChatColor.GREEN + "になりました。");
 							World world = Bukkit.getWorld(mapConfig.getString("spawnPoints.world", "world"));
 							world.setGameRuleValue("announceAdvancements", "false");
@@ -861,7 +859,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 
 	@EventHandler(priority=EventPriority.HIGHEST)
 	public void onEntityDamage(EntityDamageEvent event) {
-		Log.info("EntityDamageEvent");
 		if (event.getEntityType() != EntityType.PLAYER) return;
 		if (!gameStarted || gameEnded) event.setCancelled(true);
 		if (event.getCause() == DamageCause.FALL) event.setCancelled(true);

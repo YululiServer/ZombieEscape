@@ -124,10 +124,7 @@ public final class Utils {
 	public static List<Player> targetAFindPlayersWithRange(Location loc, double range) {
 		if (ZombieEscape.players <= 0) return null;
 		List<Player> players = new ArrayList<Player>();
-		Log.info("we're going to find players");
 		for(Player p : loc.getWorld().getPlayers()){
-			Log.info("team: " + ZombieEscape.hashMapTeam.get(p.getUniqueId()));
-			Log.info("distance: " + loc.distance(p.getLocation()));
 			if (ZombieEscape.hashMapTeam.get(p.getUniqueId()) != PlayerTeam.PLAYER) continue;
 			double distanceSqrd = loc.distance(p.getLocation());
 			if (distanceSqrd > range) continue;
@@ -153,10 +150,7 @@ public final class Utils {
 		if (ZombieEscape.players <= 0) return null;
 		Player nearestPlayer = null;
 		double lastDistance = Double.MAX_VALUE;
-		Log.info("we're going to find players");
 		for(Player p : loc.getWorld().getPlayers()){
-			Log.info("team: " + ZombieEscape.hashMapTeam.get(p.getUniqueId()));
-			Log.info("distance: " + loc.distance(p.getLocation()));
 			if (!(ZombieEscape.hashMapTeam.get(p.getUniqueId()) == PlayerTeam.PLAYER)) continue;
 			double distanceSqrd = loc.distance(p.getLocation());
 			if (distanceSqrd > 10) continue;
