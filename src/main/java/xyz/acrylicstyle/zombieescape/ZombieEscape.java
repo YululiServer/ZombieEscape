@@ -519,6 +519,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 								e.getCause().printStackTrace();
 							}
 							Log.debug("mapConfig: "+ mapConfig2); // TODO: debug message here FIXME: voted but mapConfig is seems strange
+							Log.debug("mostVotedMap: " + mostVotedMap);
 							if (mapConfig2.path != null && mapConfig2.file != null) mapConfig = mapConfig2;
 							player.sendMessage(ChatColor.GREEN + "マップは" + ChatColor.AQUA + mapConfig.getString("mapname", "???") + ChatColor.GREEN + "になりました。");
 							World world = Bukkit.getWorld(mapConfig.getString("spawnPoints.world", "world"));
