@@ -344,7 +344,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				event.getPlayer().teleport(world.getSpawnLocation());
 				event.getPlayer().setGameMode(GameMode.ADVENTURE);
 				event.getPlayer().getInventory().addItem(Utils.generateVoteItem());
-				event.getPlayer().setResourcePack("https%3A%2F%2Fum.acrylicstyle.xyz%2F162158118117%2F410047095%2FZombieEscape.zip");
+				if (config.getString("resourcepack") != null) event.getPlayer().setResourcePack(config.getString("resourcepack"));
 				event.getPlayer().sendMessage(ChatColor.BLUE + "--------------------------------------------------");
 				event.getPlayer().sendMessage(ChatColor.DARK_GREEN + "          - Zombie Escape -");
 				event.getPlayer().sendMessage("");
@@ -473,7 +473,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 							score6.setScore(6);
 						}
 						// <----- team
-						// vote -----> #FIXME: voted but mapConfig is seems strange
+						// vote ----->
 						if (timesLeft >= 11) {
 							hashMapVote.values().forEach(vote -> {
 								votes.put(vote, votes.getOrDefault(vote, 0)+1);
@@ -517,6 +517,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 								e.printStackTrace();
 								e.getCause().printStackTrace();
 							}
+							Log.debug("mapConfig: "+ mapConfig); // TODO: debug message here FIXME: voted but mapConfig is seems strange
 							player.sendMessage(ChatColor.GREEN + "マップは" + ChatColor.AQUA + mapConfig.getString("mapname", "???") + ChatColor.GREEN + "になりました。");
 							World world = Bukkit.getWorld(mapConfig.getString("spawnPoints.world", "world"));
 							world.setGameRuleValue("announceAdvancements", "false");
