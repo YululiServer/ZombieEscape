@@ -518,6 +518,12 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 								e.printStackTrace();
 								e.getCause().printStackTrace();
 							}
+							try {
+								mapConfig2.load("./plugins/ZombieEscape/maps/" + mostVotedMap + ".yml");
+							} catch (IOException | InvalidConfigurationException e) {
+								Log.error("error?");
+								e.printStackTrace();
+							}
 							Log.debug("mapConfig: "+ mapConfig2); // TODO: debug message here FIXME: voted but mapConfig is seems strange
 							Log.debug("mostVotedMap: " + mostVotedMap);
 							if (mapConfig2.path != null && mapConfig2.file != null) mapConfig = mapConfig2;
