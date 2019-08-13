@@ -510,14 +510,16 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 								}
 							});
 							if (mostVotedMap == null) mostVotedMap = mapName; // default map
+							ConfigProvider mapConfig2 = null;
 							try {
-								mapConfig = new ConfigProvider("./plugins/ZombieEscape/maps/" + mostVotedMap + ".yml");
-							} catch (IOException | InvalidConfigurationException e) {
+								mapConfig2 = new ConfigProvider("./plugins/ZombieEscape/maps/" + mostVotedMap + ".yml");
+							} catch (Exception e) {
 								Log.error("Error while loading config:");
 								e.printStackTrace();
 								e.getCause().printStackTrace();
 							}
-							Log.debug("mapConfig: "+ mapConfig); // TODO: debug message here FIXME: voted but mapConfig is seems strange
+							Log.debug("mapConfig: "+ mapConfig2); // TODO: debug message here FIXME: voted but mapConfig is seems strange
+							if (mapConfig2.path != null && mapConfig2.file != null) mapConfig = mapConfig2;
 							player.sendMessage(ChatColor.GREEN + "マップは" + ChatColor.AQUA + mapConfig.getString("mapname", "???") + ChatColor.GREEN + "になりました。");
 							World world = Bukkit.getWorld(mapConfig.getString("spawnPoints.world", "world"));
 							world.setGameRuleValue("announceAdvancements", "false");
