@@ -156,14 +156,14 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		if (!reload) reload = plib; // useless "if" statement tho
 		if (!reload) reload = tlib;
 		if (!Utils.checkPlugin("CrackShot")) logger.warning("Does not exist CrackShot plugin.");
-		if (reload) {
-			logger.warning("Reloading, if you experienced some issues after reload, please restart server!");
-			Bukkit.reload();
-		}
 	}
 
 	@Override
 	public void onEnable() {
+		if (reload) {
+			Bukkit.getLogger().warning("Reloading, if you experienced some issues after reload, please restart server!");
+			Bukkit.reload();
+		}
 		if (this.error) {
 			Bukkit.getLogger().severe("[ZombieEscape] There are errors when loading plugin.");
 			Bukkit.getPluginManager().disablePlugin(this);
