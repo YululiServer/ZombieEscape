@@ -38,6 +38,7 @@ public class AsyncDownload extends Thread {
 			}
 			dataInStream.close(); dataOutStream.close();
 		} catch (Exception e) {
+			e.printStackTrace();
 			this.result = false;
 			return false;
 		}
