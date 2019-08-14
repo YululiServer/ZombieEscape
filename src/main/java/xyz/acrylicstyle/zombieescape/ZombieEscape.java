@@ -161,8 +161,8 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	@Override
 	public void onEnable() {
 		if (reload) {
-			Bukkit.getLogger().warning("Reloading, if you experienced some issues after reload, please restart server!");
-			Bukkit.reload();
+			Bukkit.getLogger().warning("Some plugins are added to this server. Please restart server!");
+			Bukkit.shutdown();
 		}
 		if (this.error) {
 			Bukkit.getLogger().severe("[ZombieEscape] There are errors when loading plugin.");
