@@ -158,7 +158,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	@Override
 	public void onEnable() {
 		if (this.error) {
-			Bukkit.getLogger().severe("There are errors when loading plugin.");
+			Bukkit.getLogger().severe("[ZombieEscape] There are errors when loading plugin.");
 			Bukkit.getPluginManager().disablePlugin(this);
 			return;
 		}
