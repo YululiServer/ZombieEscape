@@ -136,13 +136,15 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	public static String defmapString = null;
 	public static Map<String, String> ongoingEventMap = new HashMap<String, String>();
 
+	private boolean error = false;
+
 	@Override
 	public void onLoad() {
 		Logger logger = Bukkit.getLogger();
 		if (!Bukkit.getBukkitVersion().contains(Constants.requiredMinecraftVersion)) {
 			logger.severe("Your current bukkit/minecraft version(" + Bukkit.getBukkitVersion() + ") is incompatible.");
 			logger.severe("Please use spigot 1.12.2 and restart your server.");
-			Bukkit.getPluginManager().disablePlugin(this);
+			this.error = true;
 			return;
 		}
 		logger.info("[ZombieEscape] Loading plugins");
@@ -155,6 +157,11 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 
 	@Override
 	public void onEnable() {
+		if (this.error) {
+			Bukkit.getLogger().severe("There are errors when loading plugin.");
+			Bukkit.getPluginManager().disablePlugin(this);
+			return;
+		}
 		protocol = ProtocolLibrary.getProtocolManager();
 		try {
 			config = new ConfigProvider("./plugins/ZombieEscape/config.yml");
