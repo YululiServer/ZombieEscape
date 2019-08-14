@@ -34,6 +34,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import xyz.acrylicstyle.tomeito_core.providers.ConfigProvider;
 import xyz.acrylicstyle.zombieescape.PlayerTeam;
 import xyz.acrylicstyle.zombieescape.ZombieEscape;
+import xyz.acrylicstyle.zombieescape.data.Constants;
 import xyz.acrylicstyle.zombieescape.utils.Utils;
 
 public class ZombieEscapeGameUtil {
@@ -99,7 +100,7 @@ public class ZombieEscapeGameUtil {
 				sender.sendMessage(ChatColor.RED + "ゲームはすでに開始されています！");
 				return true;
 			}
-			if (ZombieEscape.mininumPlayers > Bukkit.getOnlinePlayers().size()) {
+			if (Constants.mininumPlayers > Bukkit.getOnlinePlayers().size()) {
 				sender.sendMessage(ChatColor.RED + "プレイヤー数が最低人数に満たないため、開始できません。");
 				return true;
 			}
