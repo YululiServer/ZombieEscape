@@ -74,7 +74,7 @@
     <dependency>
       <groupId>xyz.acrylicstyle</groupId>
       <artifactId>tomeito_core</artifactId>
-      <version>21</version>
+      <version>22</version>
     </dependency>
   </dependencies>
 </project>
