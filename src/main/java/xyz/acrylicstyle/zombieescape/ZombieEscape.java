@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -86,7 +87,6 @@ import xyz.acrylicstyle.zombieescape.data.Constants;
 import xyz.acrylicstyle.zombieescape.utils.Utils;
 
 public class ZombieEscape extends JavaPlugin implements Listener {
-	public final static int mininumPlayers = 2;
 	public static ConfigProvider finalMapConfig = null;
 	public static ConfigProvider config = null;
 	public static ConfigProvider mapConfig = null;
@@ -135,6 +135,23 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	public static String mostVotedMap = null;
 	public static String defmapString = null;
 	public static Map<String, String> ongoingEventMap = new HashMap<String, String>();
+
+	@Override
+	public void onLoad() {
+		Logger logger = Bukkit.getLogger();
+		if (!Bukkit.getBukkitVersion().contains(Constants.requiredMinecraftVersion)) {
+			logger.severe("Your current bukkit/minecraft version(" + Bukkit.getBukkitVersion() + ") is incompatible.");
+			logger.severe("Please use spigot 1.12.2 and restart your server.");
+			Bukkit.getPluginManager().disablePlugin(this);
+			return;
+		}
+		logger.info("[ZombieEscape] Loading plugins");
+		Bukkit.getPluginManager().loadPlugins(new File("./plugins"));
+		logger.info("[ZombieEscape] Checking for plugins");
+		Utils.downloadPlugin("ProtocolLib", "http://ci.dmulloy2.net/job/ProtocolLib/425/artifact/modules/ProtocolLib/target/ProtocolLib.jar");
+		Utils.downloadPlugin("TomeitoLib", "https://ci.acrylicstyle.xyz/job/TomeitoLib/lastSuccessfulBuild/artifact/TomeitoLib.jar");
+		if (!Utils.checkPlugin("CrackShot")) logger.warning("Does not exist CrackShot plugin.");
+	}
 
 	@Override
 	public void onEnable() {
@@ -330,7 +347,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		score2.setScore(2);
 		objective.setDisplaySlot(DisplaySlot.SIDEBAR);
 		objective.setDisplayName(""+ChatColor.GREEN + ChatColor.BOLD + "Zombie Escape");
-		if (Bukkit.getOnlinePlayers().size() >= 2) hasEnoughPlayers = true; else {
+		if (Bukkit.getOnlinePlayers().size() >= Constants.mininumPlayers) hasEnoughPlayers = true; else {
 			hasEnoughPlayers = false;
 			timesLeft = 180;
 		}
@@ -867,7 +884,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 
 	@EventHandler
 	public synchronized void onPlayerLeft(PlayerQuitEvent event) {
-		if (Bukkit.getOnlinePlayers().size() >= 2) hasEnoughPlayers = true; else {
+		if (Bukkit.getOnlinePlayers().size() >= Constants.mininumPlayers) hasEnoughPlayers = true; else {
 			hasEnoughPlayers = false;
 			timesLeft = 180;
 		}
@@ -1006,9 +1023,10 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		if (event.getItemDrop().getItemStack().getType() == Material.STONE_AXE) event.setCancelled(true); // Please don't drop axe
 	}
 
-	private int shutdownCount = 0;
+	private int shutdownCount = 15;
 
 	public void endGame(String team) {
+		if (shutdownCount != 15) return;
 		gameEnded = true;
 		for (Player player : Bukkit.getOnlinePlayers()) {
 			player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + team + "チームの勝ち！", "", 0, 40, 0);
@@ -1032,7 +1050,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		};
 		Timer timer = new Timer();
 		timer.schedule(task, 1000*15);
-		shutdownCount = 15;
 		new BukkitRunnable() {
 			public void run() {
 				ZombieEscape.ongoingEvent = "あと" + shutdownCount + "秒でサーバー再起動";

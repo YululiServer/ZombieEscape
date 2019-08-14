@@ -8,7 +8,9 @@ public class Constants {
 	/**
 	 * Represents material(block) durability
 	 */
-	public static HashMap<Material, Integer> materialDurability = new HashMap<Material, Integer>();
+	public final static HashMap<Material, Integer> materialDurability = new HashMap<Material, Integer>();
+	public final static String requiredMinecraftVersion = "1.12.2";
+	public final static int mininumPlayers = 2;
 
 	static {
 		materialDurability.put(Material.DIRT, 45);

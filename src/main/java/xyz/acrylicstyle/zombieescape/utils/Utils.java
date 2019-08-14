@@ -76,6 +76,42 @@ public final class Utils {
 	}
 
 	/**
+	 * Check a plugin if exists.
+	 *
+	 * This method is shorthand of <pre><code>return Bukkit.getPluginManager().getPlugin(plugin) != null;</code></pre>.
+	 *
+	 * @see #downloadPlugin(String, String)
+	 * @param plugin Target plugin name
+	 * @param url A url for download plugin if not exist
+	 * @return True if exist, otherwize returns false.
+	 */
+	public static boolean checkPlugin(String plugin) {
+		return Bukkit.getPluginManager().getPlugin(plugin) != null;
+	}
+
+	/**
+	 * Check a plugin if exists, if does not exist, it'll download fresh plugin from provided url.
+	 * <br>
+	 * Similar as {@link #checkPlugin(String, String)} but it returns false if exist.
+	 *
+	 * @see #checkPlugin(String, String)
+	 * @param plugin Target plugin name
+	 * @param url A url for download plugin if not exist
+	 * @return False if exist, true if it was does not exist and attempted to download plugin.
+	 */
+	public static boolean downloadPlugin(String plugin, String url) {
+		if (Bukkit.getPluginManager().getPlugin(plugin) == null) {
+			Bukkit.getLogger().warning("[ZombieEscape] Does not exist " + plugin + ", downloading from " + url);
+			AsyncDownload downloader = new AsyncDownload(plugin, url);
+			if (!downloader.download()) {
+				throw new IllegalArgumentException("Something is wrong with argument so we couldn't download file from specified URL.");
+			}
+			Bukkit.getPluginManager().loadPlugins(new File("./plugins"));
+			return true;
+		} else return false;
+	}
+
+	/**
 	 * Reloads all config.
 	 */
 	public static void reload() {

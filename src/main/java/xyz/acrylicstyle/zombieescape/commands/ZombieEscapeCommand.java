@@ -27,9 +27,13 @@ public class ZombieEscapeCommand implements CommandExecutor {
 				if (!Utils.senderCheck(sender)) return true;
 				Bukkit.getPluginCommand("vote").execute(sender, label, cmdArgs);
 			} else {
-				String args2 = "";
-				for (String arg : args) args2 += " " + arg;
-				Bukkit.dispatchCommand(sender, "bukkit:help ZombieEscape" + args2);
+				if (!Utils.senderCheck(sender)) return true;
+				Command target = Bukkit.getPluginCommand(args[0]);
+				if (target == null) {
+					sender.sendMessage(ChatColor.DARK_GRAY + "不明なコマンドです。");
+					return true;
+				}
+				target.execute(sender, label, cmdArgs);
 			}
 		} else {
 			Bukkit.dispatchCommand(sender, "bukkit:help ZombieEscape");
