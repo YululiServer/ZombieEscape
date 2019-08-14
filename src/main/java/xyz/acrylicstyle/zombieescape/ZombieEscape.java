@@ -165,7 +165,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			defmapString = ChatColor.GREEN + "    デフォルトマップ: " + ChatColor.translateAlternateColorCodes('&', mapConfig.getString("mapname", "???"));
 		} catch (IOException | InvalidConfigurationException e1) {
 			e1.printStackTrace();
-			e1.getCause().printStackTrace();
 			Log.error("Failed to load config, disabling plugin.");
 			Bukkit.getPluginManager().disablePlugin(this);
 			return;
