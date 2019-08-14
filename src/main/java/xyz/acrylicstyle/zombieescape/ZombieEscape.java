@@ -150,9 +150,16 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		logger.info("[ZombieEscape] Loading plugins");
 		Bukkit.getPluginManager().loadPlugins(new File("./plugins"));
 		logger.info("[ZombieEscape] Checking for plugins");
-		Utils.downloadPlugin("ProtocolLib", "http://ci.dmulloy2.net/job/ProtocolLib/425/artifact/modules/ProtocolLib/target/ProtocolLib.jar");
-		Utils.downloadPlugin("TomeitoLib", "https://ci.acrylicstyle.xyz/job/TomeitoLib/lastSuccessfulBuild/artifact/TomeitoLib.jar");
+		boolean status = false;
+		boolean plib = Utils.downloadPlugin("ProtocolLib", "http://ci.dmulloy2.net/job/ProtocolLib/425/artifact/modules/ProtocolLib/target/ProtocolLib.jar");
+		boolean tlib = Utils.downloadPlugin("TomeitoLib", "https://ci.acrylicstyle.xyz/job/TomeitoLib/lastSuccessfulBuild/artifact/TomeitoLib.jar");
+		if (!status) status = plib; // useless "if" statement tho
+		if (!status) status = tlib;
 		if (!Utils.checkPlugin("CrackShot")) logger.warning("Does not exist CrackShot plugin.");
+		if (status) {
+			logger.warning("Reloading, if you experienced some issues after reload, please restart server!");
+			Bukkit.reload();
+		}
 	}
 
 	@Override

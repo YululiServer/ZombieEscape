@@ -106,7 +106,6 @@ public final class Utils {
 			if (!downloader.download()) {
 				throw new IllegalArgumentException("Something is wrong with argument so we couldn't download file from specified URL.");
 			}
-			Bukkit.getPluginManager().loadPlugins(new File("./plugins"));
 			return true;
 		} else return false;
 	}
