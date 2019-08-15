@@ -10,6 +10,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.craftbukkit.libs.jline.internal.Log;
 
 import xyz.acrylicstyle.zombieescape.utils.Utils;
 
@@ -31,8 +32,8 @@ public class ZombieEscapeCommand implements CommandExecutor {
 				}
 				if (args.length == 1) {
 					sender.sendMessage(ChatColor.RED + "Usage:");
-					sender.sendMessage(ChatColor.RED + "/zombieescape debug <Class> <Field> [= [Value]]");
-					sender.sendMessage(ChatColor.RED + "/zombieescape debug <Class> <Method> ( <args...> )");
+					sender.sendMessage(ChatColor.RED + "/zombieescape debug <Class> <Field> [= [Value]] - Get / Set field.");
+					sender.sendMessage(ChatColor.RED + "/zombieescape debug <Class> <Method> ( <args...> ) - Invoke method with args.");
 					return true;
 				}
 				try {
@@ -40,6 +41,7 @@ public class ZombieEscapeCommand implements CommandExecutor {
 						Class<?> clazz = Class.forName(args[1]);
 						if (Utils.includes(args, "=")) {
 							// set field, example: /zombieescape debug xyz.acrylicstyle.zombieescape.ZombieEscape gameStarted = true
+							Log.debug("indexOf: " + Utils.indexOf(args, "=")+1 +", length of args: " + args.length);
 							if (args.length != Utils.indexOf(args, "=")+1) throw new IllegalArgumentException("Missing 1 argument after =");
 							Field field = clazz.getField(args[2]);
 							field.setAccessible(true);
@@ -65,12 +67,7 @@ public class ZombieEscapeCommand implements CommandExecutor {
 							Field field = clazz.getField(args[2]);
 							field.setAccessible(true);
 							sender.sendMessage(ChatColor.GREEN + "Result:");
-							try {
-								sender.sendMessage("" + field.get(clazz.newInstance()));
-							} catch (Exception e) {
-								e.printStackTrace();
-								sender.sendMessage("" + field.get(null)); // get static
-							}
+							sender.sendMessage(ChatColor.GREEN + "" + field.get(clazz));
 						}
 					}
 				} catch (Exception e) {
