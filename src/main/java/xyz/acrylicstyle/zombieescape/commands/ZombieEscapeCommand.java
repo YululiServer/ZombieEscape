@@ -1,5 +1,6 @@
 package xyz.acrylicstyle.zombieescape.commands;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -23,9 +24,58 @@ public class ZombieEscapeCommand implements CommandExecutor {
 			if (args[0].equalsIgnoreCase("reload")) {
 				Utils.reload();
 				sender.sendMessage(ChatColor.GREEN + "✓ 設定を再読み込みしました。");
-			} else if (args[0].equalsIgnoreCase("vote")) {
-				if (!Utils.senderCheck(sender)) return true;
-				Bukkit.getPluginCommand("vote").execute(sender, label, cmdArgs);
+			} else if (args[0].equalsIgnoreCase("debug")) {
+				if (!sender.hasPermission("*") || !sender.isOp()) {
+					sender.sendMessage(ChatColor.RED + "Sorry but you don't have enough permission.");
+					return true;
+				}
+				if (args.length == 1) {
+					sender.sendMessage(ChatColor.RED + "Usage:");
+					sender.sendMessage(ChatColor.RED + "/zombieescape debug <Class> <Field> [= [Value]]");
+					sender.sendMessage(ChatColor.RED + "/zombieescape debug <Class> <Method> ( <args...> )");
+					return true;
+				}
+				try {
+					for (int i = 1; i < args.length; i++) {
+						Class<?> clazz = Class.forName(args[1]);
+						if (Utils.includes(args, "=")) {
+							// set field, example: /zombieescape debug xyz.acrylicstyle.zombieescape.ZombieEscape gameStarted = true
+							if (args.length != Utils.indexOf(args, "=")+1) throw new IllegalArgumentException("Missing 1 argument after =");
+							Field field = clazz.getField(args[2]);
+							field.setAccessible(true);
+							String s = args[Utils.indexOf(args, "=")+1];
+							if (Utils.isInt(s)) {
+								field.setInt(clazz.newInstance(), Integer.parseInt(s));
+							} else if (Utils.isBoolean(s)) {
+								field.setBoolean(clazz.newInstance(), Boolean.parseBoolean(s));
+							} else if (Utils.isDouble(s)) {
+								field.setDouble(clazz.newInstance(), Double.parseDouble(s));
+							} else if (Utils.isFloat(s)) {
+								field.setFloat(clazz.newInstance(), Float.parseFloat(s));
+							} else {
+								field.set(clazz.newInstance(), s);
+							}
+							sender.sendMessage(ChatColor.GREEN + "Field " + args[Utils.indexOf(args, "=")-1] + " has been set to:");
+							sender.sendMessage("" + field.get(clazz));
+						} else if (Utils.includes(args, "(") && Utils.includes(args, ")")) {
+							// invoke method, example: /zombieescape debug xyz.acrylicstyle.zombieescape.utils.Utils isInt ( 123 )
+							throw new Exception("Not implemented.");
+						} else {
+							// get field, example: /zombieescape debug xyz.acrylicstyle.zombieescape.ZombieEscape gameStarted
+							Field field = clazz.getField(args[2]);
+							field.setAccessible(true);
+							sender.sendMessage(ChatColor.GREEN + "Result:");
+							try {
+								sender.sendMessage("" + field.get(clazz.newInstance()));
+							} catch (Exception e) {
+								e.printStackTrace();
+								sender.sendMessage("" + field.get(null)); // get static
+							}
+						}
+					}
+				} catch (Exception e) {
+					sender.sendMessage(ChatColor.RED + "An unknown error occurred: " + e);
+				}
 			} else {
 				if (!Utils.senderCheck(sender)) return true;
 				Command target = Bukkit.getPluginCommand(args[0]);

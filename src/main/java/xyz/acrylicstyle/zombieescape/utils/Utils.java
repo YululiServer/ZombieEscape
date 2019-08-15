@@ -33,6 +33,7 @@ import xyz.acrylicstyle.tomeito_core.providers.ConfigProvider;
 import xyz.acrylicstyle.tomeito_core.utils.Log;
 import xyz.acrylicstyle.zombieescape.PlayerTeam;
 import xyz.acrylicstyle.zombieescape.ZombieEscape;
+import xyz.acrylicstyle.zombieescape.exception.BooleanFormatException;
 
 public final class Utils {
 	private Utils() {}
@@ -294,5 +295,92 @@ public final class Utils {
 		meta.setDisplayName(ChatColor.GREEN + "リソースパック");
 		item.setItemMeta(meta);
 		return item;
+	}
+
+	/**
+	 * Check if array contains needle but not case-sensitive.
+	 * @param array Haystack
+	 * @param needle Needle
+	 * @return true if found, otherwise false
+	 */
+	public static boolean includes(String[] array, String needle) {
+		boolean found = false;
+		for (String element : array) {
+			if (element.equalsIgnoreCase(needle)) found = true;
+		}
+		return found;
+	}
+
+	/**
+	 * Check if array contains needle and that element contains all of multiple needle but not case-sensitive.
+	 * @param array Haystack
+	 * @param needle Needle
+	 * @return true if found, otherwise false
+	 */
+	public static boolean contains(String[] array, String... needle) {
+		boolean found = false;
+		for (String element : array) {
+			found = true;
+			for (String e : needle) {
+				if (found) found = element.contains(e);
+			}
+		}
+		return found;
+	}
+
+	/**
+	 * Returns array element index that contains needle but not case-sensitive.<br>
+	 * If there are multiple needles in haystack, returns first one.
+	 * @param array Haystack
+	 * @param needle Needle
+	 * @return a number except -1 if found, returns -1 if not found
+	 */
+	public static int indexOf(String[] array, String needle) {
+		for (int i = 0; i < array.length; i++) {
+			if (array[i].equalsIgnoreCase(needle)) return i;
+		}
+		return -1;
+	}
+
+	public static boolean isInt(String arg) {
+		try {
+			Integer.parseInt(arg);
+			return true;
+		} catch (NumberFormatException e) {
+			return false;
+		}
+	}
+
+	public static boolean isDouble(String arg) {
+		try {
+			Double.parseDouble(arg);
+			return true;
+		} catch (NumberFormatException e) {
+			return false;
+		}
+	}
+
+	public static boolean parseBoolean(String bool) throws BooleanFormatException {
+		if (bool.equalsIgnoreCase("true")) return true;
+		else if (bool.equalsIgnoreCase("false")) return false;
+		else throw new BooleanFormatException("Provided string is not boolean.");
+	}
+
+	public static boolean isBoolean(String arg) {
+		try {
+			Utils.parseBoolean(arg);
+			return true;
+		} catch (BooleanFormatException e) {
+			return false;
+		}
+	}
+
+	public static boolean isFloat(String arg) {
+		try {
+			Float.parseFloat(arg);
+			return true;
+		} catch (NumberFormatException e) {
+			return false;
+		}
 	}
 }
