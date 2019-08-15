@@ -345,11 +345,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		}
 		hashMapLastScore4.put(event.getPlayer().getUniqueId(), "");
 		hashMapLastScore8.put(event.getPlayer().getUniqueId(), "");
-		event.getPlayer().getWorld().setGameRuleValue("doMobLoot", "false");
-		event.getPlayer().getWorld().setGameRuleValue("doDaylightCycle", "false");
-		event.getPlayer().getWorld().setGameRuleValue("keepInventory", "true");
-		event.getPlayer().getWorld().setGameRuleValue("doFireTick", "false");
-		event.getPlayer().getWorld().setTime(0);
 		event.getPlayer().getInventory().clear();
 		event.getPlayer().setGameMode(GameMode.ADVENTURE);
 		final Scoreboard board = manager.getNewScoreboard();
@@ -601,6 +596,12 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 							player.sendTitle(ChatColor.GREEN + "5", ChatColor.YELLOW + "チーム: " + hashMapTeam.get(player.getUniqueId()), 0, 25, 0);
 						} else if (timesLeft == 4) {
 							player.setGameMode(GameMode.ADVENTURE);
+							player.getWorld().setGameRuleValue("doMobLoot", "false");
+							player.getWorld().setGameRuleValue("doDaylightCycle", "false");
+							player.getWorld().setGameRuleValue("keepInventory", "true");
+							player.getWorld().setGameRuleValue("doFireTick", "false");
+							player.getWorld().setGameRuleValue("naturalRegeneration", "false");
+							player.getWorld().setTime(mapConfig.getInt("time", 6000));
 							if (zombies == 0) {
 								listZombies.add(player.getUniqueId().toString());
 								hashMapOriginZombie.put(player.getUniqueId(), true);
