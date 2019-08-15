@@ -229,6 +229,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 					Bukkit.getPluginCommand("destroywall").setExecutor(zegu.new DestroyWall());
 					Bukkit.getPluginCommand("zombieescape").setExecutor(new ZombieEscapeCommand());
 					Bukkit.getPluginCommand("resourcepack").setExecutor(zegu.new ResourcePack());
+					Bukkit.getPluginCommand("ping").setExecutor(zegu.new Ping());
 					Bukkit.getPluginCommand("crash").setExecutor(new CommandExecutor() {
 						@Override
 						public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {

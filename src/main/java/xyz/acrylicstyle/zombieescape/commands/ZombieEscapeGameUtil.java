@@ -21,6 +21,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.craftbukkit.libs.jline.internal.Log;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -295,6 +296,35 @@ public class ZombieEscapeGameUtil {
 				((Player) sender).setResourcePack(ZombieEscape.config.getString("resourcepack"));
 			} else {
 				sender.sendMessage(ChatColor.RED + "このサーバーにはリソースパックが設定されていません。");
+			}
+			return true;
+		}
+	}
+
+	public final class Ping implements CommandExecutor {
+		@Override
+		public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+			if (!Utils.senderCheck(sender)) return true;
+			Player player = (Player) sender;
+			try {
+				Object entityPlayer = player.getClass().getMethod("getHandle").invoke(player);
+				int ping = (int) entityPlayer.getClass().getField("ping").get(entityPlayer);
+				String pingmsg = "";
+				if (ping <= 100) {
+					pingmsg = "" + ChatColor.GREEN + ping;
+				} else if (ping <= 300) {
+					pingmsg = "" + ChatColor.GOLD + ping;
+				} else if (ping <= 500) {
+					pingmsg = "" + ChatColor.RED + ping;
+				} else {
+					pingmsg = "" + ChatColor.DARK_RED + ping;
+				}
+				sender.sendMessage(ChatColor.GREEN + "Ping: " + pingmsg + "ms");
+			} catch (Exception e) {
+				Log.error("Error while getting player's ping:");
+				e.printStackTrace();
+				e.getCause().printStackTrace();
+				sender.sendMessage(ChatColor.RED + "Pingの取得中に不明なエラーが発生しました");
 			}
 			return true;
 		}
