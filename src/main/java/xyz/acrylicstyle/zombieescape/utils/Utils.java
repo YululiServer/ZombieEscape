@@ -287,4 +287,12 @@ public final class Utils {
 		item.setItemMeta(meta);
 		return item;
 	}
+
+	public static ItemStack generateResourcePackItem() {
+		ItemStack item = new ItemStack(Material.CHEST);
+		ItemMeta meta = item.getItemMeta();
+		meta.setDisplayName(ChatColor.GREEN + "リソースパック");
+		item.setItemMeta(meta);
+		return item;
+	}
 }

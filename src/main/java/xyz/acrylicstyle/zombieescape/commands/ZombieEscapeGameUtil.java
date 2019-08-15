@@ -190,6 +190,13 @@ public class ZombieEscapeGameUtil {
 					e.setCancelled(true);
 					e.getPlayer().getInventory().clear();
 					e.getPlayer().getInventory().addItem(Utils.generateVoteItem());
+					e.getPlayer().getInventory().addItem(Utils.generateResourcePackItem());
+				} else if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.CHEST) {
+					Bukkit.dispatchCommand(e.getPlayer(), "resourcepack");
+					e.setCancelled(true);
+					e.getPlayer().getInventory().clear();
+					e.getPlayer().getInventory().addItem(Utils.generateVoteItem());
+					e.getPlayer().getInventory().addItem(Utils.generateResourcePackItem());
 				}
 			}
 		}
@@ -275,6 +282,20 @@ public class ZombieEscapeGameUtil {
 				}
 			}.runTaskTimer(ZombieEscape.getProvidingPlugin(ZombieEscape.class), 0, 20);
 			Utils.doBossBarTick(Bukkit.createBossBar(args[0], BarColor.GREEN, BarStyle.SOLID, BarFlag.DARKEN_SKY), countdown, args[0]);
+			return true;
+		}
+	}
+
+	public final class ResourcePack implements CommandExecutor {
+		@Override
+		public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+			if (!Utils.senderCheck(sender)) return true;
+			if (ZombieEscape.config.getString("resourcepack") != null) {
+				sender.sendMessage(ChatColor.GREEN + "リソースパックを送信中です...");
+				((Player) sender).setResourcePack(ZombieEscape.config.getString("resourcepack"));
+			} else {
+				sender.sendMessage(ChatColor.RED + "このサーバーにはリソースパックが設定されていません。");
+			}
 			return true;
 		}
 	}

@@ -78,3 +78,7 @@ commands:
     description: "Crashes this plugin. Needs restart if you wish re-enable plugin."
     usage: /<command>
     permission: zombieescape.danger
+  resourcepack:
+    description: "Send a resource pack to player."
+    usage: /<command>
+    aliases: ["resource", "texture", "textures", "resources", "texturepacks", "texturepack", "resourcepacks"]

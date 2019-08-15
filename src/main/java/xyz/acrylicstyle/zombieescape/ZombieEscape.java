@@ -228,6 +228,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 					Bukkit.getPluginCommand("votemap").setExecutor(votegui);
 					Bukkit.getPluginCommand("destroywall").setExecutor(zegu.new DestroyWall());
 					Bukkit.getPluginCommand("zombieescape").setExecutor(new ZombieEscapeCommand());
+					Bukkit.getPluginCommand("resourcepack").setExecutor(zegu.new ResourcePack());
 					Bukkit.getPluginCommand("crash").setExecutor(new CommandExecutor() {
 						@Override
 						public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -374,7 +375,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				event.getPlayer().teleport(world.getSpawnLocation());
 				event.getPlayer().setGameMode(GameMode.ADVENTURE);
 				event.getPlayer().getInventory().addItem(Utils.generateVoteItem());
-				if (config.getString("resourcepack") != null) event.getPlayer().setResourcePack(config.getString("resourcepack"));
+				event.getPlayer().getInventory().addItem(Utils.generateResourcePackItem());
 				event.getPlayer().sendMessage(ChatColor.BLUE + "--------------------------------------------------");
 				event.getPlayer().sendMessage(ChatColor.DARK_GREEN + "          - Zombie Escape -");
 				event.getPlayer().sendMessage("");
@@ -393,8 +394,8 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 					event.getPlayer().sendMessage(ChatColor.GREEN + "/setstatus - ゲームに関する設定を変更します。");
 					event.getPlayer().sendMessage(ChatColor.GREEN + "/sponsor <プレイヤー> - 指定したプレイヤーをスポンサーとして登録します。");
 					event.getPlayer().sendMessage(ChatColor.GREEN + "/removesponsor <プレイヤー> - 指定したプレイヤーをスポンサーから削除します。");
-					event.getPlayer().sendMessage(ChatColor.GREEN + "/setcp <数値> - チェックポイントを設定します。");
-					event.getPlayer().sendMessage(ChatColor.GREEN + "/startgame - ゲーム開始までのカウントダウンを6秒に設定します。" + ChatColor.AQUA + "/setstatus timesLeft 6" + ChatColor.GREEN + "と同等です。");
+					event.getPlayer().sendMessage(ChatColor.GREEN + "/setcp <数値> - ゾンビのチェックポイントを設定します。");
+					event.getPlayer().sendMessage(ChatColor.GREEN + "/startgame - ゲーム開始までのカウントダウンを11秒に設定します。" + ChatColor.AQUA + "/setstatus timesLeft 11" + ChatColor.GREEN + "と同等です。");
 					event.getPlayer().sendMessage(ChatColor.GREEN + "/endgame - ゲームが開始している場合、ゲームを終了します。");
 					event.getPlayer().sendMessage("");
 					event.getPlayer().sendMessage("" + ChatColor.RED + "これらのOP用コマンドの乱用は禁止されています。");
