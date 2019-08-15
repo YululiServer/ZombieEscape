@@ -59,6 +59,8 @@ public class ZombieEscapeCommand implements CommandExecutor {
 								field.setDouble(clazz, Double.parseDouble(s));
 							} else if (Utils.isFloat(s)) {
 								field.setFloat(clazz, Float.parseFloat(s));
+							} else if (s.equalsIgnoreCase("null")) {
+								field.set(clazz, null);
 							} else {
 								field.set(clazz, s);
 							}
@@ -102,7 +104,7 @@ public class ZombieEscapeCommand implements CommandExecutor {
 							// args[2] -> Field
 							Field field = clazz.getField(args[2]);
 							field.setAccessible(true);
-							sender.sendMessage(ChatColor.GREEN + "Result:");
+							sender.sendMessage(ChatColor.GREEN + "Result(" + field.get(clazz).getClass().getCanonicalName() + "):");
 							sender.sendMessage(ChatColor.GREEN + "" + field.get(clazz));
 						}
 					}
