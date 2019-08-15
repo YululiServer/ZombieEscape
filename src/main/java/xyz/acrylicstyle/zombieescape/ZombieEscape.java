@@ -156,6 +156,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		if (!reload) reload = plib; // useless "if" statement tho
 		if (!reload) reload = tlib;
 		if (!Utils.checkPlugin("CrackShot")) logger.warning("Does not exist CrackShot plugin.");
+		if (!Utils.checkPlugin("Multiverse-Core")) logger.warning("Does not exist Multiverse-Core plugin.");
 	}
 
 	@Override
