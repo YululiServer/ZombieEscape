@@ -1,6 +1,7 @@
 package xyz.acrylicstyle.zombieescape.commands;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -32,7 +33,7 @@ public class ZombieEscapeCommand implements CommandExecutor {
 				if (args.length == 1) {
 					sender.sendMessage(ChatColor.RED + "Usage:");
 					sender.sendMessage(ChatColor.RED + "/zombieescape debug <Class> <Field> [= [Value]] - Get / Set field.");
-					sender.sendMessage(ChatColor.RED + "/zombieescape debug <Class> <Method> ( <args...> ) - Invoke method with args.");
+					sender.sendMessage(ChatColor.RED + "/zombieescape debug <Class> <Method> ( [[arg1] [arg2]] ) - Invoke method with args.");
 					return true;
 				}
 				try {
@@ -42,6 +43,10 @@ public class ZombieEscapeCommand implements CommandExecutor {
 						Class<?> clazz = Class.forName(args[1]);
 						if (Utils.includes(args, "=")) {
 							// set field, example: /zombieescape debug xyz.acrylicstyle.zombieescape.ZombieEscape gameStarted = true
+							// args[1] -> Class
+							// args[2] -> Field
+							// args[3] -> =
+							// args[4] -> value
 							if (args.length != (Utils.indexOf(args, "=")+2)) throw new IllegalArgumentException("Missing 1 argument after =");
 							Field field = clazz.getField(args[2]);
 							field.setAccessible(true);
@@ -58,20 +63,41 @@ public class ZombieEscapeCommand implements CommandExecutor {
 								field.set(clazz, s);
 							}
 							sender.sendMessage(ChatColor.GREEN + "Field " + args[Utils.indexOf(args, "=")-1] + " has been set to:");
-							sender.sendMessage("" + field.get(clazz));
+							sender.sendMessage(ChatColor.GREEN + "" + field.get(clazz));
 						} else if (Utils.includes(args, "(") && Utils.includes(args, ")")) {
 							// invoke method, example: /zombieescape debug xyz.acrylicstyle.zombieescape.utils.Utils isInt ( 123 )
-							throw new Exception("Not implemented.");
+							// args[1] -> Class
+							// args[2] -> Method
+							// args[3] -> (
+							// args[4] -> argument or )
+							// args[5] -> argument or )
+							// args[6] -> ) if args[5] was argument
+							if (Utils.indexOf(args, ")") == Utils.indexOf(args, "(")+1) { // /zombieescape debug ... ( )
+								Method method = clazz.getMethod(args[2]);
+								Object result = method.invoke(clazz);
+								sender.sendMessage(ChatColor.GREEN + "Result:");
+								sender.sendMessage(ChatColor.GREEN + "" + result);
+							} else if (Utils.indexOf(args, ")") == Utils.indexOf(args, "(")+2) { // /zombieescape debug ... ( 1 )
+								Object result = Utils.invokeMethodWithType(clazz, args[2], args[4]);
+								sender.sendMessage(ChatColor.GREEN + "Result:");
+								sender.sendMessage(ChatColor.GREEN + "" + result);
+							} else if (Utils.indexOf(args, ")") == Utils.indexOf(args, "(")+3) { // /zombieescape debug ... ( 1 2 )
+								Object result = Utils.invokeMethodWithType(clazz, args[2], args[4], args[5]);
+								sender.sendMessage(ChatColor.GREEN + "Result:");
+								sender.sendMessage(ChatColor.GREEN + "" + result);
+							}
 						} else {
 							// get field, example: /zombieescape debug xyz.acrylicstyle.zombieescape.ZombieEscape gameStarted
+							// args[1] -> Class
+							// args[2] -> Field
 							Field field = clazz.getField(args[2]);
 							field.setAccessible(true);
 							sender.sendMessage(ChatColor.GREEN + "Result:");
 							sender.sendMessage(ChatColor.GREEN + "" + field.get(clazz));
 						}
 					}
-				} catch (Exception e) {
-					sender.sendMessage(ChatColor.RED + "An unknown error occurred: " + e);
+				} catch (Throwable e) {
+					sender.sendMessage(ChatColor.RED + "An error occurred: " + e);
 				}
 			} else {
 				if (!Utils.senderCheck(sender)) return true;
