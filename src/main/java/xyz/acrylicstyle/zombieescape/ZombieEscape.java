@@ -160,90 +160,94 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 
 	@Override
 	public void onEnable() {
-		if (reload) {
-			Bukkit.getLogger().warning("Some plugins are added to this server. Please restart server!");
-			Bukkit.shutdown();
-		}
-		if (this.error) {
-			Bukkit.getLogger().severe("[ZombieEscape] There are errors when loading plugin.");
-			Bukkit.getPluginManager().disablePlugin(this);
-			return;
-		}
-		protocol = ProtocolLibrary.getProtocolManager();
-		try {
-			config = new ConfigProvider("./plugins/ZombieEscape/config.yml");
-			mapName = config.getString("map", "world");
-			mapConfig = new ConfigProvider("./plugins/ZombieEscape/maps/" + mapName + ".yml");
-			finalMapConfig = new ConfigProvider("./plugins/ZombieEscape/maps/" + mapName + ".yml");
-			debug = config.getBoolean("debug", false);
-			defmapString = ChatColor.GREEN + "    デフォルトマップ: " + ChatColor.translateAlternateColorCodes('&', mapConfig.getString("mapname", "???"));
-		} catch (IOException | InvalidConfigurationException e1) {
-			e1.printStackTrace();
-			Log.error("Failed to load config, disabling plugin.");
-			Bukkit.getPluginManager().disablePlugin(this);
-			return;
-		}
-		if (Bukkit.getWorld(mapConfig.getString("spawnPoints.world", "world")) == null) {
-			Log.severe("Failed to load world(probably does not exist), disabling plugin.");
-			Log.severe("Tried to load world: " + mapConfig.getString("spawnPoints.world", "world"));
-			Bukkit.getPluginManager().disablePlugin(this);
-			return;
-		}
-		manager = Bukkit.getScoreboardManager();
-		Sponsor sponsor = null;
-		ZombieEscapeConfig zec = null;
-		ZombieEscapeGameUtil zegu = null;
-		try {
-			sponsor = new Sponsor();
-			zec = new ZombieEscapeConfig();
-			zegu = new ZombieEscapeGameUtil();
-		} catch (Exception e) {
-			Log.error("Failed to initialize commands! Showing errors below and disabling plugin.");
-			e.printStackTrace();
-			e.getCause().printStackTrace();
-			Bukkit.getPluginManager().disablePlugin(this);
-			return;
-		}
-		VoteGui votegui = null;
-		if (sponsor != null && zec != null && zegu != null) {
-			votegui = zegu.new VoteGui();
-			votegui.initialize();
-			Bukkit.getPluginCommand("setsponsor").setExecutor(sponsor.new SetSponsor());
-			Bukkit.getPluginCommand("removesponsor").setExecutor(sponsor.new RemoveSponsor());
-			Bukkit.getPluginCommand("setspawn").setExecutor(zec.new SetSpawn());
-			Bukkit.getPluginCommand("removespawn").setExecutor(zec.new RemoveSpawn());
-			Bukkit.getPluginCommand("addwall").setExecutor(zec.new AddWall());
-			Bukkit.getPluginCommand("deletewall").setExecutor(zec.new DeleteWall());
-			Bukkit.getPluginCommand("setmapname").setExecutor(zec.new SetMapName());
-			Bukkit.getPluginCommand("setmap").setExecutor(zec.new SetMap());
-			Bukkit.getPluginCommand("setcp").setExecutor(zegu.new SetCheckpoint());
-			Bukkit.getPluginCommand("startgame").setExecutor(zegu.new StartGame());
-			Bukkit.getPluginCommand("endgame").setExecutor(new EndGame());
-			Bukkit.getPluginCommand("check").setExecutor(zegu.new CheckConfig());
-			Bukkit.getPluginCommand("setstatus").setExecutor(zegu.new SetStatus());
-			Bukkit.getPluginCommand("vote").setExecutor(zegu.new Vote());
-			Bukkit.getPluginCommand("votemap").setExecutor(votegui);
-			Bukkit.getPluginCommand("destroywall").setExecutor(zegu.new DestroyWall());
-			Bukkit.getPluginCommand("zombieescape").setExecutor(new ZombieEscapeCommand());
-			Bukkit.getPluginCommand("crash").setExecutor(new CommandExecutor() {
-				@Override
-				public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-					Log.warn(sender.getName() + " requested to crash itself, disabling plugin.");
-					Bukkit.getPluginManager().disablePlugin(getInstance());
-					return true;
+		new BukkitRunnable() {
+			public void run() {
+				if (reload) {
+					Bukkit.getLogger().warning("Some plugins are added to this server. Please restart server!");
+					Bukkit.shutdown();
 				}
-			});
-		} else {
-			Log.error("Unable to register some commands! Commands are disabled.");
-		}
-		Bukkit.getPluginManager().registerEvents(this, this);
-		if (votegui != null) Bukkit.getPluginManager().registerEvents(votegui, this);
-		Utils.checkConfig();
-		maxCheckpoints = Math.min(mapConfig.getStringList("spawnPoints.player").size(), mapConfig.getStringList("spawnPoints.zombie").size());
-		locationWall = ConfigProvider.getConfigSectionValue(mapConfig.get("locationWall", new HashMap<String, Object>()), true);
-		List<?> list = config.getList("previousZombies") != null ? config.getList("previousZombies") : new ArrayList<String>();
-		previousZombies = Arrays.asList(list.toArray(new String[0]));
-		Log.info("Enabled Zombie Escape");
+				if (getInstance().error) {
+					Bukkit.getLogger().severe("[ZombieEscape] There are errors when loading plugin.");
+					Bukkit.getPluginManager().disablePlugin(getInstance());
+					return;
+				}
+				protocol = ProtocolLibrary.getProtocolManager();
+				try {
+					config = new ConfigProvider("./plugins/ZombieEscape/config.yml");
+					mapName = config.getString("map", "world");
+					mapConfig = new ConfigProvider("./plugins/ZombieEscape/maps/" + mapName + ".yml");
+					finalMapConfig = new ConfigProvider("./plugins/ZombieEscape/maps/" + mapName + ".yml");
+					debug = config.getBoolean("debug", false);
+					defmapString = ChatColor.GREEN + "    デフォルトマップ: " + ChatColor.translateAlternateColorCodes('&', mapConfig.getString("mapname", "???"));
+				} catch (IOException | InvalidConfigurationException e1) {
+					e1.printStackTrace();
+					Log.error("Failed to load config, disabling plugin.");
+					Bukkit.getPluginManager().disablePlugin(getInstance());
+					return;
+				}
+				if (Bukkit.getWorld(mapConfig.getString("spawnPoints.world", "world")) == null) {
+					Log.severe("Failed to load world(probably does not exist), disabling plugin.");
+					Log.severe("Tried to load world: " + mapConfig.getString("spawnPoints.world", "world"));
+					Bukkit.getPluginManager().disablePlugin(getInstance());
+					return;
+				}
+				manager = Bukkit.getScoreboardManager();
+				Sponsor sponsor = null;
+				ZombieEscapeConfig zec = null;
+				ZombieEscapeGameUtil zegu = null;
+				try {
+					sponsor = new Sponsor();
+					zec = new ZombieEscapeConfig();
+					zegu = new ZombieEscapeGameUtil();
+				} catch (Exception e) {
+					Log.error("Failed to initialize commands! Showing errors below and disabling plugin.");
+					e.printStackTrace();
+					e.getCause().printStackTrace();
+					Bukkit.getPluginManager().disablePlugin(getInstance());
+					return;
+				}
+				VoteGui votegui = null;
+				if (sponsor != null && zec != null && zegu != null) {
+					votegui = zegu.new VoteGui();
+					votegui.initialize();
+					Bukkit.getPluginCommand("setsponsor").setExecutor(sponsor.new SetSponsor());
+					Bukkit.getPluginCommand("removesponsor").setExecutor(sponsor.new RemoveSponsor());
+					Bukkit.getPluginCommand("setspawn").setExecutor(zec.new SetSpawn());
+					Bukkit.getPluginCommand("removespawn").setExecutor(zec.new RemoveSpawn());
+					Bukkit.getPluginCommand("addwall").setExecutor(zec.new AddWall());
+					Bukkit.getPluginCommand("deletewall").setExecutor(zec.new DeleteWall());
+					Bukkit.getPluginCommand("setmapname").setExecutor(zec.new SetMapName());
+					Bukkit.getPluginCommand("setmap").setExecutor(zec.new SetMap());
+					Bukkit.getPluginCommand("setcp").setExecutor(zegu.new SetCheckpoint());
+					Bukkit.getPluginCommand("startgame").setExecutor(zegu.new StartGame());
+					Bukkit.getPluginCommand("endgame").setExecutor(new EndGame());
+					Bukkit.getPluginCommand("check").setExecutor(zegu.new CheckConfig());
+					Bukkit.getPluginCommand("setstatus").setExecutor(zegu.new SetStatus());
+					Bukkit.getPluginCommand("vote").setExecutor(zegu.new Vote());
+					Bukkit.getPluginCommand("votemap").setExecutor(votegui);
+					Bukkit.getPluginCommand("destroywall").setExecutor(zegu.new DestroyWall());
+					Bukkit.getPluginCommand("zombieescape").setExecutor(new ZombieEscapeCommand());
+					Bukkit.getPluginCommand("crash").setExecutor(new CommandExecutor() {
+						@Override
+						public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+							Log.warn(sender.getName() + " requested to crash itself, disabling plugin.");
+							Bukkit.getPluginManager().disablePlugin(getInstance());
+							return true;
+						}
+					});
+				} else {
+					Log.error("Unable to register some commands! Commands are disabled.");
+				}
+				Bukkit.getPluginManager().registerEvents(getInstance(), getInstance());
+				if (votegui != null) Bukkit.getPluginManager().registerEvents(votegui, getInstance());
+				Utils.checkConfig();
+				maxCheckpoints = Math.min(mapConfig.getStringList("spawnPoints.player").size(), mapConfig.getStringList("spawnPoints.zombie").size());
+				locationWall = ConfigProvider.getConfigSectionValue(mapConfig.get("locationWall", new HashMap<String, Object>()), true);
+				List<?> list = config.getList("previousZombies") != null ? config.getList("previousZombies") : new ArrayList<String>();
+				previousZombies = Arrays.asList(list.toArray(new String[0]));
+				Log.info("Enabled Zombie Escape");
+			}
+		}.runTaskLater(this, 1);
 	}
 
 	@EventHandler
