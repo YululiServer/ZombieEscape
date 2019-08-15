@@ -131,6 +131,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	public static boolean playersReset = false;
 	public static boolean gameEnded = false;
 	public static boolean once = false;
+	public static boolean init = false;
 	public static String ongoingEvent = null;
 	public static String mostVotedMap = null;
 	public static String defmapString = null;
@@ -248,6 +249,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				locationWall = ConfigProvider.getConfigSectionValue(mapConfig.get("locationWall", new HashMap<String, Object>()), true);
 				List<?> list = config.getList("previousZombies") != null ? config.getList("previousZombies") : new ArrayList<String>();
 				previousZombies = Arrays.asList(list.toArray(new String[0]));
+				init = true;
 				Log.info("Enabled Zombie Escape");
 			}
 		}.runTaskLater(this, 1);
@@ -985,6 +987,10 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 
 	@EventHandler(priority=EventPriority.LOWEST)
 	public void onPlayerLogin(PlayerLoginEvent event) {
+		if (!init) {
+			event.disallow(Result.KICK_OTHER, ChatColor.YELLOW + "現在サーバーを起動中です！数秒後にもう一度参加してください。");
+			return;
+		}
 		config.reloadWithoutException();
 		if (gameEnded) {
 			event.disallow(Result.KICK_OTHER, ChatColor.RED + "ゲームはすでに終了しています！約30秒後に参加しなおしてください。");
