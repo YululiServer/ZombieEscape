@@ -768,6 +768,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				if (debug) {
 					long end = System.currentTimeMillis()-time;
 					Log.debug("Scoreboard update tick took " + end + "ms");
+					Log.debug("Zombies: " + zombies + ", Players: " + players);
 				}
 			}
 		}.runTaskTimer(this, 0, 20);
