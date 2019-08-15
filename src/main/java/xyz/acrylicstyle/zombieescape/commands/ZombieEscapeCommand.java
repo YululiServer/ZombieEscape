@@ -77,26 +77,25 @@ public class ZombieEscapeCommand implements CommandExecutor {
 							if (Utils.indexOf(args, ")") == Utils.indexOf(args, "(")+1) { // /zombieescape debug ... ( )
 								Method method = clazz.getMethod(args[2]);
 								Object result = method.invoke(clazz);
-								sender.sendMessage(ChatColor.GREEN + "Result:");
+								sender.sendMessage(ChatColor.GREEN + "Result(" + (result != null ? result.getClass().getCanonicalName() : "null") + "):");
 								sender.sendMessage(ChatColor.GREEN + "" + result);
 							} else if (Utils.indexOf(args, ")") == Utils.indexOf(args, "(")+2) { // /zombieescape debug ... ( 1 )
 								Object result = Utils.invokeMethodWithType(clazz, args[2], args[4]);
-								sender.sendMessage(ChatColor.GREEN + "Result:");
-								sender.sendMessage(ChatColor.GREEN + "" + result);
+								sender.sendMessage(ChatColor.GREEN + "Result(" + (result != null ? result.getClass().getCanonicalName() : "null") + "):");
 							} else if (Utils.indexOf(args, ")") == Utils.indexOf(args, "(")+3) { // /zombieescape debug ... ( 1 2 )
 								Object result = Utils.invokeMethodWithType(clazz, args[2], args[4], args[5]);
-								sender.sendMessage(ChatColor.GREEN + "Result:");
+								sender.sendMessage(ChatColor.GREEN + "Result(" + (result != null ? result.getClass().getCanonicalName() : "null") + "):");
 								sender.sendMessage(ChatColor.GREEN + "" + result);
 							}
 						} else if (Utils.includes(args, "()")) { // /zombieescape debug ... ()
 							Method method = clazz.getMethod(args[2]);
 							Object result = method.invoke(clazz);
-							sender.sendMessage(ChatColor.GREEN + "Result:");
+							sender.sendMessage(ChatColor.GREEN + "Result(" + (result != null ? result.getClass().getCanonicalName() : "null") + "):");
 							sender.sendMessage(ChatColor.GREEN + "" + result);
 						} else if (args[2].contains("()")) { // /zombieescape debug ... reload()
 							Method method = clazz.getMethod(args[2].replaceAll("()", ""));
 							Object result = method.invoke(clazz);
-							sender.sendMessage(ChatColor.GREEN + "Result:");
+							sender.sendMessage(ChatColor.GREEN + "Result(" + (result != null ? result.getClass().getCanonicalName() : "null") + "):");
 							sender.sendMessage(ChatColor.GREEN + "" + result);
 						} else {
 							// get field, example: /zombieescape debug xyz.acrylicstyle.zombieescape.ZombieEscape gameStarted
