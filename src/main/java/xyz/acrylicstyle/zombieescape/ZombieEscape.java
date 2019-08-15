@@ -155,8 +155,8 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		boolean tlib = Utils.downloadPlugin("TomeitoLib", "https://um.acrylicstyle.xyz/16215811865/05572883/TomeitoLib.jar");
 		if (!reload) reload = plib; // useless "if" statement tho
 		if (!reload) reload = tlib;
-		if (!Utils.checkPlugin("CrackShot")) logger.warning("Does not exist CrackShot plugin.");
-		if (!Utils.checkPlugin("Multiverse-Core")) logger.warning("Does not exist Multiverse-Core plugin.");
+		if (!Utils.checkPlugin("CrackShot")) logger.warning("[ZombieEscape] Does not exist CrackShot plugin.");
+		if (!Utils.checkPlugin("Multiverse-Core")) logger.warning("[ZombieEscape] Does not exist Multiverse-Core plugin.");
 	}
 
 	@Override
@@ -164,7 +164,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		new BukkitRunnable() {
 			public void run() {
 				if (reload) {
-					Bukkit.getLogger().warning("Some plugins are added to this server. Please restart server!");
+					Bukkit.getLogger().warning("[ZombieEscape] Some plugins are added to this server. Please restart server!");
 					Bukkit.shutdown();
 				}
 				if (getInstance().error) {

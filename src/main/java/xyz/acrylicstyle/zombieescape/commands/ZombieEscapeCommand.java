@@ -11,7 +11,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-import xyz.acrylicstyle.tomeito_core.utils.Log;
 import xyz.acrylicstyle.zombieescape.utils.Utils;
 
 public class ZombieEscapeCommand implements CommandExecutor {
@@ -37,25 +36,26 @@ public class ZombieEscapeCommand implements CommandExecutor {
 					return true;
 				}
 				try {
+					boolean did = false;
 					for (int i = 1; i < args.length; i++) {
+						if (!did) did = true; else return true;
 						Class<?> clazz = Class.forName(args[1]);
 						if (Utils.includes(args, "=")) {
 							// set field, example: /zombieescape debug xyz.acrylicstyle.zombieescape.ZombieEscape gameStarted = true
-							Log.debug("indexOf: " + Utils.indexOf(args, "=")+1 +", length of args: " + args.length);
-							if (args.length != Utils.indexOf(args, "=")+1) throw new IllegalArgumentException("Missing 1 argument after =");
+							if (args.length != (Utils.indexOf(args, "=")+2)) throw new IllegalArgumentException("Missing 1 argument after =");
 							Field field = clazz.getField(args[2]);
 							field.setAccessible(true);
 							String s = args[Utils.indexOf(args, "=")+1];
 							if (Utils.isInt(s)) {
-								field.setInt(clazz.newInstance(), Integer.parseInt(s));
+								field.setInt(clazz, Integer.parseInt(s));
 							} else if (Utils.isBoolean(s)) {
-								field.setBoolean(clazz.newInstance(), Boolean.parseBoolean(s));
+								field.setBoolean(clazz, Boolean.parseBoolean(s));
 							} else if (Utils.isDouble(s)) {
-								field.setDouble(clazz.newInstance(), Double.parseDouble(s));
+								field.setDouble(clazz, Double.parseDouble(s));
 							} else if (Utils.isFloat(s)) {
-								field.setFloat(clazz.newInstance(), Float.parseFloat(s));
+								field.setFloat(clazz, Float.parseFloat(s));
 							} else {
-								field.set(clazz.newInstance(), s);
+								field.set(clazz, s);
 							}
 							sender.sendMessage(ChatColor.GREEN + "Field " + args[Utils.indexOf(args, "=")-1] + " has been set to:");
 							sender.sendMessage("" + field.get(clazz));
