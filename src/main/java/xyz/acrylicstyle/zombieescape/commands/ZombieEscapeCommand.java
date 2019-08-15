@@ -86,6 +86,16 @@ public class ZombieEscapeCommand implements CommandExecutor {
 								sender.sendMessage(ChatColor.GREEN + "Result:");
 								sender.sendMessage(ChatColor.GREEN + "" + result);
 							}
+						} else if (Utils.includes(args, "()")) { // /zombieescape debug ... ()
+							Method method = clazz.getMethod(args[2]);
+							Object result = method.invoke(clazz);
+							sender.sendMessage(ChatColor.GREEN + "Result:");
+							sender.sendMessage(ChatColor.GREEN + "" + result);
+						} else if (args[2].contains("()")) { // /zombieescape debug ... reload()
+							Method method = clazz.getMethod(args[2]);
+							Object result = method.invoke(clazz);
+							sender.sendMessage(ChatColor.GREEN + "Result:");
+							sender.sendMessage(ChatColor.GREEN + "" + result);
 						} else {
 							// get field, example: /zombieescape debug xyz.acrylicstyle.zombieescape.ZombieEscape gameStarted
 							// args[1] -> Class
