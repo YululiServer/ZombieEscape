@@ -92,7 +92,7 @@ public class ZombieEscapeCommand implements CommandExecutor {
 							sender.sendMessage(ChatColor.GREEN + "Result:");
 							sender.sendMessage(ChatColor.GREEN + "" + result);
 						} else if (args[2].contains("()")) { // /zombieescape debug ... reload()
-							Method method = clazz.getMethod(args[2]);
+							Method method = clazz.getMethod(args[2].replaceAll("()", ""));
 							Object result = method.invoke(clazz);
 							sender.sendMessage(ChatColor.GREEN + "Result:");
 							sender.sendMessage(ChatColor.GREEN + "" + result);
