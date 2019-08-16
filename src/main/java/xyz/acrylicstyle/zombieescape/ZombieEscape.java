@@ -286,7 +286,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				for (Player player : Bukkit.getOnlinePlayers()) {
 					Set<Material> set = new HashSet<Material>();
 					set.add(Material.AIR);
-					Block block = player.getTargetBlock(set, 4);
+					Block block = player.getTargetBlock(set, 15);
 					if (block == null) {
 						lockActionBar.put(player.getUniqueId(), false);
 						continue;
