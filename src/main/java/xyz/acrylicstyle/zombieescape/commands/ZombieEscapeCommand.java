@@ -52,22 +52,25 @@ public class ZombieEscapeCommand implements CommandExecutor {
 							if (args.length != (Utils.indexOf(args, "=")+2)) throw new IllegalArgumentException("Missing 1 argument after =");
 							Field field = clazz.getDeclaredField(args[2]);
 							field.setAccessible(true);
+							Object clazzz = null;
+							if (clazz.getCanonicalName().equalsIgnoreCase("xyz.acrylicstyle.zombieescape.ZombieEscape")) clazzz = ZombieEscape.getProvidingPlugin(ZombieEscape.class);
+							else clazzz = clazz.newInstance();
 							String s = args[Utils.indexOf(args, "=")+1];
 							if (Utils.isInt(s)) {
-								field.setInt(clazz, Integer.parseInt(s));
+								field.setInt(clazzz, Integer.parseInt(s));
 							} else if (Utils.isBoolean(s)) {
-								field.setBoolean(clazz, Boolean.parseBoolean(s));
+								field.setBoolean(clazzz, Boolean.parseBoolean(s));
 							} else if (Utils.isDouble(s)) {
-								field.setDouble(clazz, Double.parseDouble(s));
+								field.setDouble(clazzz, Double.parseDouble(s));
 							} else if (Utils.isFloat(s)) {
-								field.setFloat(clazz, Float.parseFloat(s));
+								field.setFloat(clazzz, Float.parseFloat(s));
 							} else if (s.equalsIgnoreCase("null")) {
-								field.set(clazz, null);
+								field.set(clazzz, null);
 							} else {
-								field.set(clazz, s);
+								field.set(clazzz, s);
 							}
 							sender.sendMessage(ChatColor.GREEN + "Field[" + Modifier.toString(field.getModifiers()) + "] " + args[Utils.indexOf(args, "=")-1] + " has been set to:");
-							sender.sendMessage(ChatColor.GREEN + "" + field.get(clazz));
+							sender.sendMessage(ChatColor.GREEN + "" + field.get(clazzz));
 						} else if (Utils.includes(args, "(") && Utils.includes(args, ")")) {
 							// invoke method, example: /zombieescape debug xyz.acrylicstyle.zombieescape.utils.Utils isInt ( 123 )
 							// args[1] -> Class
@@ -91,13 +94,21 @@ public class ZombieEscapeCommand implements CommandExecutor {
 							}
 						} else if (Utils.includes(args, "()")) { // /zombieescape debug ... ()
 							Method method = clazz.getDeclaredMethod(args[2]);
-							Object result = method.invoke(clazz);
+							method.setAccessible(true);
+							Object clazzz = null;
+							if (clazz.getCanonicalName().equalsIgnoreCase("xyz.acrylicstyle.zombieescape.ZombieEscape")) clazzz = ZombieEscape.getProvidingPlugin(ZombieEscape.class);
+							else clazzz = clazz.newInstance();
+							Object result = method.invoke(clazzz);
 							sender.sendMessage(ChatColor.GREEN + "Result(" + (result != null ? result.getClass().getCanonicalName() : "null") + "):");
 							sender.sendMessage(ChatColor.GREEN + "" + result);
 						} else if (args[2].contains("()")) { // /zombieescape debug ... reload()
 							String methodName = args[2].replaceAll("()", "");
 							Method method = clazz.getDeclaredMethod(methodName);
-							Object result = method.invoke(clazz);
+							method.setAccessible(true);
+							Object clazzz = null;
+							if (clazz.getCanonicalName().equalsIgnoreCase("xyz.acrylicstyle.zombieescape.ZombieEscape")) clazzz = ZombieEscape.getProvidingPlugin(ZombieEscape.class);
+							else clazzz = clazz.newInstance();
+							Object result = method.invoke(clazzz);
 							sender.sendMessage(ChatColor.GREEN + "Result(" + (result != null ? result.getClass().getCanonicalName() : "null") + "):");
 							sender.sendMessage(ChatColor.GREEN + "" + result);
 						} else {

@@ -386,7 +386,7 @@ public final class Utils {
 		}
 	}
 
-	public static Object invokeMethodWithType(Class<?> clazz, String methodName, String arg1) throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+	public static Object invokeMethodWithType(Class<?> clazz, String methodName, String arg1) throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException {
 		Class<?> class1 = null;
 		String s = arg1;
 		if (Utils.isInt(s)) {
@@ -401,20 +401,24 @@ public final class Utils {
 			class1 = String.class;
 		}
 		Method method = clazz.getDeclaredMethod(methodName, class1);
+		method.setAccessible(true);
+		Object clazzz = null;
+		if (clazz.getCanonicalName().equalsIgnoreCase("xyz.acrylicstyle.zombieescape.ZombieEscape")) clazzz = ZombieEscape.getProvidingPlugin(ZombieEscape.class);
+		else clazzz = clazz.newInstance();
 		if (Utils.isInt(s)) {
-			return method.invoke(clazz, Integer.parseInt(s));
+			return method.invoke(clazzz, Integer.parseInt(s));
 		} else if (Utils.isBoolean(s)) {
-			return method.invoke(clazz, Boolean.parseBoolean(s));
+			return method.invoke(clazzz, Boolean.parseBoolean(s));
 		} else if (Utils.isDouble(s)) {
-			return method.invoke(clazz, Double.parseDouble(s));
+			return method.invoke(clazzz, Double.parseDouble(s));
 		} else if (Utils.isFloat(s)) {
-			return method.invoke(clazz, Float.parseFloat(s));
+			return method.invoke(clazzz, Float.parseFloat(s));
 		} else {
-			return method.invoke(clazz, s);
+			return method.invoke(clazzz, s);
 		}
 	}
 
-	public static Object invokeMethodWithType(Class<?> clazz, String methodName, String arg1, String arg2) throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+	public static Object invokeMethodWithType(Class<?> clazz, String methodName, String arg1, String arg2) throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException {
 		Class<?> class1 = null;
 		Class<?> class2 = null;
 		String s = arg1;
@@ -442,65 +446,69 @@ public final class Utils {
 			class2 = String.class;
 		}
 		Method method = clazz.getDeclaredMethod(methodName, class1, class2);
+		method.setAccessible(true);
+		Object clazzz = null;
+		if (clazz.getCanonicalName().equalsIgnoreCase("xyz.acrylicstyle.zombieescape.ZombieEscape")) clazzz = ZombieEscape.getProvidingPlugin(ZombieEscape.class);
+		else clazzz = clazz.newInstance();
 		if (Utils.isInt(s)) {
 			if (Utils.isInt(t)) {
-				return method.invoke(clazz, Integer.parseInt(s), Integer.parseInt(t));
+				return method.invoke(clazzz, Integer.parseInt(s), Integer.parseInt(t));
 			} else if (Utils.isBoolean(t)) {
-				return method.invoke(clazz, Integer.parseInt(s), Boolean.parseBoolean(t));
+				return method.invoke(clazzz, Integer.parseInt(s), Boolean.parseBoolean(t));
 			} else if (Utils.isDouble(t)) {
-				return method.invoke(clazz, Integer.parseInt(s), Double.parseDouble(t));
+				return method.invoke(clazzz, Integer.parseInt(s), Double.parseDouble(t));
 			} else if (Utils.isFloat(t)) {
-				return method.invoke(clazz, Integer.parseInt(s), Float.parseFloat(t));
+				return method.invoke(clazzz, Integer.parseInt(s), Float.parseFloat(t));
 			} else {
-				return method.invoke(clazz, Integer.parseInt(s), t);
+				return method.invoke(clazzz, Integer.parseInt(s), t);
 			}
 		} else if (Utils.isBoolean(s)) {
 			if (Utils.isInt(t)) {
-				return method.invoke(clazz, Boolean.parseBoolean(s), Integer.parseInt(t));
+				return method.invoke(clazzz, Boolean.parseBoolean(s), Integer.parseInt(t));
 			} else if (Utils.isBoolean(t)) {
-				return method.invoke(clazz, Boolean.parseBoolean(s), Boolean.parseBoolean(t));
+				return method.invoke(clazzz, Boolean.parseBoolean(s), Boolean.parseBoolean(t));
 			} else if (Utils.isDouble(t)) {
-				return method.invoke(clazz, Boolean.parseBoolean(s), Double.parseDouble(t));
+				return method.invoke(clazzz, Boolean.parseBoolean(s), Double.parseDouble(t));
 			} else if (Utils.isFloat(t)) {
-				return method.invoke(clazz, Boolean.parseBoolean(s), Float.parseFloat(t));
+				return method.invoke(clazzz, Boolean.parseBoolean(s), Float.parseFloat(t));
 			} else {
-				return method.invoke(clazz, Boolean.parseBoolean(s), t);
+				return method.invoke(clazzz, Boolean.parseBoolean(s), t);
 			}
 		} else if (Utils.isDouble(s)) {
 			if (Utils.isInt(t)) {
-				return method.invoke(clazz, Double.parseDouble(s), Integer.parseInt(t));
+				return method.invoke(clazzz, Double.parseDouble(s), Integer.parseInt(t));
 			} else if (Utils.isBoolean(t)) {
-				return method.invoke(clazz, Double.parseDouble(s), Boolean.parseBoolean(t));
+				return method.invoke(clazzz, Double.parseDouble(s), Boolean.parseBoolean(t));
 			} else if (Utils.isDouble(t)) {
-				return method.invoke(clazz, Double.parseDouble(s), Double.parseDouble(t));
+				return method.invoke(clazzz, Double.parseDouble(s), Double.parseDouble(t));
 			} else if (Utils.isFloat(t)) {
-				return method.invoke(clazz, Double.parseDouble(s), Float.parseFloat(t));
+				return method.invoke(clazzz, Double.parseDouble(s), Float.parseFloat(t));
 			} else {
-				return method.invoke(clazz, Double.parseDouble(s), t);
+				return method.invoke(clazzz, Double.parseDouble(s), t);
 			}
 		} else if (Utils.isFloat(s)) {
 			if (Utils.isInt(t)) {
-				return method.invoke(clazz, Float.parseFloat(s), Integer.parseInt(t));
+				return method.invoke(clazzz, Float.parseFloat(s), Integer.parseInt(t));
 			} else if (Utils.isBoolean(t)) {
-				return method.invoke(clazz, Float.parseFloat(s), Boolean.parseBoolean(t));
+				return method.invoke(clazzz, Float.parseFloat(s), Boolean.parseBoolean(t));
 			} else if (Utils.isDouble(t)) {
-				return method.invoke(clazz, Float.parseFloat(s), Double.parseDouble(t));
+				return method.invoke(clazzz, Float.parseFloat(s), Double.parseDouble(t));
 			} else if (Utils.isFloat(t)) {
-				return method.invoke(clazz, Float.parseFloat(s), Float.parseFloat(t));
+				return method.invoke(clazzz, Float.parseFloat(s), Float.parseFloat(t));
 			} else {
-				return method.invoke(clazz, Float.parseFloat(s), t);
+				return method.invoke(clazzz, Float.parseFloat(s), t);
 			}
 		} else {
 			if (Utils.isInt(t)) {
-				return method.invoke(clazz, s, Integer.parseInt(t));
+				return method.invoke(clazzz, s, Integer.parseInt(t));
 			} else if (Utils.isBoolean(t)) {
-				return method.invoke(clazz, s, Boolean.parseBoolean(t));
+				return method.invoke(clazzz, s, Boolean.parseBoolean(t));
 			} else if (Utils.isDouble(t)) {
-				return method.invoke(clazz, s, Double.parseDouble(t));
+				return method.invoke(clazzz, s, Double.parseDouble(t));
 			} else if (Utils.isFloat(t)) {
-				return method.invoke(clazz, s, Float.parseFloat(t));
+				return method.invoke(clazzz, s, Float.parseFloat(t));
 			} else {
-				return method.invoke(clazz, s, t);
+				return method.invoke(clazzz, s, t);
 			}
 		}
 	}
