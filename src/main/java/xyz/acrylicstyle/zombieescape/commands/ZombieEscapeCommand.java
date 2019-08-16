@@ -32,7 +32,7 @@ public class ZombieEscapeCommand implements CommandExecutor {
 					sender.sendMessage(ChatColor.RED + "Sorry but you don't have enough permission.");
 					return true;
 				}
-				if (args.length == 1) {
+				if (args.length <= 2) {
 					sender.sendMessage(ChatColor.RED + "Usage:");
 					sender.sendMessage(ChatColor.RED + "/zombieescape debug <Class> <Field> [= [Value]] - Get / Set field.");
 					sender.sendMessage(ChatColor.RED + "/zombieescape debug <Class> <Method> ( [[arg1] [arg2]] ) - Invoke method with args.");
