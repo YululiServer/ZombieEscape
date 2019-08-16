@@ -2,6 +2,7 @@ package xyz.acrylicstyle.zombieescape.commands;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -48,7 +49,7 @@ public class ZombieEscapeCommand implements CommandExecutor {
 							// args[3] -> =
 							// args[4] -> value
 							if (args.length != (Utils.indexOf(args, "=")+2)) throw new IllegalArgumentException("Missing 1 argument after =");
-							Field field = clazz.getField(args[2]);
+							Field field = clazz.getDeclaredField(args[2]);
 							field.setAccessible(true);
 							String s = args[Utils.indexOf(args, "=")+1];
 							if (Utils.isInt(s)) {
@@ -64,7 +65,7 @@ public class ZombieEscapeCommand implements CommandExecutor {
 							} else {
 								field.set(clazz, s);
 							}
-							sender.sendMessage(ChatColor.GREEN + "Field " + args[Utils.indexOf(args, "=")-1] + " has been set to:");
+							sender.sendMessage(ChatColor.GREEN + "Field[" + Modifier.toString(field.getModifiers()) + "] " + args[Utils.indexOf(args, "=")-1] + " has been set to:");
 							sender.sendMessage(ChatColor.GREEN + "" + field.get(clazz));
 						} else if (Utils.includes(args, "(") && Utils.includes(args, ")")) {
 							// invoke method, example: /zombieescape debug xyz.acrylicstyle.zombieescape.utils.Utils isInt ( 123 )
@@ -88,13 +89,13 @@ public class ZombieEscapeCommand implements CommandExecutor {
 								sender.sendMessage(ChatColor.GREEN + "" + result);
 							}
 						} else if (Utils.includes(args, "()")) { // /zombieescape debug ... ()
-							Method method = clazz.getMethod(args[2]);
+							Method method = clazz.getDeclaredMethod(args[2]);
 							Object result = method.invoke(clazz);
 							sender.sendMessage(ChatColor.GREEN + "Result(" + (result != null ? result.getClass().getCanonicalName() : "null") + "):");
 							sender.sendMessage(ChatColor.GREEN + "" + result);
 						} else if (args[2].contains("()")) { // /zombieescape debug ... reload()
 							String methodName = args[2].replaceAll("()", "");
-							Method method = clazz.getMethod(methodName);
+							Method method = clazz.getDeclaredMethod(methodName);
 							Object result = method.invoke(clazz);
 							sender.sendMessage(ChatColor.GREEN + "Result(" + (result != null ? result.getClass().getCanonicalName() : "null") + "):");
 							sender.sendMessage(ChatColor.GREEN + "" + result);
@@ -102,9 +103,9 @@ public class ZombieEscapeCommand implements CommandExecutor {
 							// get field, example: /zombieescape debug xyz.acrylicstyle.zombieescape.ZombieEscape gameStarted
 							// args[1] -> Class
 							// args[2] -> Field
-							Field field = clazz.getField(args[2]);
+							Field field = clazz.getDeclaredField(args[2]);
 							field.setAccessible(true);
-							sender.sendMessage(ChatColor.GREEN + "Result(" + (field.get(clazz) != null ? field.get(clazz).getClass().getCanonicalName() : "null") + "):");
+							sender.sendMessage(ChatColor.GREEN + "Field[" + Modifier.toString(field.getModifiers()) + "] (" + (field.get(clazz) != null ? field.get(clazz).getClass().getCanonicalName() : "null") + "):");
 							sender.sendMessage(ChatColor.GREEN + "" + field.get(clazz));
 						}
 					}

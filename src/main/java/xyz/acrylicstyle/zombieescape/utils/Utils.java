@@ -400,7 +400,7 @@ public final class Utils {
 		} else {
 			class1 = String.class;
 		}
-		Method method = clazz.getMethod(methodName, class1);
+		Method method = clazz.getDeclaredMethod(methodName, class1);
 		if (Utils.isInt(s)) {
 			return method.invoke(clazz, Integer.parseInt(s));
 		} else if (Utils.isBoolean(s)) {
@@ -441,7 +441,7 @@ public final class Utils {
 		} else {
 			class2 = String.class;
 		}
-		Method method = clazz.getMethod(methodName, class1, class2);
+		Method method = clazz.getDeclaredMethod(methodName, class1, class2);
 		if (Utils.isInt(s)) {
 			if (Utils.isInt(t)) {
 				return method.invoke(clazz, Integer.parseInt(s), Integer.parseInt(t));
