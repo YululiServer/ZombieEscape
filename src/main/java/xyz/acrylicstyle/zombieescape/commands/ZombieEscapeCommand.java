@@ -13,6 +13,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
+import xyz.acrylicstyle.zombieescape.ZombieEscape;
 import xyz.acrylicstyle.zombieescape.utils.Utils;
 
 public class ZombieEscapeCommand implements CommandExecutor {
@@ -105,7 +106,10 @@ public class ZombieEscapeCommand implements CommandExecutor {
 							// args[2] -> Field
 							Field field = clazz.getDeclaredField(args[2]);
 							field.setAccessible(true);
-							sender.sendMessage(ChatColor.GREEN + "Field[" + Modifier.toString(field.getModifiers()) + "] (" + (field.get(clazz) != null ? field.get(clazz).getClass().getCanonicalName() : "null") + "):");
+							Object clazzz = null;
+							if (clazz.getCanonicalName().equalsIgnoreCase("xyz.acrylicstyle.zombieescape.ZombieEscape")) clazzz = ZombieEscape.getProvidingPlugin(ZombieEscape.class);
+							else clazzz = clazz.newInstance();
+							sender.sendMessage(ChatColor.GREEN + "Field[" + Modifier.toString(field.getModifiers()) + "] (" + (field.get(clazzz) != null ? field.get(clazzz).getClass().getCanonicalName() : "null") + "):");
 							sender.sendMessage(ChatColor.GREEN + "" + field.get(clazz));
 						}
 					}
