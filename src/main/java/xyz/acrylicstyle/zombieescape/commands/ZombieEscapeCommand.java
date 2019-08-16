@@ -110,7 +110,7 @@ public class ZombieEscapeCommand implements CommandExecutor {
 							if (clazz.getCanonicalName().equalsIgnoreCase("xyz.acrylicstyle.zombieescape.ZombieEscape")) clazzz = ZombieEscape.getProvidingPlugin(ZombieEscape.class);
 							else clazzz = clazz.newInstance();
 							sender.sendMessage(ChatColor.GREEN + "Field[" + Modifier.toString(field.getModifiers()) + "] (" + (field.get(clazzz) != null ? field.get(clazzz).getClass().getCanonicalName() : "null") + "):");
-							sender.sendMessage(ChatColor.GREEN + "" + field.get(clazz));
+							sender.sendMessage(ChatColor.GREEN + "" + field.get(clazzz));
 						}
 					}
 				} catch (Throwable e) {
