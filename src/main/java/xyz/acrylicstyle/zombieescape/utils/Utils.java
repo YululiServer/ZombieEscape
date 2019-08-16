@@ -403,8 +403,12 @@ public final class Utils {
 		Method method = clazz.getDeclaredMethod(methodName, class1);
 		method.setAccessible(true);
 		Object clazzz = null;
-		if (clazz.getCanonicalName().equalsIgnoreCase("xyz.acrylicstyle.zombieescape.ZombieEscape")) clazzz = ZombieEscape.getProvidingPlugin(ZombieEscape.class);
-		else clazzz = clazz.newInstance();
+		try {
+			if (clazz.getCanonicalName().equalsIgnoreCase("xyz.acrylicstyle.zombieescape.ZombieEscape")) clazzz = ZombieEscape.getProvidingPlugin(ZombieEscape.class);
+			else clazzz = clazz.newInstance();
+		} catch (Exception e) {
+			clazzz = clazz;
+		}
 		if (Utils.isInt(s)) {
 			return method.invoke(clazzz, Integer.parseInt(s));
 		} else if (Utils.isBoolean(s)) {
@@ -448,8 +452,12 @@ public final class Utils {
 		Method method = clazz.getDeclaredMethod(methodName, class1, class2);
 		method.setAccessible(true);
 		Object clazzz = null;
-		if (clazz.getCanonicalName().equalsIgnoreCase("xyz.acrylicstyle.zombieescape.ZombieEscape")) clazzz = ZombieEscape.getProvidingPlugin(ZombieEscape.class);
-		else clazzz = clazz.newInstance();
+		try {
+			if (clazz.getCanonicalName().equalsIgnoreCase("xyz.acrylicstyle.zombieescape.ZombieEscape")) clazzz = ZombieEscape.getProvidingPlugin(ZombieEscape.class);
+			else clazzz = clazz.newInstance();
+		} catch (Exception e) {
+			clazzz = clazz;
+		}
 		if (Utils.isInt(s)) {
 			if (Utils.isInt(t)) {
 				return method.invoke(clazzz, Integer.parseInt(s), Integer.parseInt(t));

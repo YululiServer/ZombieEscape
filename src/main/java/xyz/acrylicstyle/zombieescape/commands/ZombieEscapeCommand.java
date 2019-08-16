@@ -53,8 +53,12 @@ public class ZombieEscapeCommand implements CommandExecutor {
 							Field field = clazz.getDeclaredField(args[2]);
 							field.setAccessible(true);
 							Object clazzz = null;
-							if (clazz.getCanonicalName().equalsIgnoreCase("xyz.acrylicstyle.zombieescape.ZombieEscape")) clazzz = ZombieEscape.getProvidingPlugin(ZombieEscape.class);
-							else clazzz = clazz.newInstance();
+							try {
+								if (clazz.getCanonicalName().equalsIgnoreCase("xyz.acrylicstyle.zombieescape.ZombieEscape")) clazzz = ZombieEscape.getProvidingPlugin(ZombieEscape.class);
+								else clazzz = clazz.newInstance();
+							} catch (Exception e) {
+								clazzz = clazz;
+							}
 							String s = args[Utils.indexOf(args, "=")+1];
 							if (Utils.isInt(s)) {
 								field.setInt(clazzz, Integer.parseInt(s));
@@ -96,8 +100,12 @@ public class ZombieEscapeCommand implements CommandExecutor {
 							Method method = clazz.getDeclaredMethod(args[2]);
 							method.setAccessible(true);
 							Object clazzz = null;
-							if (clazz.getCanonicalName().equalsIgnoreCase("xyz.acrylicstyle.zombieescape.ZombieEscape")) clazzz = ZombieEscape.getProvidingPlugin(ZombieEscape.class);
-							else clazzz = clazz.newInstance();
+							try {
+								if (clazz.getCanonicalName().equalsIgnoreCase("xyz.acrylicstyle.zombieescape.ZombieEscape")) clazzz = ZombieEscape.getProvidingPlugin(ZombieEscape.class);
+								else clazzz = clazz.newInstance();
+							} catch (Exception e) {
+								clazzz = clazz;
+							}
 							Object result = method.invoke(clazzz);
 							sender.sendMessage(ChatColor.GREEN + "Result(" + (result != null ? result.getClass().getCanonicalName() : "null") + "):");
 							sender.sendMessage(ChatColor.GREEN + "" + result);
@@ -118,8 +126,12 @@ public class ZombieEscapeCommand implements CommandExecutor {
 							Field field = clazz.getDeclaredField(args[2]);
 							field.setAccessible(true);
 							Object clazzz = null;
-							if (clazz.getCanonicalName().equalsIgnoreCase("xyz.acrylicstyle.zombieescape.ZombieEscape")) clazzz = ZombieEscape.getProvidingPlugin(ZombieEscape.class);
-							else clazzz = clazz.newInstance();
+							try {
+								if (clazz.getCanonicalName().equalsIgnoreCase("xyz.acrylicstyle.zombieescape.ZombieEscape")) clazzz = ZombieEscape.getProvidingPlugin(ZombieEscape.class);
+								else clazzz = clazz.newInstance();
+							} catch (Exception e) {
+								clazzz = clazz;
+							}
 							sender.sendMessage(ChatColor.GREEN + "Field[" + Modifier.toString(field.getModifiers()) + "] (" + (field.get(clazzz) != null ? field.get(clazzz).getClass().getCanonicalName() : "null") + "):");
 							sender.sendMessage(ChatColor.GREEN + "" + field.get(clazzz));
 						}
