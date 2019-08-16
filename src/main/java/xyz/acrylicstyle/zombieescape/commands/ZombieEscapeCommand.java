@@ -104,14 +104,16 @@ public class ZombieEscapeCommand implements CommandExecutor {
 							// args[1] -> Class
 							// args[2] -> Field
 							Field field = clazz.getDeclaredField(args[2]);
-							field.setAccessible(true);
+							//field.setAccessible(true);
 							sender.sendMessage(ChatColor.GREEN + "Field[" + Modifier.toString(field.getModifiers()) + "] (" + (field.get(clazz) != null ? field.get(clazz).getClass().getCanonicalName() : "null") + "):");
 							sender.sendMessage(ChatColor.GREEN + "" + field.get(clazz));
 						}
 					}
 				} catch (Throwable e) {
 					sender.sendMessage(ChatColor.RED + "An error occurred: " + e);
-					sender.sendMessage(ChatColor.RED + e.getStackTrace().toString());
+					for (StackTraceElement st : e.getStackTrace()) {
+						sender.sendMessage(ChatColor.RED + st.toString());
+					}
 				}
 			} else {
 				if (!Utils.senderCheck(sender)) return true;
