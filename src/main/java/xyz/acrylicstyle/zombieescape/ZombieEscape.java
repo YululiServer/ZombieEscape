@@ -693,7 +693,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 					if (hasEnoughPlayers && timesLeft >= 0 && settingsCheck) timesLeft--;
 				} else if (gameStarted) {
 					if (playedTime >= gameTime) {
-						endGame("ゾンビ");
+						endGame(lang.get("zombie"));
 						this.cancel();
 						return;
 					}
@@ -878,7 +878,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		player.sendTitle(lang.get("youBecameZombie"), "", 0, 40, 0);
 		Bukkit.broadcastMessage(Lang.format(lang.get("becameZombie"), player.getName(), event.getDamager().getName()));
 		if (players <= 0 && gameStarted) {
-			endGame("ゾンビ");
+			endGame(lang.get("zombie"));
 		}
 		if (debug) {
 			long end = System.currentTimeMillis()-time;
