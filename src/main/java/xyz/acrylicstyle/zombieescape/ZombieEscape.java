@@ -511,8 +511,8 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 								} catch (IOException | InvalidConfigurationException e) {
 									e.printStackTrace();
 								}
-								scoreboard.resetScores(ChatColor.GREEN + "    " + lang.get("mapVoting") + ": " + map.getString("mapname", "???"));
-								Score score = objective3.getScore(ChatColor.GREEN + "    " + lang.get("mapVoting") + ": " + map.getString("mapname", "???"));
+								scoreboard.resetScores(ChatColor.GREEN + "    " + lang.get("mapVote") + ": " + map.getString("mapname", "???"));
+								Score score = objective3.getScore(ChatColor.GREEN + "    " + lang.get("mapVote") + ": " + map.getString("mapname", "???"));
 								score.setScore(-votes.getOrDefault(thisMapName, 0));
 							};
 							votes = new HashMap<String, Integer>(); // re-intialize this map because there's no HashMap#removeAll()
