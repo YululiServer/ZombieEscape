@@ -32,7 +32,7 @@ becameZombie: "&2%s became a zombie by %s."
 loginFailed_startingServer: "&eCurrently starting the server! Please rejoin after few seconds."
 loginFailed_gameEnded: "&cGame has already ended! Please rejoin after about 30 seconds."
 loginFailed_gameFull: "&cYou have to be sponsor to join this server!"
-loginFailed_brokenSettings: "&cFailed to load settings. Please try again later.":
+loginFailed_brokenSettings: "&cFailed to load settings. Please try again later."
 gameEnd: "&a&l%s team won the game!"
 shutdownIn15: "&7This server is restarting in 15 seconds."
 shuttingdown: "&7Shutting down the server..."
