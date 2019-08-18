@@ -9,12 +9,6 @@ public enum PlayerTeam {
 
 	@Override
 	public final String toString() {
-		return this.name;
+		return this.toString().toLowerCase(Locale.ROOT);
 	}
-
-	private PlayerTeam() {
-		this.name = this.toString().toLowerCase(Locale.ROOT);
-	}
-
-	private final String name;
 }
