@@ -1,6 +1,6 @@
 name: ZombieEscape
 main: xyz.acrylicstyle.zombieescape.ZombieEscape
-version: 0.0.1
+version: 1.0.0
 
 commands:
   zombieescape:
@@ -37,11 +37,6 @@ commands:
     description: "Ends ongoing game."
     usage: /<command>
     permission: zombieescape.endgame
-  check:
-    description: "Check configuration."
-    usage: /<command>
-    permission: zombieescape.check
-    aliases: ["recheck"]
   addwall:
     description: "Add a wall."
     usage: /<command>
@@ -52,10 +47,6 @@ commands:
     usage: /<command>
     permission: zombieescape.deletewall
     aliases: ["removewall"]
-  setstatus:
-    description: "Set status of the game."
-    usage: /<command>
-    permission: zombieescape.setstatus
   setmapname:
     description: "Set name of the map."
     usage: /<command>

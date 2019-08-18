@@ -14,20 +14,25 @@ import org.json.simple.parser.ParseException;
 
 import net.md_5.bungee.api.ChatColor;
 import xyz.acrylicstyle.tomeito_core.providers.ConfigProvider;
+import xyz.acrylicstyle.tomeito_core.providers.LanguageProvider;
+import xyz.acrylicstyle.tomeito_core.utils.Lang;
+import xyz.acrylicstyle.zombieescape.ZombieEscape;
 import xyz.acrylicstyle.zombieescape.utils.PlayerUtils;
 
 public final class Sponsor {
 	public final ConfigProvider config;
+	public final LanguageProvider lang;
 
 	public Sponsor() throws IOException, InvalidConfigurationException {
 		config = new ConfigProvider("./plugins/ZombieEscape/config.yml");
+		lang = ZombieEscape.lang;
 	}
 
 	public final class SetSponsor implements CommandExecutor {
 		@Override
 		public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 			if (args.length == 0) {
-				sender.sendMessage(ChatColor.RED + "使用法: /setsponsor <プレイヤー名>");
+				sender.sendMessage(ChatColor.RED + lang.get("usage") + ": /setsponsor <" + lang.get("player") + ">");
 				return true;
 			}
 			config.reloadWithoutException();
@@ -36,17 +41,17 @@ public final class Sponsor {
 				uuid = PlayerUtils.getByName(args[0]).toUUID();
 			} catch (IllegalArgumentException | IOException | ParseException e) {
 				e.printStackTrace();
-				sender.sendMessage(ChatColor.RED + "プレイヤーを取得中にエラーが発生しました");
+				sender.sendMessage(lang.get("errorFetchingPlayer"));
 				return true;
 			}
 			if (uuid == null) {
-				sender.sendMessage(ChatColor.RED + "プレイヤーを見つけられませんでした: " + args[0]);
+				sender.sendMessage(ChatColor.RED + lang.get("couldntFindPlayer") + ": " + args[0]);
 				return true;
 			}
 			List<String> sponsors = new ArrayList<String>();
 			sponsors.addAll(Arrays.asList(config.getList("sponsors", new ArrayList<String>()).toArray(new String[0])));
 			if (sponsors.contains(uuid.toString())) {
-				sender.sendMessage(ChatColor.RED + "指定したプレイヤーはすでにスポンサーです");
+				sender.sendMessage(lang.get("alreadySponsor"));
 				return true;
 			}
 			sponsors.add(uuid.toString());
@@ -54,10 +59,10 @@ public final class Sponsor {
 				config.setThenSave("sponsors", sponsors);
 			} catch (IOException e) {
 				e.printStackTrace();
-				sender.sendMessage(ChatColor.RED + "設定を保存中にエラーが発生しました");
+				sender.sendMessage(lang.get("errorSavingConfig"));
 				return true;
 			}
-			sender.sendMessage(ChatColor.GREEN + args[0] + " をスポンサーとして登録しました。");
+			sender.sendMessage(Lang.format(lang.get("addedSponsor"), args[0]));
 			return true;
 		}
 	}
@@ -66,7 +71,7 @@ public final class Sponsor {
 		@Override
 		public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 			if (args.length == 0) {
-				sender.sendMessage(ChatColor.RED + "使用法: /removesponsor <プレイヤー名>");
+				sender.sendMessage(ChatColor.RED + lang.get("usage") + ": /removesponsor <" + lang.get("player") + ">");
 				return true;
 			}
 			config.reloadWithoutException();
@@ -75,17 +80,17 @@ public final class Sponsor {
 				uuid = PlayerUtils.getByName(args[0]).toUUID();
 			} catch (IllegalArgumentException | IOException | ParseException e) {
 				e.printStackTrace();
-				sender.sendMessage(ChatColor.RED + "プレイヤーを取得中にエラーが発生しました");
+				sender.sendMessage(lang.get("errorFetchingPlayer"));
 				return true;
 			}
 			if (uuid == null) {
-				sender.sendMessage(ChatColor.RED + "プレイヤーを見つけられませんでした: " + args[0]);
+				sender.sendMessage(ChatColor.RED + lang.get("couldntFindPlayer") + ": " + args[0]);
 				return true;
 			}
 			List<String> sponsors = new ArrayList<String>();
 			sponsors.addAll(Arrays.asList(config.getList("sponsors", new ArrayList<String>()).toArray(new String[0])));
 			if (!sponsors.contains(uuid.toString())) {
-				sender.sendMessage(ChatColor.RED + "指定したプレイヤーはスポンサーではありません");
+				sender.sendMessage(lang.get("notSponsor"));
 				return true;
 			}
 			sponsors.remove(uuid.toString());
@@ -93,10 +98,10 @@ public final class Sponsor {
 				config.setThenSave("sponsors", sponsors);
 			} catch (IOException e) {
 				e.printStackTrace();
-				sender.sendMessage(ChatColor.RED + "設定を保存中にエラーが発生しました");
+				sender.sendMessage(lang.get("errorSavingConfig"));
 				return true;
 			}
-			sender.sendMessage(ChatColor.GREEN + args[0] + " をスポンサーから除外しました。");
+			sender.sendMessage(Lang.format(lang.get("removedSponsor"), args[0]));
 			return true;
 		}
 	}

@@ -146,7 +146,7 @@ public class ZombieEscapeCommand implements CommandExecutor {
 				if (!Utils.senderCheck(sender)) return true;
 				Command target = Bukkit.getPluginCommand(args[0]);
 				if (target == null) {
-					sender.sendMessage(ChatColor.DARK_GRAY + "不明なコマンドです。");
+					sender.sendMessage(ZombieEscape.lang.get("unknownCommand"));
 					return true;
 				}
 				target.execute(sender, label, cmdArgs);

@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>xyz.acrylicstyle.zombieescape</groupId>
   <artifactId>ZombieEscape-1.12.2</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>1.0.0-SNAPSHOT</version>
   <name>Zombie Escape</name>
   <developers>
     <developer>
@@ -74,7 +74,7 @@
     <dependency>
       <groupId>xyz.acrylicstyle</groupId>
       <artifactId>tomeito_core</artifactId>
-      <version>22</version>
+      <version>27</version>
     </dependency>
   </dependencies>
 </project>

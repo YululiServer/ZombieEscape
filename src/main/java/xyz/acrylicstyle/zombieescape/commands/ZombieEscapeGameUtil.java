@@ -33,17 +33,25 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import xyz.acrylicstyle.tomeito_core.providers.ConfigProvider;
+import xyz.acrylicstyle.tomeito_core.providers.LanguageProvider;
+import xyz.acrylicstyle.tomeito_core.utils.Lang;
 import xyz.acrylicstyle.zombieescape.PlayerTeam;
 import xyz.acrylicstyle.zombieescape.ZombieEscape;
 import xyz.acrylicstyle.zombieescape.data.Constants;
 import xyz.acrylicstyle.zombieescape.utils.Utils;
 
 public class ZombieEscapeGameUtil {
+	public final LanguageProvider lang;
+
+	public ZombieEscapeGameUtil() {
+		lang = ZombieEscape.lang;
+	}
+
 	public final class SetCheckpoint implements CommandExecutor { // /setcp from command block or something
 		@Override
 		public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 			if (args.length == 0) {
-				sender.sendMessage(ChatColor.RED + "使用法: /setcp <0, 1, 2, 3, ...>");
+				sender.sendMessage(ChatColor.RED + lang.get("usage") + ": /setcp <0, 1, 2, 3, ...>");
 				return true;
 			}
 			Player nearestPlayer = null;
@@ -51,45 +59,39 @@ public class ZombieEscapeGameUtil {
 				nearestPlayer = Utils.targetP(((BlockCommandSender)sender).getBlock().getLocation());
 			} else if (sender instanceof Player) {
 				nearestPlayer = Utils.targetP(((Player)sender).getLocation());
-			} else {
-				sender.sendMessage(ChatColor.RED + "不明なタイプです: " + sender.toString() + ", Name: " + sender.getName());
+			} else { // it shouldn't happen
+				sender.sendMessage(ChatColor.RED + "Unknown type: " + sender.toString() + ", Name: " + sender.getName());
 				return false;
 			}
 			// op
 			if (sender instanceof Player && ((Player)sender).isOp()) {
 				if (sender instanceof BlockCommandSender) {
 					if (ZombieEscape.zombieCheckpoint >= Integer.parseInt(args[0])) {
-						sender.sendMessage(ChatColor.RED + "そのゾンビチェックポイントはすでに通過しています。");
 						return false;
 					}
 				}
 				ZombieEscape.zombieCheckpoint = Integer.parseInt(args[0]);
-				sender.sendMessage(ChatColor.GREEN + "ゾンビチェックポイントを " + args[0] + " に設定しました。");
-				Bukkit.broadcastMessage(ChatColor.GREEN + "ゾンビチェックポイント" + args[0] + "を通過しました。");
+				Bukkit.broadcastMessage(Lang.format(lang.get("passedCPZombie"), args[0]));
 				return true;
 			}
 			// op end
 			if (ZombieEscape.hashMapTeam.get(nearestPlayer.getUniqueId()) != PlayerTeam.ZOMBIE) {
 				if (sender instanceof BlockCommandSender) {
 					if (ZombieEscape.playerCheckpoint >= Integer.parseInt(args[0])) {
-						sender.sendMessage(ChatColor.RED + "そのプレイヤーチェックポイントはすでに通過しています。");
 						return false;
 					}
 				}
 				ZombieEscape.playerCheckpoint = Integer.parseInt(args[0]);
-				sender.sendMessage(ChatColor.GREEN + "プレイヤーチェックポイントを " + args[0] + " に設定しました。");
-				Bukkit.broadcastMessage(ChatColor.GREEN + "プレイヤーがチェックポイント" + args[0] + "を通過しました。");
+				Bukkit.broadcastMessage(Lang.format(lang.get("passedCPPlayer"), args[0]));
 				return true;
 			}
 			if (sender instanceof BlockCommandSender) {
 				if (ZombieEscape.zombieCheckpoint >= Integer.parseInt(args[0])) {
-					sender.sendMessage(ChatColor.RED + "そのゾンビチェックポイントはすでに通過しています。");
 					return false;
 				}
 			}
 			ZombieEscape.zombieCheckpoint = Integer.parseInt(args[0]);
-			sender.sendMessage(ChatColor.GREEN + "ゾンビチェックポイントを " + args[0] + " に設定しました。");
-			Bukkit.broadcastMessage(ChatColor.GREEN + "ゾンビがチェックポイント" + args[0] + "を通過しました。");
+			Bukkit.broadcastMessage(Lang.format(lang.get("passedCPZombie"), args[0]));
 			return true;
 		}
 	}
@@ -98,55 +100,14 @@ public class ZombieEscapeGameUtil {
 		@Override
 		public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 			if (ZombieEscape.gameStarted) {
-				sender.sendMessage(ChatColor.RED + "ゲームはすでに開始されています！");
+				sender.sendMessage(lang.get("alreadyStarted"));
 				return true;
 			}
 			if (Constants.mininumPlayers > Bukkit.getOnlinePlayers().size()) {
-				sender.sendMessage(ChatColor.RED + "プレイヤー数が最低人数に満たないため、開始できません。");
+				sender.sendMessage(lang.get("cantStart"));
 				return true;
 			}
 			ZombieEscape.timesLeft = 11;
-			return true;
-		}
-	}
-
-	public final class CheckConfig implements CommandExecutor {
-		@Override
-		public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-			Utils.checkConfig();
-			sender.sendMessage(ChatColor.GREEN + "設定を再確認しました。結果は " + ZombieEscape.settingsCheck + " です。");
-			return true;
-		}
-	}
-
-	public final class SetStatus implements CommandExecutor {
-		@Override
-		public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-			if (args.length != 2) {
-				sender.sendMessage(ChatColor.RED + "引数が2つ必要です。");
-				sender.sendMessage(ChatColor.GRAY + "引数<type> [gameEnded<Boolean>, gameStarted<Boolean>, gameTime<Integer>, playedTime<Integer>, timesLeft<Integer>, debug<Boolean>]");
-				return true;
-			}
-			if (args[0].equalsIgnoreCase("gameEnded")) {
-				ZombieEscape.gameEnded = Boolean.getBoolean(args[1]);
-			} else if (args[0].equalsIgnoreCase("gameStarted")) {
-				ZombieEscape.gameStarted = Boolean.getBoolean(args[1]);
-			} else if (args[0].equalsIgnoreCase("gameTime")) {
-				ZombieEscape.gameTime = Integer.parseInt(args[1]);
-			} else if (args[0].equalsIgnoreCase("playedTime")) {
-				ZombieEscape.playedTime = Integer.parseInt(args[1]);
-			} else if (args[0].equalsIgnoreCase("timesLeft")) {
-				ZombieEscape.timesLeft = Integer.parseInt(args[1]);
-			} else if (args[0].equalsIgnoreCase("debug")) {
-				ZombieEscape.debug = Boolean.parseBoolean(args[1]);
-			} else if (args[0].equalsIgnoreCase("hashMapVote")) {
-				ZombieEscape.hashMapVote = null;
-				args[1] = "null";
-			} else {
-				sender.sendMessage(ChatColor.GRAY + "引数<type> [gameEnded<Boolean>, gameStarted<Boolean>, gameTime<Integer>, playedTime<Integer>, timesLeft<Integer>, debug<Boolean>]");
-				return true;
-			}
-			sender.sendMessage(ChatColor.GREEN + args[0] + "を" + args[1] + "に設定しました。");
 			return true;
 		}
 	}
@@ -156,7 +117,7 @@ public class ZombieEscapeGameUtil {
 		private Inventory inventory;
 
 		public void initialize() {
-			this.inventory = Utils.initializeItems(Bukkit.createInventory(this, 27, "投票"));
+			this.inventory = Utils.initializeItems(Bukkit.createInventory(this, 27, lang.get("mapVote")));
 			this.init = true;
 		}
 
@@ -177,7 +138,7 @@ public class ZombieEscapeGameUtil {
 		@EventHandler
 		public void onInventoryClick(InventoryClickEvent e) {
 			if (e.getCurrentItem() == null || e.getCurrentItem().getType() == Material.AIR) return;
-			if (!e.getView().getTopInventory().getTitle().equalsIgnoreCase("投票")) return;
+			if (!e.getView().getTopInventory().getTitle().equalsIgnoreCase(lang.get("mapVote"))) return;
 			Bukkit.dispatchCommand(((Player)e.getWhoClicked()), "vote " + e.getCurrentItem().getItemMeta().getLore().get(0));
 			e.setCancelled(true);
 			e.getWhoClicked().closeInventory();
@@ -209,18 +170,18 @@ public class ZombieEscapeGameUtil {
 			if (!Utils.senderCheck(sender)) return true;
 			Player ps = (Player) sender;
 			if (args.length == 0) {
-				sender.sendMessage(ChatColor.RED + "使用法: /vote <マップ名>");
+				sender.sendMessage(ChatColor.RED + lang.get("usage") + ": /vote <Map>");
 				return true;
 			}
 			if (ZombieEscape.gameStarted) {
-				sender.sendMessage(ChatColor.RED + "ゲームはすでに開始されています！");
+				sender.sendMessage(lang.get("alreadyStarted"));
 				return true;
 			}
 			File maps = new File("./plugins/ZombieEscape/maps/");
 			List<String> files = new ArrayList<String>();
 			for (File file : maps.listFiles()) files.add(file.getName().replaceAll(".yml", ""));
 			if (!files.contains(args[0])) {
-				sender.sendMessage(ChatColor.RED + "指定されたマップは存在しません。");
+				sender.sendMessage(lang.get("nomap"));
 				return true;
 			}
 			ConfigProvider mapConfig = null;
@@ -230,11 +191,11 @@ public class ZombieEscapeGameUtil {
 				e.printStackTrace();
 			}
 			if (Bukkit.getWorld(mapConfig.getString("spawnPoints.world", "world")) == null) {
-				sender.sendMessage(ChatColor.RED + "指定されたマップのワールドはこのサーバーには存在しません。");
+				sender.sendMessage(lang.get("nonExistWorld"));
 				return true;
 			}
 			ZombieEscape.hashMapVote.put(ps.getUniqueId(), args[0]);
-			sender.sendMessage(ChatColor.GREEN + mapConfig.getString("mapname") + " に投票しました。");
+			sender.sendMessage(Lang.format(lang.get("votedTo"), mapConfig.getString("mapname")));
 			return true;
 		}
 	}
@@ -245,7 +206,7 @@ public class ZombieEscapeGameUtil {
 		@Override
 		public boolean onCommand(final CommandSender sender, Command command, String label, String[] args) {
 			if (args.length <= 1) {
-				sender.sendMessage(ChatColor.RED + "使用法: /destroywall <壁のID> <壁破壊までの時間(秒)>");
+				sender.sendMessage(ChatColor.RED + lang.get("usage") + ": /destroywall <ID of wall> <Time until broke a wall (seconds)>");
 				return true;
 			}
 			if (sender instanceof BlockCommandSender) {
@@ -255,7 +216,7 @@ public class ZombieEscapeGameUtil {
 			try {
 				countdown = Integer.parseInt(args[1]);
 			} catch(NumberFormatException e) {
-				sender.sendMessage(ChatColor.RED + "時間は数値にしてください。");
+				sender.sendMessage(lang.get("timeMustNumber"));
 				return true;
 			}
 			new BukkitRunnable() {
@@ -267,13 +228,17 @@ public class ZombieEscapeGameUtil {
 						ablock.setType(Material.AIR);
 						ablock.getWorld().playSound(ablock.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 5, 1);
 					});
-					sender.sendMessage(ChatColor.GREEN + "壁を破壊しました。");
+					sender.sendMessage(lang.get("brokenWall"));
 				}
 			}.runTaskLater(ZombieEscape.getProvidingPlugin(ZombieEscape.class), 20*countdown);
 			count.put(args[0], countdown);
 			new BukkitRunnable() {
 				public void run() {
-					ZombieEscape.ongoingEventMap.put(args[0], "あと" + count.get(args[0]) + "秒で壁(" + args[0] + ")破壊");
+					if (ZombieEscape.config.getString("language", "en_US") == "en_US") {
+						ZombieEscape.ongoingEventMap.put(args[0],  Lang.format(lang.get("brokeWallIn"), args[0], count.get(args[0]).toString()));
+					} else {
+						ZombieEscape.ongoingEventMap.put(args[0],  Lang.format(lang.get("brokeWallIn"), count.get(args[0]).toString(), args[0]));
+					}
 					if (count.get(args[0]) <= 0) {
 						ZombieEscape.ongoingEventMap.remove(args[0]);
 						this.cancel();
@@ -292,10 +257,10 @@ public class ZombieEscapeGameUtil {
 		public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 			if (!Utils.senderCheck(sender)) return true;
 			if (ZombieEscape.config.getString("resourcepack") != null) {
-				sender.sendMessage(ChatColor.GREEN + "リソースパックを送信中です...");
+				sender.sendMessage(lang.get("sendingResourcePack"));
 				((Player) sender).setResourcePack(ZombieEscape.config.getString("resourcepack"));
 			} else {
-				sender.sendMessage(ChatColor.RED + "このサーバーにはリソースパックが設定されていません。");
+				sender.sendMessage(lang.get("resourcePackIsntSet"));
 			}
 			return true;
 		}
@@ -320,11 +285,11 @@ public class ZombieEscapeGameUtil {
 					pingmsg = "" + ChatColor.DARK_RED + ping;
 				}
 				sender.sendMessage(ChatColor.GREEN + "Ping: " + pingmsg + "ms");
-			} catch (Exception e) {
+			} catch (Exception e) { // it shouldn't happen
 				Log.error("Error while getting player's ping:");
 				e.printStackTrace();
 				e.getCause().printStackTrace();
-				sender.sendMessage(ChatColor.RED + "Pingの取得中に不明なエラーが発生しました");
+				sender.sendMessage(ChatColor.RED + "An unknown error occurred while getting your ping");
 			}
 			return true;
 		}

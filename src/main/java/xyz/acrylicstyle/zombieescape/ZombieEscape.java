@@ -77,6 +77,8 @@ import com.comphenix.protocol.ProtocolManager;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import xyz.acrylicstyle.tomeito_core.providers.ConfigProvider;
+import xyz.acrylicstyle.tomeito_core.providers.LanguageProvider;
+import xyz.acrylicstyle.tomeito_core.utils.Lang;
 import xyz.acrylicstyle.tomeito_core.utils.Log;
 import xyz.acrylicstyle.zombieescape.commands.Sponsor;
 import xyz.acrylicstyle.zombieescape.commands.ZombieEscapeCommand;
@@ -136,6 +138,8 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	public static String mostVotedMap = null;
 	public static String defmapString = null;
 	public static Map<String, String> ongoingEventMap = new HashMap<String, String>();
+	public static Lang language = null;
+	public static LanguageProvider lang = null;
 
 	private boolean error = false;
 	private boolean reload = false;
@@ -180,7 +184,13 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 					mapConfig = new ConfigProvider("./plugins/ZombieEscape/maps/" + mapName + ".yml");
 					finalMapConfig = new ConfigProvider("./plugins/ZombieEscape/maps/" + mapName + ".yml");
 					debug = config.getBoolean("debug", false);
-					defmapString = ChatColor.GREEN + "    デフォルトマップ: " + ChatColor.translateAlternateColorCodes('&', mapConfig.getString("mapname", "???"));
+					Lang.saveResource(getInstance(), "language_ja_JP.yml");
+					Lang.saveResource(getInstance(), "language_en_US.yml");
+					language = new Lang("ZombieEscape");
+					language.addLanguage("ja_JP");
+					language.addLanguage("en_US");
+					lang = language.get(config.getString("language", "en_US"));
+					defmapString = "    " + Lang.format(lang.get("defaultMap"), ChatColor.translateAlternateColorCodes('&', mapConfig.getString("mapname", "???")));
 				} catch (IOException | InvalidConfigurationException e1) {
 					e1.printStackTrace();
 					Log.error("Failed to load config, disabling plugin.");
@@ -223,8 +233,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 					Bukkit.getPluginCommand("setcp").setExecutor(zegu.new SetCheckpoint());
 					Bukkit.getPluginCommand("startgame").setExecutor(zegu.new StartGame());
 					Bukkit.getPluginCommand("endgame").setExecutor(new EndGame());
-					Bukkit.getPluginCommand("check").setExecutor(zegu.new CheckConfig());
-					Bukkit.getPluginCommand("setstatus").setExecutor(zegu.new SetStatus());
 					Bukkit.getPluginCommand("vote").setExecutor(zegu.new Vote());
 					Bukkit.getPluginCommand("votemap").setExecutor(votegui);
 					Bukkit.getPluginCommand("destroywall").setExecutor(zegu.new DestroyWall());
@@ -260,7 +268,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		List<String> cmds = config.getStringList("disabledcommands");
 		cmds.forEach(cmd -> {
 			if (e.getMessage().startsWith(cmd) || e.getMessage().startsWith("/" + cmd)) {
-				e.getPlayer().sendMessage(ChatColor.RED + "このコマンドは無効化されています。");
+				e.getPlayer().sendMessage(lang.get("disabledCommand"));
 				e.setCancelled(true);
 			}
 		});
@@ -299,7 +307,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 					}
 					Integer state = hashMapBlockState.get(wall) != null ? hashMapBlockState.get(wall) : 0;
 					int durability = (int) Math.nextUp(Math.min(Constants.materialDurability.getOrDefault(block.getType(), 5)*((double)players/(double)5), 3000));
-					player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(ChatColor.GREEN + "壁の耐久力: " + state + "/" + durability + (ongoingEvent == null ? "" : ChatColor.GREEN + " | " + ChatColor.AQUA + ongoingEvent)));
+					player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(lang.get("wallDurability") + state + "/" + durability + (ongoingEvent == null ? "" : ChatColor.GREEN + " | " + ChatColor.AQUA + ongoingEvent)));
 					lockActionBar.put(player.getUniqueId(), true);
 					if (debug) {
 						long end = System.currentTimeMillis()-time;
@@ -344,8 +352,8 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "effect " + event.getPlayer().getName() + " clear");
 		hashMapOriginZombie.put(event.getPlayer().getUniqueId(), false);
 		if (!settingsCheck) {
-			event.getPlayer().sendMessage(ChatColor.RED + "設定がまだ完了してない/エラーが発生したため、ゲームを開始できません。");
-			event.getPlayer().sendMessage(ChatColor.RED + "/setspawn、/removespawn、/addwall、/deletewallで設定してください。");
+			event.getPlayer().sendMessage(lang.get("incompleteSettings"));
+			event.getPlayer().sendMessage(lang.get("incompleteSettings2"));
 		}
 		hashMapLastScore4.put(event.getPlayer().getUniqueId(), "");
 		hashMapLastScore8.put(event.getPlayer().getUniqueId(), "");
@@ -382,29 +390,14 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				event.getPlayer().sendMessage(ChatColor.BLUE + "--------------------------------------------------");
 				event.getPlayer().sendMessage(ChatColor.DARK_GREEN + "          - Zombie Escape -");
 				event.getPlayer().sendMessage("");
-				event.getPlayer().sendMessage(ChatColor.YELLOW + "プレイヤー: ゾンビから逃げ、ゾンビよりも先にゴールに到達する");
-				event.getPlayer().sendMessage(ChatColor.YELLOW + "ゾンビ: プレイヤーを全員倒すか先にゴールに到達する");
+				event.getPlayer().sendMessage(lang.get("intro1"));
+				event.getPlayer().sendMessage(lang.get("intro2"));
 				event.getPlayer().sendMessage("");
-				event.getPlayer().sendMessage(ChatColor.YELLOW + "チームはゲーム開始5秒前に決定されます。");
-				event.getPlayer().sendMessage(ChatColor.YELLOW + "チャットはデフォルトで" + ChatColor.AQUA + "[チーム]" + ChatColor.YELLOW + "チャットです。");
-				event.getPlayer().sendMessage(ChatColor.YELLOW + "'!'をチャットの先頭につけると" + ChatColor.RED + "[All]" + ChatColor.YELLOW + "(全体)チャットになります。");
-				event.getPlayer().sendMessage(ChatColor.DARK_GREEN + "[Z] = ゾンビ " + ChatColor.AQUA + "[P] = プレイヤー " + ChatColor.GRAY + "[S] = スペクテイター");
+				event.getPlayer().sendMessage(lang.get("intro3"));
+				event.getPlayer().sendMessage(lang.get("intro4"));
+				event.getPlayer().sendMessage(lang.get("intro5"));
+				event.getPlayer().sendMessage(lang.get("intro6"));
 				event.getPlayer().sendMessage(ChatColor.BLUE + "--------------------------------------------------");
-				if (event.getPlayer().isOp()) {
-					event.getPlayer().sendMessage(ChatColor.BLUE + "--------------------------------------------------");
-					event.getPlayer().sendMessage(ChatColor.DARK_GREEN + "          - OP用コマンド -");
-					event.getPlayer().sendMessage(ChatColor.GREEN + "/setmap <マップ> - プレイするマップを設定します。全プレイヤーがキックされます。*ここで指定するマップはマップ名ではありません*");
-					event.getPlayer().sendMessage(ChatColor.GREEN + "/setstatus - ゲームに関する設定を変更します。");
-					event.getPlayer().sendMessage(ChatColor.GREEN + "/sponsor <プレイヤー> - 指定したプレイヤーをスポンサーとして登録します。");
-					event.getPlayer().sendMessage(ChatColor.GREEN + "/removesponsor <プレイヤー> - 指定したプレイヤーをスポンサーから削除します。");
-					event.getPlayer().sendMessage(ChatColor.GREEN + "/setcp <数値> - ゾンビのチェックポイントを設定します。");
-					event.getPlayer().sendMessage(ChatColor.GREEN + "/startgame - ゲーム開始までのカウントダウンを11秒に設定します。" + ChatColor.AQUA + "/setstatus timesLeft 11" + ChatColor.GREEN + "と同等です。");
-					event.getPlayer().sendMessage(ChatColor.GREEN + "/endgame - ゲームが開始している場合、ゲームを終了します。");
-					event.getPlayer().sendMessage("");
-					event.getPlayer().sendMessage("" + ChatColor.RED + "これらのOP用コマンドの乱用は禁止されています。");
-					event.getPlayer().sendMessage("" + ChatColor.RED + "乱用した場合、OP権限の剥奪や、BANが行われます。");
-					event.getPlayer().sendMessage(ChatColor.BLUE + "--------------------------------------------------");
-				}
 				if (gameStarted || timesLeft < 6) {
 					Player player = event.getPlayer();
 					zombies = zombies + 1;
@@ -412,8 +405,8 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 					hashMapTeam.remove(player.getUniqueId());
 					hashMapTeam.put(player.getUniqueId(), PlayerTeam.ZOMBIE);
 					final Objective objective = hashMapScoreboard.get(player.getUniqueId()).getObjective("scoreboard");
-					Score score6 = objective.getScore(ChatColor.GREEN + "    チーム: " + ChatColor.DARK_GREEN + "ゾンビ");
-					objective.getScoreboard().resetScores(ChatColor.GREEN + "    チーム: " + ChatColor.AQUA + "プレイヤー");
+					Score score6 = objective.getScore("    " + ChatColor.GREEN + lang.get("team") + ": " + ChatColor.DARK_GREEN + lang.get("zombie"));
+					objective.getScoreboard().resetScores("    " + ChatColor.GREEN + lang.get("team") + ": " + ChatColor.AQUA + lang.get("player"));
 					score6.setScore(6);
 					String[] spawnLists = Arrays.asList(mapConfig.getList("spawnPoints.zombie", new ArrayList<String>()).toArray(new String[0])).get(zombieCheckpoint).split(",");
 					Location location = new Location(Bukkit.getWorld(mapConfig.getString("spawnPoints.world")), Double.parseDouble(spawnLists[0]), Double.parseDouble(spawnLists[1]), Double.parseDouble(spawnLists[2]));
@@ -436,13 +429,13 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 							player.addPotionEffect(PotionEffectType.JUMP.createEffect(100000, 0));
 							ItemStack item = new ItemStack(Material.IRON_SWORD);
 							ItemMeta meta = item.getItemMeta();
-							meta.setDisplayName("" + ChatColor.RESET + ChatColor.WHITE + "ナイフ");
+							meta.setDisplayName("" + ChatColor.RESET + ChatColor.WHITE + lang.get("knife"));
 							item.setItemMeta(meta);
 							item.addUnsafeEnchantment(Enchantment.DURABILITY, 100);
 							item.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 100);
 							player.getInventory().setItem(0, item);
-							Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "give " + player.getName() + " minecraft:stone_axe 1 0 {CanDestroy:[\"minecraft:planks\",\"minecraft:dirt\",\"minecraft:grass\"],HideFlags:1,Unbreakable:1,display:{Name:\"錆びついた斧\"},ench:[{id:32,lvl:10}]}");
-							Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "give " + player.getName() + " minecraft:stone_pickaxe 1 0 {CanDestroy:[\"minecraft:gold_block\",\"minecraft:cobblestone\"],HideFlags:1,Unbreakable:1,display:{Name:\"錆びついたツルハシ\"},ench:[{id:32,lvl:10}]}");
+							Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "give " + player.getName() + " minecraft:stone_axe 1 0 {CanDestroy:[\"minecraft:planks\",\"minecraft:dirt\",\"minecraft:grass\"],HideFlags:1,Unbreakable:1,display:{Name:\"" + lang.get("rustedAxe") + "\"},ench:[{id:32,lvl:10}]}");
+							Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "give " + player.getName() + " minecraft:stone_pickaxe 1 0 {CanDestroy:[\"minecraft:gold_block\",\"minecraft:cobblestone\"],HideFlags:1,Unbreakable:1,display:{Name:\"" + lang.get("rustedPickaxe") + "\"},ench:[{id:32,lvl:10}]}");
 						}
 					}.runTaskLater(getInstance(), 40);
 					return;
@@ -468,9 +461,8 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				for (final Player player : Bukkit.getOnlinePlayers()) {
 					hashMapScoreboard.get(player.getUniqueId()).resetScores(hashMapLastScore4.get(player.getUniqueId()));
 				}
-				final String zombieMessage = ChatColor.GREEN + "    チーム: " + ChatColor.DARK_GREEN + "ゾンビ";
-				final String playerMessage = ChatColor.GREEN + "    チーム: " + ChatColor.AQUA + "プレイヤー";
-				final String spectatorMessage = ChatColor.GREEN + "    チーム: " + ChatColor.GRAY + "スペクテイター";
+				final String zombieMessage = ChatColor.GREEN + "    " + lang.get("team") + ": " + ChatColor.DARK_GREEN + lang.get("zombie");
+				final String playerMessage = ChatColor.GREEN + "    " + lang.get("team") + ": " + ChatColor.AQUA + lang.get("player");
 				if (!gameStarted) {
 					for (final Player player : Bukkit.getOnlinePlayers()) {
 						// team ----->
@@ -478,7 +470,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 						Objective objective3 = scoreboard.getObjective(DisplaySlot.SIDEBAR);
 						String lastScore8 = hashMapLastScore8.get(player.getUniqueId());
 						scoreboard.resetScores(lastScore8);
-						lastScore8 = ChatColor.GREEN + "    プレイヤー: " + Bukkit.getOnlinePlayers().size() + "/" + Bukkit.getMaxPlayers();
+						lastScore8 = ChatColor.GREEN + "    " + lang.get("player") + ": " + Bukkit.getOnlinePlayers().size() + "/" + Bukkit.getMaxPlayers();
 						Score score8 = objective3.getScore(lastScore8);
 						score8.setScore(8);
 						String leftSecond = Integer.toString(timesLeft % 60);
@@ -486,24 +478,20 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 						String lastScore4 = hashMapLastScore4.get(player.getUniqueId());
 						scoreboard.resetScores(lastScore4);
 						if (hasEnoughPlayers && settingsCheck)
-							lastScore4 = ChatColor.GREEN + "    あと" + Math.round(Math.nextDown(timesLeft/60)) + ":" + leftSecond + "で開始";
+							lastScore4 = "    " + Lang.format(lang.get("startingIn"), Math.round(Math.nextDown(timesLeft/60)) + ":" + leftSecond);
 						else
-							lastScore4 = ChatColor.WHITE + "    待機中...";
+							lastScore4 = "    " + lang.get("waiting");
 						hashMapLastScore8.put(player.getUniqueId(), lastScore8);
 						hashMapLastScore4.put(player.getUniqueId(), lastScore4);
 						Score score4 = objective3.getScore(lastScore4);
 						score4.setScore(4);
 						scoreboard.resetScores(zombieMessage);
 						scoreboard.resetScores(playerMessage);
-						scoreboard.resetScores(spectatorMessage);
 						if (hashMapTeam.get(player.getUniqueId()) == PlayerTeam.ZOMBIE) {
 							Score score6 = objective3.getScore(zombieMessage);
 							score6.setScore(6);
 						} else if (hashMapTeam.get(player.getUniqueId()) == PlayerTeam.PLAYER) {
 							Score score6 = objective3.getScore(playerMessage);
-							score6.setScore(6);
-						} else { // spectator
-							Score score6 = objective3.getScore(spectatorMessage);
 							score6.setScore(6);
 						}
 						// <----- team
@@ -523,8 +511,8 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 								} catch (IOException | InvalidConfigurationException e) {
 									e.printStackTrace();
 								}
-								scoreboard.resetScores(ChatColor.GREEN + "    マップ投票: " + map.getString("mapname", "???"));
-								Score score = objective3.getScore(ChatColor.GREEN + "    マップ投票: " + map.getString("mapname", "???"));
+								scoreboard.resetScores(ChatColor.GREEN + "    " + lang.get("mapVoting") + ": " + map.getString("mapname", "???"));
+								Score score = objective3.getScore(ChatColor.GREEN + "    " + lang.get("mapVoting") + ": " + map.getString("mapname", "???"));
 								score.setScore(-votes.getOrDefault(thisMapName, 0));
 							};
 							votes = new HashMap<String, Integer>(); // re-intialize this map because there's no HashMap#removeAll()
@@ -533,7 +521,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 							player.getInventory().clear();
 							votes = new HashMap<String, Integer>();
 							scoreboard.resetScores(defmapString);
-							player.sendMessage(ChatColor.GREEN + "マップ投票を締め切りました。");
+							player.sendMessage(lang.get("closedMapVoting"));
 							hashMapVote.values().forEach(vote -> {
 								votes.put(vote, votes.getOrDefault(vote, 0)+1);
 							});
@@ -546,7 +534,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 							if (mostVotedMap == null) mostVotedMap = mapName; // default map
 							mapName = mostVotedMap;
 							Utils.reload();
-							player.sendMessage(ChatColor.GREEN + "マップは" + ChatColor.AQUA + mapConfig.getString("mapname", "???") + ChatColor.GREEN + "になりました。");
+							player.sendMessage(Lang.format(lang.get("mapIsNow"), mapConfig.getString("mapname", "???")));
 							World world = Bukkit.getWorld(mapConfig.getString("spawnPoints.world", "world"));
 							world.setGameRuleValue("announceAdvancements", "false");
 							player.teleport(world.getSpawnLocation());
@@ -567,7 +555,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 									hashMapOriginZombie.put(player.getUniqueId(), true);
 									hashMapTeam.put(player.getUniqueId(), PlayerTeam.ZOMBIE);
 									zombies = zombies+1;
-									Score score6 = objective.getScore(ChatColor.GREEN + "    チーム: " + ChatColor.DARK_GREEN + "ゾンビ");
+									Score score6 = objective.getScore(ChatColor.GREEN + "    " + lang.get("team") + ": " + ChatColor.DARK_GREEN + lang.get("zombie"));
 									score6.setScore(6);
 									player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(250);
 									player.setHealth(250);
@@ -591,13 +579,13 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 									player.getInventory().setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
 									player.getInventory().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
 									player.removePotionEffect(PotionEffectType.INCREASE_DAMAGE);
-									Score score6 = objective.getScore(ChatColor.GREEN + "    チーム: " + ChatColor.AQUA + "プレイヤー");
+									Score score6 = objective.getScore(ChatColor.GREEN + "    " + lang.get("team") + ": " + ChatColor.AQUA + lang.get("player"));
 									score6.setScore(6);
 									player.setPlayerListName(ChatColor.AQUA + player.getName());
 								}
 							}
 							player.playSound(player.getLocation(), Sound.BLOCK_NOTE_PLING, 100, 1);
-							player.sendTitle(ChatColor.GREEN + "5", ChatColor.YELLOW + "チーム: " + hashMapTeam.get(player.getUniqueId()), 0, 25, 0);
+							player.sendTitle(ChatColor.GREEN + "5", ChatColor.YELLOW + lang.get("team") + ": " + hashMapTeam.get(player.getUniqueId()), 0, 25, 0);
 						} else if (timesLeft == 4) {
 							player.setGameMode(GameMode.ADVENTURE);
 							player.getWorld().setGameRuleValue("doMobLoot", "false");
@@ -611,7 +599,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 								hashMapOriginZombie.put(player.getUniqueId(), true);
 								hashMapTeam.put(player.getUniqueId(), PlayerTeam.ZOMBIE);
 								zombies = zombies+1;
-								Score score6 = objective.getScore(ChatColor.GREEN + "    チーム: " + ChatColor.DARK_GREEN + "ゾンビ");
+								Score score6 = objective.getScore(ChatColor.GREEN + "    " + lang.get("team") + ": " + ChatColor.DARK_GREEN + lang.get("zombie"));
 								score6.setScore(6);
 								player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(250);
 								player.setHealth(250);
@@ -626,7 +614,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 								player.setPlayerListName(ChatColor.DARK_GREEN + player.getName());
 							}
 							player.playSound(player.getLocation(), Sound.BLOCK_NOTE_PLING, 100, 1);
-							player.sendTitle(ChatColor.AQUA + "4", ChatColor.YELLOW + "チーム: " + hashMapTeam.get(player.getUniqueId()), 0, 25, 0);
+							player.sendTitle(ChatColor.AQUA + "4", ChatColor.YELLOW + lang.get("team") + ": " + hashMapTeam.get(player.getUniqueId()), 0, 25, 0);
 						} else if (timesLeft == 3) {
 							try {
 								ConfigProvider.setThenSave("previousZombies", listZombies, "ZombieEscape");
@@ -635,26 +623,26 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 								Log.error("Error while saving previous zombies!");
 							}
 							player.playSound(player.getLocation(), Sound.BLOCK_NOTE_PLING, 100, 1);
-							player.sendTitle(ChatColor.BLUE + "3", ChatColor.YELLOW + "チーム: " + hashMapTeam.get(player.getUniqueId()), 0, 25, 0);
+							player.sendTitle(ChatColor.BLUE + "3", ChatColor.YELLOW + lang.get("team") + ": " + hashMapTeam.get(player.getUniqueId()), 0, 25, 0);
 						} else if (timesLeft == 2) {
 							player.playSound(player.getLocation(), Sound.BLOCK_NOTE_PLING, 100, 1);
-							player.sendTitle(ChatColor.YELLOW + "2", ChatColor.YELLOW + "チーム: " + hashMapTeam.get(player.getUniqueId()), 0, 25, 0);
+							player.sendTitle(ChatColor.YELLOW + "2", ChatColor.YELLOW + lang.get("team") + ": " + hashMapTeam.get(player.getUniqueId()), 0, 25, 0);
 						} else if (timesLeft == 1) {
 							player.playSound(player.getLocation(), Sound.BLOCK_NOTE_PLING, 100, 1);
-							player.sendTitle(ChatColor.RED + "1", ChatColor.YELLOW + "チーム: " + hashMapTeam.get(player.getUniqueId()), 0, 25, 0);
+							player.sendTitle(ChatColor.RED + "1", ChatColor.YELLOW + lang.get("team") + ": " + hashMapTeam.get(player.getUniqueId()), 0, 25, 0);
 						} else if (timesLeft == 0) {
 							player.setGameMode(GameMode.ADVENTURE);
 							gameStarted = true;
 							player.playSound(player.getLocation(), Sound.ENTITY_ENDERDRAGON_GROWL, 100, 1);
 							if (hashMapTeam.get(player.getUniqueId()) == PlayerTeam.ZOMBIE) {
-								player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + "GO!", ChatColor.YELLOW + "目標: プレイヤーを全員倒すか先にゴールに到達する", 0, 40, 0);
-								player.sendMessage(ChatColor.GRAY + "あと12秒後にワープします...");
+								player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + "GO!", ChatColor.YELLOW + lang.get("zombieObjective"), 0, 40, 0);
+								player.sendMessage(lang.get("teleportIn"));
 								if (!once) {
 									once = true;
 									count = 12;
 									new BukkitRunnable() {
 										public void run() {
-											ZombieEscape.ongoingEventMap.put("zombieRelease", "あと" + count + "秒でゾンビ解放");
+											ZombieEscape.ongoingEventMap.put("zombieRelease", Lang.format(lang.get("releaseZombie"), Integer.toString(count)));
 											if (count <= 0) {
 												ZombieEscape.ongoingEventMap.remove("zombieRelease");
 												this.cancel();
@@ -672,17 +660,17 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 										player.addPotionEffect(PotionEffectType.SPEED.createEffect(100000, 0));
 										ItemStack item = new ItemStack(Material.IRON_SWORD);
 										ItemMeta meta = item.getItemMeta();
-										meta.setDisplayName("" + ChatColor.RESET + ChatColor.WHITE + "ナイフ");
+										meta.setDisplayName("" + ChatColor.RESET + ChatColor.WHITE + lang.get("knife"));
 										item.setItemMeta(meta);
 										item.addUnsafeEnchantment(Enchantment.DURABILITY, 100);
 										item.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 100);
 										player.getInventory().setItem(0, item);
-										Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "give " + player.getName() + " minecraft:stone_axe 1 0 {CanDestroy:[\"minecraft:planks\",\"minecraft:dirt\",\"minecraft:grass\"],HideFlags:1,Unbreakable:1,display:{Name:\"錆びついた斧\"},ench:[{id:32,lvl:10}]}");
-										Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "give " + player.getName() + " minecraft:stone_pickaxe 1 0 {CanDestroy:[\"minecraft:gold_block\",\"minecraft:cobblestone\"],HideFlags:1,Unbreakable:1,display:{Name:\"錆びついたツルハシ\"},ench:[{id:32,lvl:10}]}");
+										Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "give " + player.getName() + " minecraft:stone_axe 1 0 {CanDestroy:[\"minecraft:planks\",\"minecraft:dirt\",\"minecraft:grass\"],HideFlags:1,Unbreakable:1,display:{Name:\"" + lang.get("rustedAxe") + "\"},ench:[{id:32,lvl:10}]}");
+										Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "give " + player.getName() + " minecraft:stone_pickaxe 1 0 {CanDestroy:[\"minecraft:gold_block\",\"minecraft:cobblestone\"],HideFlags:1,Unbreakable:1,display:{Name:\"" + lang.get("rustedPickaxe") + "\"},ench:[{id:32,lvl:10}]}");
 										String[] spawnLists = Arrays.asList(mapConfig.getList("spawnPoints.zombie", new ArrayList<String>()).toArray(new String[0])).get(0).split(",");
 										Location location = new Location(Bukkit.getWorld(mapConfig.getString("spawnPoints.world")), Double.parseDouble(spawnLists[0]), Double.parseDouble(spawnLists[1]), Double.parseDouble(spawnLists[2]));
 										if (!player.teleport(location)) {
-											player.sendMessage(ChatColor.RED + "ワープに失敗しました。");
+											player.sendMessage(lang.get("failedWarp"));
 											return;
 										}
 									}
@@ -690,11 +678,11 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 							} else if (hashMapTeam.get(player.getUniqueId()) == PlayerTeam.PLAYER) {
 								Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "shot give " + player.getName() + " ak-47");
 								//player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(2);
-								player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + "GO!", ChatColor.YELLOW + "目標: ゾンビから逃げ、ゾンビよりも先にゴールに到達する", 0, 25, 0);
+								player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + "GO!", ChatColor.YELLOW + lang.get("playerObjective"), 0, 25, 0);
 								String[] spawnLists = Arrays.asList(mapConfig.getList("spawnPoints.player", new ArrayList<String>()).toArray(new String[0])).get(0).split(",");
 								Location location = new Location(Bukkit.getWorld(mapConfig.getString("spawnPoints.world")), Double.parseDouble(spawnLists[0]), Double.parseDouble(spawnLists[1]), Double.parseDouble(spawnLists[2]));
 								if (!player.teleport(location)) {
-									player.sendMessage(ChatColor.RED + "ワープに失敗しました。");
+									player.sendMessage(lang.get("failedWarp"));
 									return;
 								}
 							} else {
@@ -723,7 +711,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 								} catch (IOException | InvalidConfigurationException e) {
 									e.printStackTrace();
 								}
-								scoreboard.resetScores(ChatColor.GREEN + "    マップ投票: " + map.getString("mapname", "???"));
+								scoreboard.resetScores(ChatColor.GREEN + "    " + lang.get("mapVote") + ": " + map.getString("mapname", "???"));
 							};
 						}
 						Objective objective3 = scoreboard.getObjective(DisplaySlot.SIDEBAR);
@@ -740,8 +728,8 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 						Score score0 = objective3.getScore("     ");
 						score0.setScore(0);
 						for (int i = 1; i < maxCheckpoints; i++) {
-							String okString = ChatColor.RED + "✕ チェックポイント" + i;
-							String koString = ChatColor.GREEN + "✓ チェックポイント" + i;
+							String okString = ChatColor.RED + "✕ " + lang.get("checkpoint") + i;
+							String koString = ChatColor.GREEN + "✓ " + lang.get("checkpoint") + i;
 							boolean zombiePassedcp = zombieCheckpoint >= i;
 							boolean zombieIncp = zombieCheckpoint == i;
 							//boolean playerPassedcp = playerCheckpoint >= i;
@@ -785,11 +773,11 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		hashMapTeam.remove(event.getEntity().getUniqueId());
 		hashMapTeam.put(event.getEntity().getUniqueId(), PlayerTeam.ZOMBIE);
 		final Objective objective = hashMapScoreboard.get(event.getEntity().getUniqueId()).getObjective("scoreboard");
-		Score score6 = objective.getScore(ChatColor.GREEN + "    チーム: " + ChatColor.DARK_GREEN + "ゾンビ");
-		objective.getScoreboard().resetScores(ChatColor.GREEN + "    チーム: " + ChatColor.AQUA + "プレイヤー");
+		Score score6 = objective.getScore(ChatColor.GREEN + "    " + lang.get("team") + ": " + ChatColor.DARK_GREEN + lang.get("zombie"));
+		objective.getScoreboard().resetScores(ChatColor.GREEN + "    " + lang.get("team") + ": " + ChatColor.AQUA + lang.get("player"));
 		score6.setScore(6);
 		event.getEntity().setPlayerListName(ChatColor.DARK_GREEN + event.getEntity().getName());
-		if (players <= 0 && gameStarted) endGame("ゾンビ");
+		if (players <= 0 && gameStarted) endGame(lang.get("zombie"));
 	}
 
 	@EventHandler
@@ -806,7 +794,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		event.getPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(150);
 		event.getPlayer().setHealth(150);
 		event.getPlayer().setHealthScale(40);
-		event.getPlayer().sendMessage("" + ChatColor.GREEN + ChatColor.BOLD + "あと5秒でリスポーンします！");
+		event.getPlayer().sendMessage(lang.get("respawn"));
 		respawnWait.put(event.getPlayer().getUniqueId(), true);
 		new BukkitRunnable() {
 			public void run() {
@@ -818,13 +806,13 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 100000, 0, false, false));
 				ItemStack item = new ItemStack(Material.IRON_SWORD);
 				ItemMeta meta = item.getItemMeta();
-				meta.setDisplayName("" + ChatColor.RESET + ChatColor.WHITE + "ナイフ");
+				meta.setDisplayName("" + ChatColor.RESET + ChatColor.WHITE + lang.get("knife"));
 				item.setItemMeta(meta);
 				item.addUnsafeEnchantment(Enchantment.DURABILITY, 100);
 				item.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 100);
 				event.getPlayer().getInventory().setItem(0, item);
-				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "give " + event.getPlayer().getName() + " minecraft:stone_axe 1 0 {CanDestroy:[\"minecraft:planks\",\"minecraft:dirt\",\"minecraft:grass\"],HideFlags:1,Unbreakable:1,display:{Name:\"錆びついた斧\"},ench:[{id:32,lvl:10}]}");
-				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "give " + event.getPlayer().getName() + " minecraft:stone_pickaxe 1 0 {CanDestroy:[\"minecraft:gold_block\",\"minecraft:cobblestone\"],HideFlags:1,Unbreakable:1,display:{Name:\"錆びついたツルハシ\"},ench:[{id:32,lvl:10}]}");
+				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "give " + event.getPlayer().getName() + " minecraft:stone_axe 1 0 {CanDestroy:[\"minecraft:planks\",\"minecraft:dirt\",\"minecraft:grass\"],HideFlags:1,Unbreakable:1,display:{Name:\"" + lang.get("rustedAxe") + "\"},ench:[{id:32,lvl:10}]}");
+				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "give " + event.getPlayer().getName() + " minecraft:stone_pickaxe 1 0 {CanDestroy:[\"minecraft:gold_block\",\"minecraft:cobblestone\"],HideFlags:1,Unbreakable:1,display:{Name:\"" + lang.get("rustedPickaxe") + "\"},ench:[{id:32,lvl:10}]}");
 			}
 		}.runTaskLater(this, 20*5);
 	}
@@ -854,8 +842,8 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		hashMapTeam.remove(player.getUniqueId());
 		hashMapTeam.put(player.getUniqueId(), PlayerTeam.ZOMBIE);
 		final Objective objective = hashMapScoreboard.get(player.getUniqueId()).getObjective("scoreboard");
-		Score score6 = objective.getScore(ChatColor.GREEN + "    チーム: " + ChatColor.DARK_GREEN + "ゾンビ");
-		objective.getScoreboard().resetScores(ChatColor.GREEN + "    チーム: " + ChatColor.AQUA + "プレイヤー");
+		Score score6 = objective.getScore(ChatColor.GREEN + "    " + lang.get("team") + ": " + ChatColor.DARK_GREEN + lang.get("zombie"));
+		objective.getScoreboard().resetScores(ChatColor.GREEN + "    " + lang.get("team") + ": " + ChatColor.AQUA + lang.get("player"));
 		score6.setScore(6);
 		player.setGameMode(GameMode.ADVENTURE);
 		player.setPlayerListName(ChatColor.DARK_GREEN + player.getName());
@@ -875,20 +863,20 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				player.addPotionEffect(PotionEffectType.JUMP.createEffect(100000, 0));
 				ItemStack item = new ItemStack(Material.IRON_SWORD);
 				ItemMeta meta = item.getItemMeta();
-				meta.setDisplayName("" + ChatColor.RESET + ChatColor.WHITE + "ナイフ");
+				meta.setDisplayName("" + ChatColor.RESET + ChatColor.WHITE + lang.get("knife"));
 				item.setItemMeta(meta);
 				item.addUnsafeEnchantment(Enchantment.DURABILITY, 100);
 				item.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 100);
 				player.getInventory().setItem(0, item);
-				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "give " + player.getName() + " minecraft:stone_axe 1 0 {CanDestroy:[\"minecraft:planks\",\"minecraft:dirt\",\"minecraft:grass\"],HideFlags:1,Unbreakable:1,display:{Name:\"錆びついた斧\"},ench:[{id:32,lvl:10}]}");
-				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "give " + player.getName() + " minecraft:stone_pickaxe 1 0 {CanDestroy:[\"minecraft:gold_block\",\"minecraft:cobblestone\"],HideFlags:1,Unbreakable:1,display:{Name:\"錆びついたツルハシ\"},ench:[{id:32,lvl:10}]}");
+				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "give " + player.getName() + " minecraft:stone_axe 1 0 {CanDestroy:[\"minecraft:planks\",\"minecraft:dirt\",\"minecraft:grass\"],HideFlags:1,Unbreakable:1,display:{Name:\"" + lang.get("rustedAxe") + "\"},ench:[{id:32,lvl:10}]}");
+				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "give " + player.getName() + " minecraft:stone_pickaxe 1 0 {CanDestroy:[\"minecraft:gold_block\",\"minecraft:cobblestone\"],HideFlags:1,Unbreakable:1,display:{Name:\"" + lang.get("rustedPickaxe") + "\"},ench:[{id:32,lvl:10}]}");
 			}
 		}.runTaskLater(this, 40);
 		for (Player player2 : Bukkit.getOnlinePlayers()) {
 			player2.playSound(player2.getLocation(), Sound.ENTITY_ENDERDRAGON_GROWL, 80, 1); // avoid loud sound, it's 80%!
 		}
-		player.sendTitle(ChatColor.DARK_GREEN + "ゾンビチームになった！", "", 0, 40, 0);
-		Bukkit.broadcastMessage(ChatColor.DARK_GREEN + player.getName() + "が" + event.getDamager().getName() + "によってゾンビにされた。");
+		player.sendTitle(lang.get("youBecameZombie"), "", 0, 40, 0);
+		Bukkit.broadcastMessage(Lang.format(lang.get("becameZombie"), player.getName(), event.getDamager().getName()));
 		if (players <= 0 && gameStarted) {
 			endGame("ゾンビ");
 		}
@@ -927,7 +915,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		}
 		hashMapTeam.remove(event.getPlayer().getUniqueId());
 		if (gameStarted && (zombies == 0 || players == 0)) {
-			String team = zombies == 0 ? "プレイヤー" : "ゾンビ";
+			String team = zombies == 0 ? lang.get("player") : lang.get("zombie");
 			endGame(team);
 		}
 	}
@@ -988,12 +976,12 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	@EventHandler(priority=EventPriority.LOWEST)
 	public void onPlayerLogin(PlayerLoginEvent event) {
 		if (!init) {
-			event.disallow(Result.KICK_OTHER, ChatColor.YELLOW + "現在サーバーを起動中です！数秒後にもう一度参加してください。");
+			event.disallow(Result.KICK_OTHER, lang.get("loginFailed_startingServer"));
 			return;
 		}
 		config.reloadWithoutException();
 		if (gameEnded) {
-			event.disallow(Result.KICK_OTHER, ChatColor.RED + "ゲームはすでに終了しています！約30秒後に参加しなおしてください。");
+			event.disallow(Result.KICK_OTHER, lang.get("loginFailed_gameEnded"));
 			return;
 		}
 		if (Bukkit.getOnlinePlayers().size() < Bukkit.getMaxPlayers()) {
@@ -1005,10 +993,10 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			if (sponsors.contains(event.getPlayer().getUniqueId().toString()) == true) {
 				event.allow();
 			} else if (sponsors.contains(event.getPlayer().getUniqueId().toString()) == false) {
-				event.disallow(Result.KICK_OTHER, ChatColor.RED + "満員のサーバーに参加するにはスポンサーが必要です！");
+				event.disallow(Result.KICK_OTHER, lang.get("loginFailed_gameFull"));
 			}
 		} catch (Exception e) {
-			event.disallow(Result.KICK_OTHER, ChatColor.RED + "設定の読み込みに失敗しました。あとでやり直してください。");
+			event.disallow(Result.KICK_OTHER, lang.get("loginFailed_brokenSettings"));
 		}
 	}
 
@@ -1033,7 +1021,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	public void onDropItem(PlayerDropItemEvent event) {
 		ItemStack knifeitem = new ItemStack(Material.IRON_SWORD);
 		ItemMeta knifemeta = knifeitem.getItemMeta();
-		knifemeta.setDisplayName("" + ChatColor.RESET + ChatColor.WHITE + "ナイフ");
+		knifemeta.setDisplayName("" + ChatColor.RESET + ChatColor.WHITE + lang.get("knife"));
 		knifeitem.setItemMeta(knifemeta);
 		knifeitem.addUnsafeEnchantment(Enchantment.DURABILITY, 100); // Always sharp!
 		knifeitem.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 100); // Sharpness like #.
@@ -1057,7 +1045,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		if (shutdownCount != 15) return;
 		gameEnded = true;
 		for (Player player : Bukkit.getOnlinePlayers()) {
-			player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + team + "チームの勝ち！", "", 0, 40, 0);
+			player.sendTitle(Lang.format(lang.get("gameEnd"), team), "", 0, 40, 0);
 			new BukkitRunnable() {
 				public void run() {
 					if (fireworked*Bukkit.getOnlinePlayers().size() >= 40*Bukkit.getOnlinePlayers().size()) this.cancel();
@@ -1068,11 +1056,11 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				}
 			}.runTaskTimer(getInstance(), 0, 5);
 		}
-		Bukkit.broadcastMessage("" + ChatColor.GREEN + ChatColor.BOLD + team + "チームの勝ち！");
-		Bukkit.broadcastMessage(ChatColor.GRAY + "このサーバーはあと15秒でシャットダウンします。");
+		Bukkit.broadcastMessage(Lang.format(lang.get("gameEnd"), team));
+		Bukkit.broadcastMessage(lang.get("shutdownIn15"));
 		TimerTask task = new TimerTask() {
 			public void run() {
-				Bukkit.broadcastMessage(ChatColor.GRAY + "サーバーをシャットダウン中...");
+				Bukkit.broadcastMessage(lang.get("shuttingdown"));
 				Bukkit.shutdown();
 			}
 		};
@@ -1080,7 +1068,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		timer.schedule(task, 1000*15);
 		new BukkitRunnable() {
 			public void run() {
-				ZombieEscape.ongoingEvent = "あと" + shutdownCount + "秒でサーバー再起動";
+				ZombieEscape.ongoingEvent = Lang.format(lang.get("shutdownIn"), Integer.toString(shutdownCount));
 				if (shutdownCount <= 0) {
 					ZombieEscape.ongoingEvent = null;
 					this.cancel();
@@ -1101,10 +1089,10 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				return true;
 			}
 			if (!ZombieEscape.gameStarted) {
-				sender.sendMessage(ChatColor.RED + "ゲームはまだ開始されていません！");
+				sender.sendMessage(lang.get("gameIsntStarted"));
 				return true;
 			}
-			Bukkit.broadcastMessage("" + ChatColor.GOLD + ChatColor.BOLD + "あと10秒で救援が来ます！");
+			Bukkit.broadcastMessage(lang.get("escapeIn"));
 			new BukkitRunnable() {
 				public void run() {
 					gameEnded = true;
@@ -1116,14 +1104,14 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 					} else if (sender instanceof Player) {
 						nearestPlayer = Utils.targetPFindPlayers(((Player)sender).getLocation());
 						players = Utils.targetAFindPlayersWithRange(((Player)sender).getLocation(), 10);
-					} else {
-						sender.sendMessage(ChatColor.RED + "不明なタイプです: " + sender.toString() + ", Name: " + sender.getName());
+					} else { // it shouldn't happen
+						sender.sendMessage(ChatColor.RED + "Unknown type: " + sender.toString() + ", Name: " + sender.getName());
 						return;
 					}
 					ZombieEscape.gameEnded = true;
-					String team = nearestPlayer == null ? "ゾンビ" : "プレイヤー";
+					String team = nearestPlayer == null ? lang.get("zombie") : lang.get("player");
 					if (players.size() != 0) {
-						Bukkit.broadcastMessage(ChatColor.GREEN + "下記のプレイヤーの勝ち！:");
+						Bukkit.broadcastMessage(lang.get("followingPlayersWon"));
 						players.forEach(player -> {
 							Bukkit.broadcastMessage(ChatColor.GREEN + " - " + player.getName());
 						});
@@ -1135,7 +1123,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			count = 10;
 			new BukkitRunnable() {
 				public void run() {
-					ZombieEscape.ongoingEvent = "あと" + count + "秒で脱出！";
+					ZombieEscape.ongoingEvent = Lang.format(lang.get("escapeIn2"), Integer.toString(count));
 					if (count <= 0) {
 						ZombieEscape.ongoingEvent = null;
 						this.cancel();

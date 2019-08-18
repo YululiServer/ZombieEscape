@@ -32,6 +32,7 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import xyz.acrylicstyle.tomeito_core.providers.ConfigProvider;
+import xyz.acrylicstyle.tomeito_core.utils.Lang;
 import xyz.acrylicstyle.tomeito_core.utils.Log;
 import xyz.acrylicstyle.zombieescape.PlayerTeam;
 import xyz.acrylicstyle.zombieescape.ZombieEscape;
@@ -127,18 +128,25 @@ public final class Utils {
 		ZombieEscape.locationWall = ConfigProvider.getConfigSectionValue(ZombieEscape.mapConfig.get("locationWall", new HashMap<String, Object>()), true);
 		ZombieEscape.maxCheckpoints = Math.min(ZombieEscape.mapConfig.getStringList("spawnPoints.player").size(), ZombieEscape.mapConfig.getStringList("spawnPoints.zombie").size());
 		ZombieEscape.debug = ZombieEscape.config.getBoolean("debug", false);
+		ZombieEscape.defmapString = "    " + Lang.format(ZombieEscape.lang.get("defaultMap"), ChatColor.translateAlternateColorCodes('&', ZombieEscape.mapConfig.getString("mapname", "???")));
+		ZombieEscape.language = new Lang("ZombieEscape");
+		try {
+			ZombieEscape.language.addLanguage("ja_JP");
+			ZombieEscape.language.addLanguage("en_US");
+		} catch (IOException | InvalidConfigurationException e) {} // ignore
+		ZombieEscape.lang = ZombieEscape.language.get(ZombieEscape.config.getString("language", "en_US"));
 	}
 
 	public static void endGameStatic(String team) {
 		for (Player player : Bukkit.getOnlinePlayers()) {
 			player.playSound(player.getLocation(), Sound.ENTITY_FIREWORK_LAUNCH, 100, 1);
-			player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + team + "チームの勝ち！", "", 0, 60, 20);
+			player.sendTitle(Lang.format(ZombieEscape.lang.get("gameEnd"), team), "", 0, 60, 20);
 		}
-		Bukkit.broadcastMessage("" + ChatColor.GREEN + ChatColor.BOLD + team + "チームの勝ち！");
-		Bukkit.broadcastMessage(ChatColor.GRAY + "このサーバーはあと15秒でシャットダウンします。");
+		Bukkit.broadcastMessage(Lang.format(ZombieEscape.lang.get("gameEnd"), team));
+		Bukkit.broadcastMessage(ZombieEscape.lang.get("shutdownIn15"));
 		TimerTask task = new TimerTask() {
 			public void run() {
-				Bukkit.broadcastMessage(ChatColor.GRAY + "サーバーをシャットダウン中...");
+				Bukkit.broadcastMessage(ZombieEscape.lang.get("shuttingdown"));
 				Bukkit.shutdown();
 			}
 		};
@@ -224,7 +232,7 @@ public final class Utils {
 				if (team != pteam) return;
 				for (Player player : Bukkit.getOnlinePlayers()) {
 					if (player.getUniqueId().equals(uuid)) {
-						player.sendMessage(ChatColor.AQUA + "[チーム] " + teamname + " " + event.getPlayer().getName() + ChatColor.RESET + ChatColor.WHITE + ": " + event.getMessage());
+						player.sendMessage(ChatColor.AQUA + "[" + ZombieEscape.lang.get("team") + "] " + teamname + " " + event.getPlayer().getName() + ChatColor.RESET + ChatColor.WHITE + ": " + event.getMessage());
 					}
 				}
 			});
@@ -286,7 +294,7 @@ public final class Utils {
 	public static ItemStack generateVoteItem() {
 		ItemStack item = new ItemStack(Material.EMPTY_MAP);
 		ItemMeta meta = item.getItemMeta();
-		meta.setDisplayName(ChatColor.GREEN + "マップ投票");
+		meta.setDisplayName(ChatColor.GREEN + ZombieEscape.lang.get("mapVote"));
 		item.setItemMeta(meta);
 		return item;
 	}
@@ -294,7 +302,7 @@ public final class Utils {
 	public static ItemStack generateResourcePackItem() {
 		ItemStack item = new ItemStack(Material.CHEST);
 		ItemMeta meta = item.getItemMeta();
-		meta.setDisplayName(ChatColor.GREEN + "リソースパック");
+		meta.setDisplayName(ChatColor.GREEN + ZombieEscape.lang.get("resourcepack"));
 		item.setItemMeta(meta);
 		return item;
 	}

@@ -21,10 +21,18 @@ import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
 
 import xyz.acrylicstyle.tomeito_core.providers.ConfigProvider;
+import xyz.acrylicstyle.tomeito_core.providers.LanguageProvider;
+import xyz.acrylicstyle.tomeito_core.utils.Lang;
 import xyz.acrylicstyle.zombieescape.ZombieEscape;
 import xyz.acrylicstyle.zombieescape.utils.Utils;
 
 public class ZombieEscapeConfig {
+	public final LanguageProvider lang;
+
+	public ZombieEscapeConfig() {
+		lang = ZombieEscape.lang;
+	}
+
 	public final class SetSpawn implements CommandExecutor {
 		@Override
 		public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -33,13 +41,13 @@ public class ZombieEscapeConfig {
 				return true;
 			}
 			if (args.length == 0) {
-				sender.sendMessage(ChatColor.RED + "使用法: /setspawn <zombie/player> <0, 1, 2, 3, ...> or /setspawn <world>");
+				sender.sendMessage(ChatColor.RED + lang.get("usage") + ": /setspawn <zombie/player> <0, 1, 2, 3, ...> or /setspawn <world>");
 				return true;
 			}
 			Player ps = (Player) sender;
 			if (args[0].equalsIgnoreCase("zombie")) {
 				if (args.length <= 1) {
-					sender.sendMessage(ChatColor.RED + "使用法: /setspawn <zombie/player> <0, 1, 2, 3, ...> or /setspawn <world>");
+					sender.sendMessage(ChatColor.RED + lang.get("usage") + ": /setspawn <zombie/player> <0, 1, 2, 3, ...> or /setspawn <world>");
 					return true;
 				}
 				ConfigProvider config = ConfigProvider.initWithoutException("./plugins/ZombieEscape/maps/" + ZombieEscape.mapName + ".yml");
@@ -50,12 +58,12 @@ public class ZombieEscapeConfig {
 					config.setThenSave("spawnPoints.zombie", spawns);
 				} catch (IOException e) {
 					e.printStackTrace();
-					sender.sendMessage(ChatColor.RED + "設定の保存中にエラーが発生しました。");
+					sender.sendMessage(lang.get("errorSavingConfig"));
 					return true;
 				}
 			} else if (args[0].equalsIgnoreCase("player")) {
 				if (args.length <= 1) {
-					sender.sendMessage(ChatColor.RED + "使用法: /setspawn <zombie/player> <0, 1, 2, 3, ...> or /setspawn <world>");
+					sender.sendMessage(ChatColor.RED + lang.get("usage") + ": /setspawn <zombie/player> <0, 1, 2, 3, ...> or /setspawn <world>");
 					return true;
 				}
 				ConfigProvider config = ConfigProvider.initWithoutException("./plugins/ZombieEscape/maps/" + ZombieEscape.mapName + ".yml");
@@ -66,7 +74,7 @@ public class ZombieEscapeConfig {
 					config.setThenSave("spawnPoints.player", spawns);
 				} catch (IOException e) {
 					e.printStackTrace();
-					sender.sendMessage(ChatColor.RED + "設定の保存中にエラーが発生しました。");
+					sender.sendMessage(lang.get("errorSavingConfig"));
 					return true;
 				}
 			} else if (args[0].equalsIgnoreCase("world")) {
@@ -75,15 +83,15 @@ public class ZombieEscapeConfig {
 					config.setThenSave("spawnPoints.world", ps.getWorld().getName());
 				} catch (IOException e) {
 					e.printStackTrace();
-					sender.sendMessage(ChatColor.RED + "設定の保存中にエラーが発生しました。");
+					sender.sendMessage(lang.get("errorSavingConfig"));
 					return true;
 				}
 			} else {
-				sender.sendMessage(ChatColor.RED + "使用法: /setspawn <zombie/player> <0, 1, 2, 3, ...> or /setspawn <world>");
+				sender.sendMessage(ChatColor.RED + lang.get("usage") + ": /setspawn <zombie/player> <0, 1, 2, 3, ...> or /setspawn <world>");
 				return true;
 			}
 			Utils.checkConfig();
-			sender.sendMessage(ChatColor.GREEN + "設定を保存しました。");
+			sender.sendMessage(lang.get("savedConfig"));
 			return true;
 		}
 	}
@@ -92,18 +100,18 @@ public class ZombieEscapeConfig {
 		@Override
 		public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 			if (args.length == 0) {
-				sender.sendMessage(ChatColor.RED + "使用法: /setmapname <マップ名>");
+				sender.sendMessage(ChatColor.RED + lang.get("usage") + ": /setmapname <Map name>");
 				return true;
 			}
 			try {
 				ConfigProvider.setThenSave("mapname", args[0], new File("./plugins/ZombieEscape/maps/" + ZombieEscape.mapName + ".yml"));
 			} catch (IOException | InvalidConfigurationException e) {
 				e.printStackTrace();
-				sender.sendMessage(ChatColor.RED + "設定の保存中にエラーが発生しました。");
+				sender.sendMessage(lang.get("errorSavingConfig"));
 				return true;
 			}
 			Utils.checkConfig();
-			sender.sendMessage(ChatColor.GREEN + "設定を保存しました。");
+			sender.sendMessage(lang.get("savedConfig"));
 			return true;
 		}
 	}
@@ -112,26 +120,26 @@ public class ZombieEscapeConfig {
 		@Override
 		public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 			if (ZombieEscape.gameStarted || ZombieEscape.timesLeft < 6) {
-				sender.sendMessage(ChatColor.RED + "ゲームがすでに開始しているので設定できません！");
+				sender.sendMessage(lang.get("alreadyStarted"));
 				return true;
 			}
 			if (args.length == 0) {
-				sender.sendMessage(ChatColor.RED + "使用法: /setmap <マップ名>");
+				sender.sendMessage(ChatColor.RED + lang.get("usage") + ": /setmap <Map>");
 				return true;
 			}
 			try {
 				ConfigProvider.setThenSave("map", args[0], new File("./plugins/ZombieEscape/config.yml"));
 				for (Player player : Bukkit.getOnlinePlayers()) {
-					player.kickPlayer(ChatColor.RED + sender.getName() + ChatColor.AQUA + "によってマップが変更されました。もう一度参加しなおしてください！");
+					player.kickPlayer(Lang.format(lang.get("mapChaned"), sender.getName()));
 				}
 			} catch (IOException | InvalidConfigurationException e) {
 				e.printStackTrace();
-				sender.sendMessage(ChatColor.RED + "設定の保存中にエラーが発生しました。");
+				sender.sendMessage(lang.get("errorSavingConfig"));
 				return true;
 			}
 			Utils.checkConfig();
 			Utils.reload();
-			sender.sendMessage(ChatColor.GREEN + "設定を保存しました。");
+			sender.sendMessage(lang.get("savedConfig"));
 			return true;
 		}
 	}
@@ -144,14 +152,14 @@ public class ZombieEscapeConfig {
 				return true;
 			}
 			if (args.length == 0) {
-				sender.sendMessage(ChatColor.RED + "使用法: /addwall <壁の名前>");
+				sender.sendMessage(ChatColor.RED + lang.get("usage") + ": /addwall <Wall>");
 				return true;
 			}
 			Set<Material> set = new HashSet<Material>();
 			set.add(Material.AIR);
 			Block block = ((Player)sender).getTargetBlock(set, 4);
 			if (block == null) {
-				sender.sendMessage(ChatColor.RED + "ブロックを視野に入れてください(4ブロック以内)。");
+				sender.sendMessage(lang.get("seeTheBlock"));
 				return true;
 			}
 			int x = block.getLocation().getBlockX();
@@ -168,11 +176,11 @@ public class ZombieEscapeConfig {
 				config.setThenSave("locationWall", locationWall);
 			} catch (IOException | InvalidConfigurationException e) {
 				e.printStackTrace();
-				sender.sendMessage(ChatColor.RED + "コマンドの実行中に不明なエラーが発生しました");
+				sender.sendMessage(lang.get("errorSavingConfig"));
 				return true;
 			}
 			Utils.checkConfig(); // well we dont need to do this smh
-			sender.sendMessage(ChatColor.GREEN + "設定を保存しました。");
+			sender.sendMessage(lang.get("savedConfig"));
 			return true;
 		}
 	}
@@ -185,7 +193,7 @@ public class ZombieEscapeConfig {
 				return true;
 			}
 			if (args.length == 0) {
-				sender.sendMessage(ChatColor.RED + "使用法: /deletewall <壁の名前>");
+				sender.sendMessage(ChatColor.RED + lang.get("usage") + ": /deletewall <Wall>");
 				return true;
 			}
 			try {
@@ -198,11 +206,11 @@ public class ZombieEscapeConfig {
 				});
 			} catch (IOException | InvalidConfigurationException e) {
 				e.printStackTrace();
-				sender.sendMessage(ChatColor.RED + "コマンドの実行中に不明なエラーが発生しました");
+				sender.sendMessage(lang.get("errorSavingConfig"));
 				return true;
 			}
 			Utils.checkConfig(); // well we dont need to do this
-			sender.sendMessage(ChatColor.GREEN + "設定を保存しました。");
+			sender.sendMessage(lang.get("savedConfig"));
 			return true;
 		}
 	}
@@ -215,12 +223,12 @@ public class ZombieEscapeConfig {
 				return true;
 			}
 			if (args.length == 0) {
-				sender.sendMessage(ChatColor.RED + "使用法: /removespawn <zombie/player> <0, 1, 2, 3, ...> or /removespawn <world>");
+				sender.sendMessage(ChatColor.RED + lang.get("usage") + ": /removespawn <zombie/player> <0, 1, 2, 3, ...> or /removespawn <world>");
 				return true;
 			}
 			if (args[0].equalsIgnoreCase("zombie")) {
 				if (args.length <= 1) {
-					sender.sendMessage(ChatColor.RED + "使用法: /removespawn <zombie/player> <0, 1, 2, 3, ...> or /removespawn <world>");
+					sender.sendMessage(ChatColor.RED + lang.get("usage") + ": /removespawn <zombie/player> <0, 1, 2, 3, ...> or /removespawn <world>");
 					return true;
 				}
 				ConfigProvider config = ConfigProvider.initWithoutException("./plugins/ZombieEscape/maps/" + ZombieEscape.mapName + ".yml");
@@ -231,12 +239,12 @@ public class ZombieEscapeConfig {
 					config.setThenSave("spawnPoints.zombie", spawns.size() == 0 ? null : spawns);
 				} catch (IOException e) {
 					e.printStackTrace();
-					sender.sendMessage(ChatColor.RED + "設定の保存中にエラーが発生しました。");
+					sender.sendMessage(lang.get("errorSavingConfig"));
 					return true;
 				}
 			} else if (args[0].equalsIgnoreCase("player")) {
 				if (args.length <= 1) {
-					sender.sendMessage(ChatColor.RED + "使用法: /removespawn <zombie/player> <0, 1, 2, 3, ...> or /removespawn <world>");
+					sender.sendMessage(ChatColor.RED + lang.get("usage") + ": /removespawn <zombie/player> <0, 1, 2, 3, ...> or /removespawn <world>");
 					return true;
 				}
 				ConfigProvider config = ConfigProvider.initWithoutException("./plugins/ZombieEscape/maps/" + ZombieEscape.mapName + ".yml");
@@ -247,7 +255,7 @@ public class ZombieEscapeConfig {
 					config.setThenSave("spawnPoints.player", spawns.size() == 0 ? null : spawns);
 				} catch (IOException e) {
 					e.printStackTrace();
-					sender.sendMessage(ChatColor.RED + "設定の保存中にエラーが発生しました。");
+					sender.sendMessage(lang.get("errorSavingConfig"));
 					return true;
 				}
 			} else if (args[0].equalsIgnoreCase("world")) {
@@ -256,15 +264,15 @@ public class ZombieEscapeConfig {
 					config.setThenSave("spawnPoints.world", null);
 				} catch (IOException e) {
 					e.printStackTrace();
-					sender.sendMessage(ChatColor.RED + "設定の保存中にエラーが発生しました。");
+					sender.sendMessage(lang.get("errorSavingConfig"));
 					return true;
 				}
 			} else {
-				sender.sendMessage(ChatColor.RED + "使用法: /removespawn <zombie/player> <0, 1, 2, 3, ...> or /removespawn <world>");
+				sender.sendMessage(ChatColor.RED + lang.get("usage") + ": /removespawn <zombie/player> <0, 1, 2, 3, ...> or /removespawn <world>");
 				return true;
 			}
 			Utils.checkConfig();
-			sender.sendMessage(ChatColor.GREEN + "設定を保存しました。");
+			sender.sendMessage(lang.get("savedConfig"));
 			return true;
 		}
 	}
