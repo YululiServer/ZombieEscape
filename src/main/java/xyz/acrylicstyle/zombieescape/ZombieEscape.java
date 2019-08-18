@@ -635,7 +635,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 							gameStarted = true;
 							player.playSound(player.getLocation(), Sound.ENTITY_ENDERDRAGON_GROWL, 100, 1);
 							if (hashMapTeam.get(player.getUniqueId()) == PlayerTeam.ZOMBIE) {
-								player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + "GO!", ChatColor.YELLOW + lang.get("zombieObjective"), 0, 40, 0);
+								player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + "GO!", ChatColor.YELLOW + lang.get("zombieObjective"), 0, 120, 0);
 								player.sendMessage(lang.get("teleportIn"));
 								if (!once) {
 									once = true;
@@ -678,7 +678,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 							} else if (hashMapTeam.get(player.getUniqueId()) == PlayerTeam.PLAYER) {
 								Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "shot give " + player.getName() + " ak-47");
 								//player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(2);
-								player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + "GO!", ChatColor.YELLOW + lang.get("playerObjective"), 0, 25, 0);
+								player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + "GO!", ChatColor.YELLOW + lang.get("playerObjective"), 0, 120, 0);
 								String[] spawnLists = Arrays.asList(mapConfig.getList("spawnPoints.player", new ArrayList<String>()).toArray(new String[0])).get(0).split(",");
 								Location location = new Location(Bukkit.getWorld(mapConfig.getString("spawnPoints.world")), Double.parseDouble(spawnLists[0]), Double.parseDouble(spawnLists[1]), Double.parseDouble(spawnLists[2]));
 								if (!player.teleport(location)) {
