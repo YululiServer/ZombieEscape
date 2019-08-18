@@ -234,7 +234,7 @@ public class ZombieEscapeGameUtil {
 			count.put(args[0], countdown);
 			new BukkitRunnable() {
 				public void run() {
-					if (ZombieEscape.config.getString("language", "en_US") == "en_US") {
+					if (ZombieEscape.config.getString("language", "en_US").equalsIgnoreCase("en_US")) {
 						ZombieEscape.ongoingEventMap.put(args[0],  Lang.format(lang.get("brokeWallIn"), args[0], count.get(args[0]).toString()));
 					} else {
 						ZombieEscape.ongoingEventMap.put(args[0],  Lang.format(lang.get("brokeWallIn"), count.get(args[0]).toString(), args[0]));
