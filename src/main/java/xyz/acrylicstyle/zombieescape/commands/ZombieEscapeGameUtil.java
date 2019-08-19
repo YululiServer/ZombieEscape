@@ -194,6 +194,13 @@ public class ZombieEscapeGameUtil {
 				sender.sendMessage(lang.get("nonExistWorld"));
 				return true;
 			}
+			if (!(mapConfig.getList("spawnPoints.zombie") != null // check if zombie spawn points exists
+					&& mapConfig.getList("spawnPoints.zombie").size() != 0 // check if zombie spawn points are *actually* exists(0 isn't exist)
+					&& mapConfig.getList("spawnPoints.player") != null // check if player spawn points exists
+					&& mapConfig.getList("spawnPoints.player").size() != 0)) {
+				sender.sendMessage(ChatColor.RED + "指定したマップにはスポーン地点が設定されていません。");
+				return true;
+			}
 			ZombieEscape.hashMapVote.put(ps.getUniqueId(), args[0]);
 			sender.sendMessage(Lang.format(lang.get("votedTo"), mapConfig.getString("mapname")));
 			return true;
