@@ -48,6 +48,8 @@ public class ZombieEscapeGameUtil {
 	}
 
 	public final class SetCheckpoint implements CommandExecutor { // /setcp from command block or something
+		private Map<String, Integer> count = new HashMap<String, Integer>();
+
 		@Override
 		public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 			if (args.length == 0) {
@@ -83,6 +85,40 @@ public class ZombieEscapeGameUtil {
 				}
 				ZombieEscape.playerCheckpoint = Integer.parseInt(args[0]);
 				Bukkit.broadcastMessage(Lang.format(lang.get("passedCPPlayer"), args[0]));
+				int countdown = ZombieEscape.mapConfig.getInt("worldborder.cp" + args[0] + ".delay", 0);
+				if (countdown > 0) {
+					count.put("stormcoming" + args[0], countdown);
+					new BukkitRunnable() {
+						public void run() {
+							ZombieEscape.ongoingEventMap.put("stormcoming" + args[0],  Lang.format(lang.get("stormComing"), count.get(args[0]).toString()));
+							if (count.get(args[0]) <= 0) {
+								ZombieEscape.ongoingEventMap.remove("stormcoming" + args[0]);
+								this.cancel();
+								return;
+							}
+							count.put(args[0], count.get(args[0])-1);
+						}
+					}.runTaskTimer(ZombieEscape.getProvidingPlugin(ZombieEscape.class), 0, 20);
+					Utils.doBossBarTick(Bukkit.createBossBar(args[0], BarColor.RED, BarStyle.SEGMENTED_10, BarFlag.DARKEN_SKY), countdown, "stormcoming" + args[0], true);
+				}
+				new BukkitRunnable() {
+					public void run() {
+						count.put("stormmoving" + args[0], countdown);
+						Bukkit.getWorld(ZombieEscape.mapConfig.getString("spawnPoints.world", "world")).getWorldBorder().setSize(ZombieEscape.mapConfig.getInt("worldborder.cp" + args[0] + ".blocks"), ZombieEscape.mapConfig.getInt("worldborder.cp" + args[0] + ".seconds"));
+						new BukkitRunnable() {
+							public void run() {
+								ZombieEscape.ongoingEventMap.put("stormmoving" + args[0],  Lang.format(lang.get("stormMoving"), count.get(args[0]).toString()));
+								if (count.get(args[0]) <= 0) {
+									ZombieEscape.ongoingEventMap.remove("stormmoving" + args[0]);
+									this.cancel();
+									return;
+								}
+								count.put(args[0], count.get(args[0])-1);
+							}
+						}.runTaskTimer(ZombieEscape.getProvidingPlugin(ZombieEscape.class), 0, 20);
+						Utils.doBossBarTick(Bukkit.createBossBar(args[0], BarColor.RED, BarStyle.SEGMENTED_10, BarFlag.DARKEN_SKY), countdown, "stormmoving" + args[0]);
+					}
+				}.runTaskLater(ZombieEscape.getProvidingPlugin(ZombieEscape.class), countdown <= 0 ? 1 : countdown*20);
 				return true;
 			}
 			if (sender instanceof BlockCommandSender) {
