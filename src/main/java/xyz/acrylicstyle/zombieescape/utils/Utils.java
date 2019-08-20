@@ -316,7 +316,7 @@ public final class Utils {
 	public static void damageIfOutsideOfBorder() {
 		for (Player player : Bukkit.getOnlinePlayers()) {
 			if (ZombieEscape.hashMapTeam.get(player.getUniqueId()) == PlayerTeam.PLAYER) {
-				if (isOutsideOfBorder(player)) player.damage(10);
+				if (isOutsideOfBorder(player)) player.damage(5);
 			}
 		}
 	}

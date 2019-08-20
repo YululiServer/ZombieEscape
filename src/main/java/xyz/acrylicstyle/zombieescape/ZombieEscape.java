@@ -310,10 +310,10 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 					int durability = (int) Math.nextUp(Math.min(Constants.materialDurability.getOrDefault(block.getType(), 5)*((double)players/(double)5), 3000));
 					player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(lang.get("wallDurability") + state + "/" + durability + (ongoingEvent == null ? "" : ChatColor.GREEN + " | " + ChatColor.AQUA + ongoingEvent)));
 					lockActionBar.put(player.getUniqueId(), true);
-					if (debug) {
-						long end = System.currentTimeMillis()-time;
-						Log.debug("20 ticks task took " + end + "ms");
-					}
+				}
+				if (debug) {
+					long end = System.currentTimeMillis()-time;
+					Log.debug("20 ticks task took " + end + "ms");
 				}
 			}
 		}.runTaskTimer(this, 0, 20);
@@ -384,7 +384,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		event.getPlayer().setHealthScale(20);
 		new BukkitRunnable() {
 			public void run() {
-				event.getPlayer().getWorld().getWorldBorder().setSize(mapConfig.getInt("worldborder.initsize", 29999999)); // set border to max
 				event.getPlayer().getInventory().clear();
 				event.getPlayer().teleport(world.getSpawnLocation());
 				event.getPlayer().setGameMode(GameMode.ADVENTURE);
@@ -442,6 +441,9 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 						}
 					}.runTaskLater(getInstance(), 40);
 					return;
+				} else {
+					event.getPlayer().getWorld().getWorldBorder().setSize(mapConfig.getInt("worldborder.initsize", 29999999)); // set border to max
+					event.getPlayer().getWorld().getWorldBorder().setDamageAmount(0);
 				}
 			}
 		}.runTaskLater(this, 40);

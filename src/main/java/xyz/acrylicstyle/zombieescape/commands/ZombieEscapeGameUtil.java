@@ -85,6 +85,7 @@ public class ZombieEscapeGameUtil {
 				}
 				ZombieEscape.playerCheckpoint = Integer.parseInt(args[0]);
 				Bukkit.broadcastMessage(Lang.format(lang.get("passedCPPlayer"), args[0]));
+				if (!ZombieEscape.mapConfig.getBoolean("worldborder.enable", false)) return true;
 				int countdown = ZombieEscape.mapConfig.getInt("worldborder.cp" + args[0] + ".delay", 0);
 				if (countdown > 0) {
 					count.put("stormcoming" + args[0], countdown);
