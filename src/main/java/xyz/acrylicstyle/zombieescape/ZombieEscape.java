@@ -291,7 +291,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		new BukkitRunnable() {
 			public void run() {
 				long time = System.currentTimeMillis();
-				if (mapConfig.getBoolean("worldborder", false)) Utils.damageIfOutsideOfBorder();
+				if (mapConfig.getBoolean("worldborder.enable", false)) Utils.damageIfOutsideOfBorder();
 				for (Player player : Bukkit.getOnlinePlayers()) {
 					Set<Material> set = new HashSet<Material>();
 					set.add(Material.AIR);
