@@ -291,6 +291,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		new BukkitRunnable() {
 			public void run() {
 				long time = System.currentTimeMillis();
+				if (mapConfig.getBoolean("worldborder", false)) Utils.damageIfOutsideOfBorder();
 				for (Player player : Bukkit.getOnlinePlayers()) {
 					Set<Material> set = new HashSet<Material>();
 					set.add(Material.AIR);
@@ -311,7 +312,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 					lockActionBar.put(player.getUniqueId(), true);
 					if (debug) {
 						long end = System.currentTimeMillis()-time;
-						Log.debug("Display durability took " + end + "ms");
+						Log.debug("20 ticks task took " + end + "ms");
 					}
 				}
 			}

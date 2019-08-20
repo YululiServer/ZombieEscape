@@ -15,6 +15,7 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.WorldBorder;
 import org.bukkit.boss.BossBar;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -302,5 +303,22 @@ public final class Utils {
 		meta.setDisplayName(ChatColor.GREEN + ZombieEscape.lang.get("resourcepack"));
 		item.setItemMeta(meta);
 		return item;
+	}
+
+	public static void damageIfOutsideOfBorder() {
+		for (Player player : Bukkit.getOnlinePlayers()) {
+			if (ZombieEscape.hashMapTeam.get(player.getUniqueId()) == PlayerTeam.PLAYER) {
+				if (isOutsideOfBorder(player)) player.damage(10);
+			}
+		}
+	}
+
+	public static boolean isOutsideOfBorder(Player player) {
+		Location location = player.getLocation();
+		WorldBorder border = player.getWorld().getWorldBorder();
+		double x = location.getX();
+		double z = location.getZ();
+		double size = border.getSize();
+		return ((x > size || (-x) > size) || (z > size || (-z) > size));
 	}
 }
