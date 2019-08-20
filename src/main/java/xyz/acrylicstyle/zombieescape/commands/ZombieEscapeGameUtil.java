@@ -90,7 +90,7 @@ public class ZombieEscapeGameUtil {
 					count.put("stormcoming" + args[0], countdown);
 					new BukkitRunnable() {
 						public void run() {
-							ZombieEscape.ongoingEventMap.put("stormcoming" + args[0],  Lang.format(lang.get("stormComing"), count.get(args[0]).toString()));
+							ZombieEscape.ongoingEventMap.put("stormcoming" + args[0],  Lang.format(lang.get("stormComing"), count.get("stormcoming" + args[0]).toString()));
 							if (count.get(args[0]) <= 0) {
 								ZombieEscape.ongoingEventMap.remove("stormcoming" + args[0]);
 								this.cancel();
@@ -107,7 +107,7 @@ public class ZombieEscapeGameUtil {
 						Bukkit.getWorld(ZombieEscape.mapConfig.getString("spawnPoints.world", "world")).getWorldBorder().setSize(ZombieEscape.mapConfig.getInt("worldborder.cp" + args[0] + ".blocks"), ZombieEscape.mapConfig.getInt("worldborder.cp" + args[0] + ".seconds"));
 						new BukkitRunnable() {
 							public void run() {
-								ZombieEscape.ongoingEventMap.put("stormmoving" + args[0],  Lang.format(lang.get("stormMoving"), count.get(args[0]).toString()));
+								ZombieEscape.ongoingEventMap.put("stormmoving" + args[0],  Lang.format(lang.get("stormMoving"), count.get("stormmoving" + args[0]).toString()));
 								if (count.get(args[0]) <= 0) {
 									ZombieEscape.ongoingEventMap.remove("stormmoving" + args[0]);
 									this.cancel();
