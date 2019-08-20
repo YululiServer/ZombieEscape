@@ -384,7 +384,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		event.getPlayer().setHealthScale(20);
 		new BukkitRunnable() {
 			public void run() {
-				event.getPlayer().getWorld().getWorldBorder().setSize(29999999); // set border to max
+				event.getPlayer().getWorld().getWorldBorder().setSize(mapConfig.getInt("worldborder.initsize", 29999999)); // set border to max
 				event.getPlayer().getInventory().clear();
 				event.getPlayer().teleport(world.getSpawnLocation());
 				event.getPlayer().setGameMode(GameMode.ADVENTURE);
