@@ -68,3 +68,4 @@ passedCPZombie: "&aゾンビがチェックポイント%sを通過しました�
 passedCPPlayer: "&aプレイヤーがチェックポイント%sを通過しました。"
 stormComing: "&cストームの目があと%s秒で縮小します"
 stormMoving: "&cストームの目が縮小中: %s秒"
+becameZombieNaturally: "&2%sがゾンビになった。"

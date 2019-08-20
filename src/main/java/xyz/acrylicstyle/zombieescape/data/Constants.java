@@ -14,6 +14,8 @@ public class Constants {
 	public final static Set<Material> breakableWall = new HashSet<Material>(); // applies to only players
 	public final static String requiredMinecraftVersion = "1.12.2";
 	public final static int mininumPlayers = 2;
+	public final static char heart = '\u2764';
+	public final static char peace = '\u270c';
 
 	static {
 		materialDurability.put(Material.DIRT, 120);

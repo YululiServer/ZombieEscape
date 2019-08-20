@@ -169,11 +169,11 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		new BukkitRunnable() {
 			public void run() {
 				if (reload) {
-					Bukkit.getLogger().warning("[ZombieEscape] Some plugins are added to this server. Please restart server!");
+					Bukkit.getLogger().warning("[ZombieEscape] Some plugins were added to this server. Please restart server!");
 					Bukkit.shutdown();
 				}
 				if (getInstance().error) {
-					Bukkit.getLogger().severe("[ZombieEscape] There are errors when loading plugin.");
+					Bukkit.getLogger().severe("[ZombieEscape] There was errors when loading plugin.");
 					Bukkit.getPluginManager().disablePlugin(getInstance());
 					return;
 				}
@@ -317,13 +317,16 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				}
 			}
 		}.runTaskTimer(this, 0, 20);
+		final Scoreboard board = manager.getNewScoreboard();
+		final Objective hpobjective = board.registerNewObjective("hpdisplay", "dummy");
+		final Score hp = hpobjective.getScore("" + ChatColor.DARK_RED + Constants.heart);
 		BukkitRunnable healthBar = new BukkitRunnable() {
 			public void run() {
 				for (Player player : Bukkit.getOnlinePlayers()) {
 					if (lockActionBar.getOrDefault(player.getUniqueId(), false)) continue;
 					int maxHealth = (int) player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue();
 					int health = (int) player.getHealth();
-					//ActionBar.setActionBarWithoutException(player, "" + ChatColor.RED + health + "/" + maxHealth + "❤");
+					hp.setScore(health);
 					player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("" + ChatColor.RED + health + "/" + maxHealth + "❤" + (ongoingEvent == null ? "" : ChatColor.GREEN + " | " + ChatColor.AQUA + ongoingEvent)));
 				}
 			}
@@ -361,7 +364,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		hashMapLastScore8.put(event.getPlayer().getUniqueId(), "");
 		event.getPlayer().getInventory().clear();
 		event.getPlayer().setGameMode(GameMode.ADVENTURE);
-		final Scoreboard board = manager.getNewScoreboard();
 		event.getPlayer().setScoreboard(board);
 		final Objective objective = board.registerNewObjective("scoreboard", "dummy");
 		Score score7 = objective.getScore(" ");
@@ -373,6 +375,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		Score score2 = objective.getScore(defmapString);
 		score2.setScore(2);
 		objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+		hpobjective.setDisplaySlot(DisplaySlot.BELOW_NAME);
 		objective.setDisplayName(""+ChatColor.GREEN + ChatColor.BOLD + "Zombie Escape");
 		if (Bukkit.getOnlinePlayers().size() >= Constants.mininumPlayers) hasEnoughPlayers = true; else {
 			hasEnoughPlayers = false;
@@ -402,6 +405,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				event.getPlayer().sendMessage(ChatColor.BLUE + "--------------------------------------------------");
 				if (gameStarted || timesLeft < 6) {
 					Player player = event.getPlayer();
+					Bukkit.broadcastMessage(Lang.format(lang.get("becameZombieNaturally"), player.getName()));
 					zombies = zombies + 1;
 					player.getInventory().clear();
 					hashMapTeam.remove(player.getUniqueId());
@@ -774,7 +778,10 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		if (event.getEntityType() != EntityType.PLAYER) return;
 		if (hashMapTeam.get(event.getEntity().getUniqueId()) == PlayerTeam.SPECTATOR) return;
 		event.getEntity().getInventory().clear();
-		if (hashMapTeam.get(event.getEntity().getUniqueId()) == PlayerTeam.PLAYER) players--;
+		if (hashMapTeam.get(event.getEntity().getUniqueId()) == PlayerTeam.PLAYER) {
+			Bukkit.broadcastMessage(Lang.format(lang.get("becameZombieNaturally"), event.getEntity().getName()));
+			players--;
+		}
 		hashMapTeam.remove(event.getEntity().getUniqueId());
 		hashMapTeam.put(event.getEntity().getUniqueId(), PlayerTeam.ZOMBIE);
 		final Objective objective = hashMapScoreboard.get(event.getEntity().getUniqueId()).getObjective("scoreboard");
