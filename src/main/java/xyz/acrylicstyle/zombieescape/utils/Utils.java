@@ -316,7 +316,7 @@ public final class Utils {
 	public static void damageIfOutsideOfBorder() {
 		for (Player player : Bukkit.getOnlinePlayers()) {
 			if (ZombieEscape.hashMapTeam.get(player.getUniqueId()) == PlayerTeam.PLAYER) {
-				if (isOutsideOfBorder(player)) player.damage(5);
+				if (isOutsideOfBorder(player)) player.damage(5.0);
 			}
 		}
 	}
@@ -327,6 +327,10 @@ public final class Utils {
 		double x = location.getX();
 		double z = location.getZ();
 		double size = border.getSize();
+		Log.debug("x: " + x);
+		Log.debug("z: " + z);
+		Log.debug("size: " + size);
+		Log.debug("true?: " + ((x > size || (-x) > size) || (z > size || (-z) > size)));
 		return ((x > size || (-x) > size) || (z > size || (-z) > size));
 	}
 }

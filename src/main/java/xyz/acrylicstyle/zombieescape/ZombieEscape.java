@@ -893,6 +893,8 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 
 	@EventHandler(priority=EventPriority.HIGHEST)
 	public void onEntityDamage(EntityDamageEvent event) {
+		if (debug) Log.debug("Called onEntityDamage");
+		if (event.getDamage() == 5.0) return;
 		if (event.getEntityType() != EntityType.PLAYER) return;
 		if (!gameStarted || gameEnded) event.setCancelled(true);
 		if (event.getCause() == DamageCause.FALL) event.setCancelled(true);
