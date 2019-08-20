@@ -331,6 +331,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			public void run() {
 				for (Player player : Bukkit.getOnlinePlayers()) {
 					if (player.isDead()) player.spigot().respawn();
+					if (player.getGameMode() == GameMode.SURVIVAL) player.setGameMode(GameMode.ADVENTURE);
 					player.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 1, false, false));
 					if (hashMapTeam.get(player.getUniqueId()) == PlayerTeam.ZOMBIE) {
 						player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100000, 0, false, false));
