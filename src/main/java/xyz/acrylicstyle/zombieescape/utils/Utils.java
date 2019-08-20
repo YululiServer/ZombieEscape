@@ -241,6 +241,10 @@ public final class Utils {
 	private static Map<String, Double> progress = new HashMap<String, Double>();
 
 	public static void doBossBarTick(BossBar bossbar, double countdownInSecond, String eventId) {
+		Utils.doBossBarTick(bossbar, countdownInSecond, eventId, false);
+	}
+
+	public static void doBossBarTick(BossBar bossbar, double countdownInSecond, String eventId, boolean reverse) {
 		final double max = 20 * countdownInSecond;
 		progress.put(eventId, max);
 		for (Player player : Bukkit.getOnlinePlayers()) bossbar.addPlayer(player);
@@ -254,7 +258,11 @@ public final class Utils {
 						return;
 					}
 					bossbar.setTitle(ChatColor.AQUA + ZombieEscape.ongoingEventMap.get(eventId));
-					bossbar.setProgress(progress.get(eventId)/max); // double / double => double
+					if (reverse) {
+						bossbar.setProgress((max-progress.get(eventId))/max);
+					} else {
+						bossbar.setProgress(progress.get(eventId)/max); // double / double => double
+					}
 					progress.put(eventId, progress.get(eventId)-1);
 				} catch(Exception e) {
 					e.printStackTrace();
