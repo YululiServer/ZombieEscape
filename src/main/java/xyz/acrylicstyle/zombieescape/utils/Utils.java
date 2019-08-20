@@ -326,7 +326,7 @@ public final class Utils {
 		WorldBorder border = player.getWorld().getWorldBorder();
 		double x = location.getX() - border.getCenter().getX();
 		double z = location.getZ() - border.getCenter().getZ();
-		double size = border.getSize();
+		double size = border.getSize()/2;
 		Log.debug("x: " + x);
 		Log.debug("z: " + z);
 		Log.debug("size: " + size);
