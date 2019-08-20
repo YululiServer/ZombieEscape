@@ -320,6 +320,9 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		final Scoreboard board = manager.getNewScoreboard();
 		final Objective hpobjective = board.registerNewObjective("hpdisplay", "dummy");
 		hpobjective.setDisplayName("" + ChatColor.RED + Constants.heart);
+		Score hp = hpobjective.getScore(event.getPlayer().getName());
+		hp.setScore((int) event.getPlayer().getHealth());
+		hpobjective.setDisplaySlot(DisplaySlot.BELOW_NAME);
 		BukkitRunnable healthBar = new BukkitRunnable() {
 			public void run() {
 				for (Player player : Bukkit.getOnlinePlayers()) {
@@ -374,7 +377,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		Score score2 = objective.getScore(defmapString);
 		score2.setScore(2);
 		objective.setDisplaySlot(DisplaySlot.SIDEBAR);
-		hpobjective.setDisplaySlot(DisplaySlot.BELOW_NAME);
 		objective.setDisplayName(""+ChatColor.GREEN + ChatColor.BOLD + "Zombie Escape");
 		if (Bukkit.getOnlinePlayers().size() >= Constants.mininumPlayers) hasEnoughPlayers = true; else {
 			hasEnoughPlayers = false;
