@@ -934,7 +934,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		Block block = event.getHitBlock();
 		if (block == null) return;
 		int durability = (int) Math.nextUp(Math.min(Constants.materialDurability.getOrDefault(block.getType(), 5)*((double)players/(double)5), 3000));
-		if (block.getType() == Material.DIRT || block.getType() == Material.GRASS || block.getType() == Material.WOOD) {
+		if (Constants.breakableWall.contains(block.getType())) {
 			String location = block.getLocation().getBlockX() + "," + block.getLocation().getBlockY() + "," + block.getLocation().getBlockZ();
 			String wall = (String) locationWall.getOrDefault(location, null);
 			Integer state = hashMapBlockState.get(wall) != null ? hashMapBlockState.get(wall) : 0;
