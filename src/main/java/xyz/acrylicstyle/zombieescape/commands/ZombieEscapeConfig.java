@@ -130,7 +130,7 @@ public class ZombieEscapeConfig {
 			try {
 				ConfigProvider.setThenSave("map", args[0], new File("./plugins/ZombieEscape/config.yml"));
 				for (Player player : Bukkit.getOnlinePlayers()) {
-					player.kickPlayer(Lang.format(lang.get("mapChaned"), sender.getName()));
+					player.kickPlayer(Lang.format(lang.get("mapChanged"), sender.getName()));
 				}
 			} catch (IOException | InvalidConfigurationException e) {
 				e.printStackTrace();
