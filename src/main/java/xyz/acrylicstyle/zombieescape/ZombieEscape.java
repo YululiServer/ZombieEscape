@@ -320,14 +320,12 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		final Scoreboard board = manager.getNewScoreboard();
 		final Objective hpobjective = board.registerNewObjective("hpdisplay", "dummy");
 		hpobjective.setDisplayName("" + ChatColor.RED + Constants.heart);
-		final Score hp = hpobjective.getScore(event.getPlayer().getName());
 		BukkitRunnable healthBar = new BukkitRunnable() {
 			public void run() {
 				for (Player player : Bukkit.getOnlinePlayers()) {
 					if (lockActionBar.getOrDefault(player.getUniqueId(), false)) continue;
 					int maxHealth = (int) player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue();
 					int health = (int) player.getHealth();
-					hp.setScore(health);
 					player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("" + ChatColor.RED + health + "/" + maxHealth + "❤" + (ongoingEvent == null ? "" : ChatColor.GREEN + " | " + ChatColor.AQUA + ongoingEvent)));
 				}
 			}
@@ -478,6 +476,9 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 						// team ----->
 						Scoreboard scoreboard = hashMapScoreboard.get(player.getUniqueId());
 						Objective objective3 = scoreboard.getObjective(DisplaySlot.SIDEBAR);
+						Objective hpobjective2 = scoreboard.getObjective(DisplaySlot.BELOW_NAME);
+						Score hp = hpobjective2.getScore(event.getPlayer().getName());
+						hp.setScore((int) player.getHealth());
 						String lastScore8 = hashMapLastScore8.get(player.getUniqueId());
 						scoreboard.resetScores(lastScore8);
 						lastScore8 = ChatColor.GREEN + "    " + lang.get("player") + ": " + Bukkit.getOnlinePlayers().size() + "/" + Bukkit.getMaxPlayers();
