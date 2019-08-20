@@ -324,13 +324,7 @@ public final class Utils {
 	public static boolean isOutsideOfBorder(Player player) {
 		Location location = player.getLocation();
 		WorldBorder border = player.getWorld().getWorldBorder();
-		double x = location.getX();
-		double z = location.getZ();
-		double size = border.getSize();
-		Log.debug("x: " + x);
-		Log.debug("z: " + z);
-		Log.debug("size: " + size);
-		Log.debug("true?: " + ((x > size || (-x) > size) || (z > size || (-z) > size)));
-		return ((x > size || (-x) > size) || (z > size || (-z) > size));
+		double radius = border.getSize() / 2;
+		return border.getCenter().distanceSquared(location) >= (radius * radius);
 	}
 }
