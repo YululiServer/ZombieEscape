@@ -327,10 +327,6 @@ public final class Utils {
 		double x = location.getX() - border.getCenter().getX();
 		double z = location.getZ() - border.getCenter().getZ();
 		double size = border.getSize()/2;
-		Log.debug("x: " + x);
-		Log.debug("z: " + z);
-		Log.debug("size: " + size);
-		Log.debug("true?: " + ((x > size || (-x) > size) || (z > size || (-z) > size)));
 		return ((x > size || (-x) > size) || (z > size || (-z) > size));
 	}
 }
