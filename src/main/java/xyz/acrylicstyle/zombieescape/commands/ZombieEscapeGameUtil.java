@@ -91,12 +91,12 @@ public class ZombieEscapeGameUtil {
 					new BukkitRunnable() {
 						public void run() {
 							ZombieEscape.ongoingEventMap.put("stormcoming" + args[0],  Lang.format(lang.get("stormComing"), count.get("stormcoming" + args[0]).toString()));
-							if (count.get(args[0]) <= 0) {
+							if (count.get("stormcoming" + args[0]) <= 0) {
 								ZombieEscape.ongoingEventMap.remove("stormcoming" + args[0]);
 								this.cancel();
 								return;
 							}
-							count.put(args[0], count.get(args[0])-1);
+							count.put("stormcoming" + args[0], count.get("stormcoming" + args[0])-1);
 						}
 					}.runTaskTimer(ZombieEscape.getProvidingPlugin(ZombieEscape.class), 0, 20);
 					Utils.doBossBarTick(Bukkit.createBossBar(args[0], BarColor.RED, BarStyle.SEGMENTED_10, BarFlag.DARKEN_SKY), countdown, "stormcoming" + args[0], true);
@@ -108,12 +108,12 @@ public class ZombieEscapeGameUtil {
 						new BukkitRunnable() {
 							public void run() {
 								ZombieEscape.ongoingEventMap.put("stormmoving" + args[0],  Lang.format(lang.get("stormMoving"), count.get("stormmoving" + args[0]).toString()));
-								if (count.get(args[0]) <= 0) {
+								if (count.get("stormmoving" + args[0]) <= 0) {
 									ZombieEscape.ongoingEventMap.remove("stormmoving" + args[0]);
 									this.cancel();
 									return;
 								}
-								count.put(args[0], count.get(args[0])-1);
+								count.put("stormmoving" + args[0], count.get("stormmoving" + args[0])-1);
 							}
 						}.runTaskTimer(ZombieEscape.getProvidingPlugin(ZombieEscape.class), 0, 20);
 						Utils.doBossBarTick(Bukkit.createBossBar(args[0], BarColor.RED, BarStyle.SEGMENTED_10, BarFlag.DARKEN_SKY), countdown, "stormmoving" + args[0]);
