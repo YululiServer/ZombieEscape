@@ -257,6 +257,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				locationWall = ConfigProvider.getConfigSectionValue(mapConfig.get("locationWall", new HashMap<String, Object>()), true);
 				List<?> list = config.getList("previousZombies") != null ? config.getList("previousZombies") : new ArrayList<String>();
 				previousZombies = Arrays.asList(list.toArray(new String[0]));
+				Constants.mininumPlayers = config.getInt("mininumPlayers", 2);
 				init = true;
 				Log.info("Enabled Zombie Escape");
 			}
