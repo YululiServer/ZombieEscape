@@ -1,10 +1,11 @@
-# Zombie Escape
+# Zombie Escape [![Build Status](https://ci.acrylicstyle.xyz/job/ZombieEscape/badge/icon)](https://ci.acrylicstyle.xyz/job/ZombieEscape/)
 
 ## Depending plugin
 - ProtocolLib
-- [TomeitoLib](https://ci.acrylicstyle.xyz/job/TomeitoLib/11/artifact/TomeitoLib.jar)
+- [TomeitoLib](https://ci.acrylicstyle.xyz/job/TomeitoLib/lastSuccessfulBuild/artifact/TomeitoLib.jar)
 - CrackShot
-- 1.8.8 (Paper) Spigot
+- 1.12.2 (Paper) Spigot
 
 ## Note
-If you're going to use it with ViaVersion or something, you'll experience strange anvil behavior when you walked into anvil. (It's impossible to fix)
+ - You are not able to see build status if you don't have permission to view status on [my jenkins](https://ci.acrylicstyle.xyz/).
+ - If you want to access ZombieEscape builds, please create a issue.
