@@ -6,6 +6,8 @@ import java.util.Set;
 
 import org.bukkit.Material;
 
+import xyz.acrylicstyle.zombieescape.ZombieEscape;
+
 public class Constants {
 	/**
 	 * Represents material(block) durability
@@ -13,11 +15,12 @@ public class Constants {
 	public final static HashMap<Material, Integer> materialDurability = new HashMap<Material, Integer>();
 	public final static Set<Material> breakableWall = new HashSet<Material>(); // applies to only players
 	public final static String requiredMinecraftVersion = "1.12.2";
-	public final static int mininumPlayers = 2;
+	public final static int mininumPlayers;
 	public final static char heart = '\u2764';
 	public final static char peace = '\u270c';
 
 	static {
+		mininumPlayers = ZombieEscape.config.getInt("mininumPlayers", 2);
 		materialDurability.put(Material.DIRT, 120);
 		materialDurability.put(Material.GRASS, 120);
 		materialDurability.put(Material.WOOD, 150);
