@@ -370,7 +370,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		event.getPlayer().setGameMode(GameMode.ADVENTURE);
 		event.getPlayer().setScoreboard(board);
 		final Objective objective = board.registerNewObjective("scoreboard", "dummy");
-		Score score9 = objective.getScore("      " + ChatColor.DARK_GRAY + Constants.instanceIdentifier);
+		Score score9 = objective.getScore("                        " + ChatColor.GRAY + Constants.instanceIdentifier); // 24 spaces
 		score9.setScore(9);
 		Score score7 = objective.getScore(" ");
 		score7.setScore(7);
@@ -398,7 +398,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				event.getPlayer().getInventory().addItem(Utils.generateVoteItem());
 				event.getPlayer().getInventory().addItem(Utils.generateResourcePackItem());
 				event.getPlayer().sendMessage(ChatColor.BLUE + "--------------------------------------------------");
-				event.getPlayer().sendMessage(ChatColor.DARK_GREEN + "          - Zombie Escape " + ChatColor.GRAY + "(" + Constants.version + ")" + ChatColor.DARK_GREEN + "-");
+				event.getPlayer().sendMessage(ChatColor.DARK_GREEN + "          - Zombie Escape " + ChatColor.GRAY + "(" + Constants.version + ")" + ChatColor.DARK_GREEN + " -");
 				event.getPlayer().sendMessage("");
 				event.getPlayer().sendMessage(lang.get("intro1"));
 				event.getPlayer().sendMessage(lang.get("intro2"));
