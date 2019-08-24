@@ -15,6 +15,7 @@ import java.util.TimerTask;
 import java.util.UUID;
 import java.util.logging.Logger;
 
+import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -263,6 +264,19 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				Log.info("Enabled Zombie Escape");
 			}
 		}.runTaskLater(this, 1);
+	}
+
+	@Override
+	public void onDisable() {
+		File log = new File("./logs/latest.log");
+		File log2 = new File("./logs/" + Constants.intIdentifier + ".log");
+		try {
+			log2.createNewFile();
+			FileUtils.copyFile(log, log2);
+		} catch (IOException e) {
+			Log.error("Error while saving log file");
+			e.printStackTrace();
+		}
 	}
 
 	@EventHandler

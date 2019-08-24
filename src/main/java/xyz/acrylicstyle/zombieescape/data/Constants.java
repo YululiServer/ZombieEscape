@@ -14,6 +14,7 @@ public class Constants {
 	public final static HashMap<Material, Integer> materialDurability = new HashMap<Material, Integer>();
 	public final static String version = "v1.1";
 	public final static String instanceIdentifier;
+	public final static int intIdentifier;
 	public final static Set<Material> breakableWall = new HashSet<Material>(); // applies to only players
 	public final static String requiredMinecraftVersion = "1.12.2";
 	public static int mininumPlayers = 2;
@@ -46,6 +47,7 @@ public class Constants {
 			case 4: identifier = peace; break;
 			default: identifier = warning;
 		}
-		instanceIdentifier = Integer.toString(random.nextInt(100000)) + identifier;
+		intIdentifier = random.nextInt(100000);
+		instanceIdentifier = "" + intIdentifier + identifier;
 	}
 }
