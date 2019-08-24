@@ -39,11 +39,11 @@ public class Constants {
 		Random random = new Random();
 		char identifier;
 		switch(random.nextInt(5)) {
-			case 0: identifier = heavy_check_mark;
-			case 1: identifier = heart_suit;
-			case 2: identifier = heart;
-			case 3: identifier = heart_exclamation;
-			case 4: identifier = peace;
+			case 0: identifier = heavy_check_mark; break;
+			case 1: identifier = heart_suit; break;
+			case 2: identifier = heart; break;
+			case 3: identifier = heart_exclamation; break;
+			case 4: identifier = peace; break;
 			default: identifier = warning;
 		}
 		instanceIdentifier = Integer.toString(random.nextInt(100000)) + identifier;
