@@ -3,6 +3,7 @@ package xyz.acrylicstyle.zombieescape.utils;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -329,5 +330,27 @@ public final class Utils {
 		double z = location.getZ() - border.getCenter().getZ();
 		double size = border.getSize()/2;
 		return ((x > size || (-x) > size) || (z > size || (-z) > size));
+	}
+
+	public static void teleport(Player player) {
+		String team = ZombieEscape.hashMapTeam.get(player.getUniqueId()).toString();
+		String[] spawnLists = Arrays.asList(ZombieEscape.mapConfig.getList("spawnPoints." + team, new ArrayList<String>()).toArray(new String[0])).get(0).split(",");
+		Location location = new Location(Bukkit.getWorld(ZombieEscape.mapConfig.getString("spawnPoints.world")), Double.parseDouble(spawnLists[0]), Double.parseDouble(spawnLists[1]), Double.parseDouble(spawnLists[2]));
+		if (!player.teleport(location)) {
+			player.sendMessage(ZombieEscape.lang.get("failedWarp"));
+			return;
+		}
+	}
+
+	public static void teleportAllPlayers() {
+		int time = 0; // 20 ticks = 1 second, 2 ticks = 0.1 second
+		for (Player player : Bukkit.getOnlinePlayers()) {
+			new BukkitRunnable() {
+				public void run() {
+					Utils.teleport(player);
+				}
+			}.runTaskLater(ZombieEscape.getProvidingPlugin(ZombieEscape.class), time);
+			time = time + 2;
+		};
 	}
 }

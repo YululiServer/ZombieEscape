@@ -147,6 +147,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	@Override
 	public void onLoad() {
 		Logger logger = Bukkit.getLogger();
+		logger.info("This ZombieEscape is running at " + Constants.instanceIdentifier);
 		if (!Bukkit.getBukkitVersion().contains(Constants.requiredMinecraftVersion)) {
 			logger.severe("Your current bukkit/minecraft version(" + Bukkit.getBukkitVersion() + ") is incompatible.");
 			logger.severe("Please use spigot 1.12.2 and restart your server.");
@@ -284,7 +285,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	@EventHandler
 	public synchronized void onPlayerJoin(final PlayerJoinEvent event) {
 		long time = System.currentTimeMillis();
-		if (!gameStarted && timesLeft >= 7) players = players + 1;
+		if (!gameStarted && timesLeft >= 16) players = players + 1;
 		World world = Bukkit.getWorld(mapConfig.getString("spawnPoints.world", "world"));
 		world.setGameRuleValue("announceAdvancements", "false");
 		hashMapTeam.put(event.getPlayer().getUniqueId(), PlayerTeam.PLAYER);
@@ -369,6 +370,8 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		event.getPlayer().setGameMode(GameMode.ADVENTURE);
 		event.getPlayer().setScoreboard(board);
 		final Objective objective = board.registerNewObjective("scoreboard", "dummy");
+		Score score9 = objective.getScore("      " + ChatColor.DARK_GRAY + Constants.instanceIdentifier);
+		score9.setScore(9);
 		Score score7 = objective.getScore(" ");
 		score7.setScore(7);
 		Score score5 = objective.getScore("  ");
@@ -395,7 +398,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				event.getPlayer().getInventory().addItem(Utils.generateVoteItem());
 				event.getPlayer().getInventory().addItem(Utils.generateResourcePackItem());
 				event.getPlayer().sendMessage(ChatColor.BLUE + "--------------------------------------------------");
-				event.getPlayer().sendMessage(ChatColor.DARK_GREEN + "          - Zombie Escape -");
+				event.getPlayer().sendMessage(ChatColor.DARK_GREEN + "          - Zombie Escape " + ChatColor.GRAY + "(" + Constants.version + ")" + ChatColor.DARK_GREEN + "-");
 				event.getPlayer().sendMessage("");
 				event.getPlayer().sendMessage(lang.get("intro1"));
 				event.getPlayer().sendMessage(lang.get("intro2"));
@@ -405,7 +408,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				event.getPlayer().sendMessage(lang.get("intro5"));
 				event.getPlayer().sendMessage(lang.get("intro6"));
 				event.getPlayer().sendMessage(ChatColor.BLUE + "--------------------------------------------------");
-				if (gameStarted || timesLeft < 6) {
+				if (gameStarted) {
 					Player player = event.getPlayer();
 					Bukkit.broadcastMessage(Lang.format(lang.get("becameZombieNaturally"), player.getName()));
 					zombies = zombies + 1;
@@ -447,7 +450,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 						}
 					}.runTaskLater(getInstance(), 40);
 					return;
-				} else {
+				} else { // timesLeft < 16
 					event.getPlayer().getWorld().getWorldBorder().setSize(mapConfig.getInt("worldborder.initsize", 29999999)); // set border to max
 					event.getPlayer().getWorld().getWorldBorder().setDamageAmount(0);
 				}
@@ -551,11 +554,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 							player.sendMessage(Lang.format(lang.get("mapIsNow"), mapConfig.getString("mapname", "???")));
 							World world = Bukkit.getWorld(mapConfig.getString("spawnPoints.world", "world"));
 							world.setGameRuleValue("announceAdvancements", "false");
-							player.teleport(world.getSpawnLocation());
-						}
-						// <----- vote
-						/* do not edit this line */ player.setScoreboard(hashMapScoreboard.get(player.getUniqueId()));
-						if (timesLeft == 5) {
 							if (mapConfig == null) mapConfig = ConfigProvider.initWithoutException("./plugins/ZombieEscape/maps/" + mapName + ".yml");
 							if (!playersReset) {
 								playersReset = true;
@@ -598,6 +596,13 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 									player.setPlayerListName(ChatColor.AQUA + player.getName());
 								}
 							}
+							Utils.teleportAllPlayers();
+							player.playSound(player.getLocation(), Sound.BLOCK_NOTE_PLING, 100, 1);
+							player.sendTitle(ChatColor.GREEN + "10", ChatColor.YELLOW + lang.get("team") + ": " + hashMapTeam.get(player.getUniqueId()), 0, 25, 0);
+						}
+						// <----- vote
+						/* do not edit this line */ player.setScoreboard(hashMapScoreboard.get(player.getUniqueId()));
+						if (timesLeft == 5) {
 							player.playSound(player.getLocation(), Sound.BLOCK_NOTE_PLING, 100, 1);
 							player.sendTitle(ChatColor.GREEN + "5", ChatColor.YELLOW + lang.get("team") + ": " + hashMapTeam.get(player.getUniqueId()), 0, 25, 0);
 						} else if (timesLeft == 4) {
@@ -650,7 +655,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 							player.playSound(player.getLocation(), Sound.ENTITY_ENDERDRAGON_GROWL, 100, 1);
 							if (hashMapTeam.get(player.getUniqueId()) == PlayerTeam.ZOMBIE) {
 								player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + "GO!", ChatColor.YELLOW + lang.get("zombieObjective"), 0, 120, 0);
-								player.sendMessage(lang.get("teleportIn"));
+								player.sendMessage(lang.get("teleportIn")); // move*
 								if (!once) {
 									once = true;
 									count = 12;
@@ -681,12 +686,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 										player.getInventory().setItem(0, item);
 										Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "give " + player.getName() + " minecraft:stone_axe 1 0 {CanDestroy:[\"minecraft:planks\"],HideFlags:1,Unbreakable:1,display:{Name:\"" + lang.get("rustedAxe") + "\"},ench:[{id:32,lvl:10}]}");
 										Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "give " + player.getName() + " minecraft:stone_pickaxe 1 0 {CanDestroy:[\"minecraft:gold_block\",\"minecraft:cobblestone\",\"lapis_block\"],HideFlags:1,Unbreakable:1,display:{Name:\"" + lang.get("rustedPickaxe") + "\"},ench:[{id:32,lvl:10}]}");
-										String[] spawnLists = Arrays.asList(mapConfig.getList("spawnPoints.zombie", new ArrayList<String>()).toArray(new String[0])).get(0).split(",");
-										Location location = new Location(Bukkit.getWorld(mapConfig.getString("spawnPoints.world")), Double.parseDouble(spawnLists[0]), Double.parseDouble(spawnLists[1]), Double.parseDouble(spawnLists[2]));
-										if (!player.teleport(location)) {
-											player.sendMessage(lang.get("failedWarp"));
-											return;
-										}
 									}
 								}.runTaskLater(getInstance(), 20*12);
 							} else if (hashMapTeam.get(player.getUniqueId()) == PlayerTeam.PLAYER) {
@@ -1004,13 +1003,30 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			return;
 		}
 		if (Bukkit.getOnlinePlayers().size() < Bukkit.getMaxPlayers()) {
-			event.allow();
+			if (timesLeft >= 15) {
+				event.allow();
+				return;
+			}
+			new BukkitRunnable() {
+				public void run() {
+					event.allow();
+				}
+			}.runTaskLater(this, timesLeft); // this is the BAD idea
 			return;
-		}
+		};
 		try {
 			List<String> sponsors = Arrays.asList(config.getList("sponsors", new ArrayList<String>()).toArray(new String[0]));
 			if (sponsors.contains(event.getPlayer().getUniqueId().toString()) == true) {
-				event.allow();
+				if (timesLeft >= 15) {
+					event.allow();
+					return;
+				}
+				new BukkitRunnable() {
+					public void run() {
+						event.allow();
+					}
+				}.runTaskLater(this, timesLeft);
+				return;
 			} else if (sponsors.contains(event.getPlayer().getUniqueId().toString()) == false) {
 				event.disallow(Result.KICK_OTHER, lang.get("loginFailed_gameFull"));
 			}

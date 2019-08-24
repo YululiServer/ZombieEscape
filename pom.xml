@@ -34,7 +34,7 @@
     </repository>
     <repository>
       <id>acrylicstyle-repo</id>
-      <url>https://ci.acrylicstyle.xyz/job/TomeitoLib/ws/</url>
+      <url>http://ci.acrylicstyle.xyz/job/TomeitoLib/ws/</url>
     </repository>
   </repositories>
   <dependencies>
