@@ -23,12 +23,10 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots to help explain your problem.
 
 **Environment**
- - OS: ` `
- - Spigot build (`/version`): ` `
+ - Spigot Build(`/version`): ` `
+ - Instance identifier(xxxxx❤ at scoreboard or something): ` `
 
 **Additional context**
 Add any other context about the problem here.
 
-[ ] I've made sure there are no duplicate issues
-[ ] This issue is not caused by other plugins
-[ ] Using spigot/paper 1.12.2, and latest build
+ - [ ] I've made sure there are no duplicate issues
