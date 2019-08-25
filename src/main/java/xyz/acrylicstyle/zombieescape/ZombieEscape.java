@@ -610,6 +610,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 									player.setPlayerListName(ChatColor.AQUA + player.getName());
 								}
 							}
+							for (Player player2 : Bukkit.getOnlinePlayers()) respawnWait.put(player2.getUniqueId(), true);
 							Utils.teleportAllPlayers();
 							player.playSound(player.getLocation(), Sound.BLOCK_NOTE_PLING, 100, 1);
 							player.sendTitle(ChatColor.GREEN + "10", ChatColor.YELLOW + lang.get("team") + ": " + hashMapTeam.get(player.getUniqueId()), 0, 25, 0);
@@ -666,6 +667,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 						} else if (timesLeft == 0) {
 							player.setGameMode(GameMode.ADVENTURE);
 							gameStarted = true;
+							for (Player player2 : Bukkit.getOnlinePlayers()) respawnWait.remove(player2.getUniqueId(), true);
 							player.playSound(player.getLocation(), Sound.ENTITY_ENDERDRAGON_GROWL, 100, 1);
 							if (hashMapTeam.get(player.getUniqueId()) == PlayerTeam.ZOMBIE) {
 								player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + "GO!", ChatColor.YELLOW + lang.get("zombieObjective"), 0, 120, 0);
