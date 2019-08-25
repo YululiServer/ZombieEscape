@@ -669,7 +669,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 						} else if (timesLeft == 0) {
 							player.setGameMode(GameMode.ADVENTURE);
 							gameStarted = true;
-							for (Player player2 : Bukkit.getOnlinePlayers()) respawnWait.remove(player2.getUniqueId(), true);
+							for (Player player2 : Bukkit.getOnlinePlayers()) if (hashMapTeam.get(player2.getUniqueId()) == PlayerTeam.PLAYER) respawnWait.remove(player2.getUniqueId(), true);
 							player.playSound(player.getLocation(), Sound.ENTITY_ENDERDRAGON_GROWL, 100, 1);
 							if (hashMapTeam.get(player.getUniqueId()) == PlayerTeam.ZOMBIE) {
 								player.sendTitle("" + ChatColor.GREEN + ChatColor.BOLD + "GO!", ChatColor.YELLOW + lang.get("zombieObjective"), 0, 120, 0);
@@ -693,6 +693,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 								new BukkitRunnable() {
 									@Override
 									public void run() {
+										for (Player player2 : Bukkit.getOnlinePlayers()) if (hashMapTeam.get(player2.getUniqueId()) == PlayerTeam.ZOMBIE) respawnWait.remove(player2.getUniqueId(), true);
 										player.setGameMode(GameMode.ADVENTURE);
 										player.addPotionEffect(PotionEffectType.SPEED.createEffect(100000, 0));
 										ItemStack item = new ItemStack(Material.IRON_SWORD);
