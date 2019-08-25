@@ -731,6 +731,9 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 					}
 					for (Player player : Bukkit.getOnlinePlayers()) {
 						final Scoreboard scoreboard = hashMapScoreboard.get(player.getUniqueId());
+						Objective hpobjective2 = scoreboard.getObjective(DisplaySlot.BELOW_NAME);
+						Score hp = hpobjective2.getScore(event.getPlayer().getName());
+						hp.setScore((int) player.getHealth());
 						if (playedTime <= 1) {
 							File maps = new File("./plugins/ZombieEscape/maps/");
 							File[] keys = maps.listFiles();
