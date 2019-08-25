@@ -492,6 +492,8 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				final String zombieMessage = ChatColor.GREEN + "    " + lang.get("team") + ": " + ChatColor.DARK_GREEN + lang.get("zombie");
 				final String playerMessage = ChatColor.GREEN + "    " + lang.get("team") + ": " + ChatColor.AQUA + lang.get("player");
 				if (!gameStarted) {
+					if (Bukkit.getOnlinePlayers().size() == 0) this.cancel();
+					if (Bukkit.getOnlinePlayers().size() < Constants.mininumPlayers) hasEnoughPlayers = false;
 					for (final Player player : Bukkit.getOnlinePlayers()) {
 						// team ----->
 						Scoreboard scoreboard = hashMapScoreboard.get(player.getUniqueId());
