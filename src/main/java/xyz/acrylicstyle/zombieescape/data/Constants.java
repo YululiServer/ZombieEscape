@@ -37,6 +37,7 @@ public class Constants {
 		breakableWall.add(Material.DIRT);
 		breakableWall.add(Material.GRASS);
 		breakableWall.add(Material.LAPIS_BLOCK);
+		breakableWall.add(Material.COBBLESTONE);
 		Random random = new Random();
 		char identifier;
 		switch(random.nextInt(5)) {
