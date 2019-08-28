@@ -36,6 +36,10 @@
       <id>acrylicstyle-repo</id>
       <url>http://ci.acrylicstyle.xyz/job/TomeitoLib/ws/</url>
     </repository>
+    <repository>
+      <id>robingrether-repo</id>
+      <url>http://repo.robingrether.de/</url>
+    </repository>
   </repositories>
   <dependencies>
     <dependency>
@@ -75,6 +79,11 @@
       <groupId>xyz.acrylicstyle</groupId>
       <artifactId>tomeito_core</artifactId>
       <version>27</version>
+    </dependency>
+    <dependency>
+      <groupId>de.robingrether.idisguise</groupId>
+      <artifactId>idisguise-full</artifactId>
+      <version>5.8.2</version>
     </dependency>
   </dependencies>
 </project>

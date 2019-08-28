@@ -75,6 +75,9 @@ import org.bukkit.scoreboard.ScoreboardManager;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 
+import de.robingrether.idisguise.api.DisguiseAPI;
+import de.robingrether.idisguise.disguise.DisguiseType;
+import de.robingrether.idisguise.disguise.ZombieVillagerDisguise;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import xyz.acrylicstyle.tomeito_core.providers.ConfigProvider;
@@ -141,6 +144,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	public static Map<String, String> ongoingEventMap = new HashMap<String, String>();
 	public static Lang language = null;
 	public static LanguageProvider lang = null;
+	public static DisguiseAPI disguise = null;
 
 	private boolean error = false;
 	private boolean reload = false;
@@ -155,21 +159,21 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			this.error = true;
 			return;
 		}
-		logger.info("[ZombieEscape] Loading plugins");
-		Bukkit.getPluginManager().loadPlugins(new File("./plugins"));
-		logger.info("[ZombieEscape] Checking for plugins");
-		boolean plib = Utils.downloadPlugin("ProtocolLib", "http://ci.dmulloy2.net/job/ProtocolLib/425/artifact/modules/ProtocolLib/target/ProtocolLib.jar");
-		boolean tlib = Utils.downloadPlugin("TomeitoLib", "https://ci.acrylicstyle.xyz/job/TomeitoLib/lastSuccessfulBuild/artifact/TomeitoLib.jar");
-		if (!reload) reload = plib; // useless "if" statement tho
-		if (!reload) reload = tlib;
-		if (!Utils.checkPlugin("CrackShot")) logger.warning("[ZombieEscape] Does not exist CrackShot plugin.");
-		if (!Utils.checkPlugin("Multiverse-Core")) logger.warning("[ZombieEscape] Does not exist Multiverse-Core plugin.");
 	}
 
 	@Override
 	public void onEnable() {
 		new BukkitRunnable() {
 			public void run() {
+				Log.info("[ZombieEscape] Checking for plugins");
+				boolean plib = Utils.downloadPlugin("ProtocolLib", "http://ci.dmulloy2.net/job/ProtocolLib/425/artifact/modules/ProtocolLib/target/ProtocolLib.jar");
+				boolean tlib = Utils.downloadPlugin("TomeitoLib", "https://ci.acrylicstyle.xyz/job/TomeitoLib/lastSuccessfulBuild/artifact/TomeitoLib.jar");
+				boolean disguiseLib = Utils.downloadPlugin("iDisguise", "https://um.acrylicstyle.xyz/16215811864/3010105970/idisguise-full-5.8.3-20181230.121050-1.jar");
+				if (!reload) reload = plib; // useless "if" statement tho
+				if (!reload) reload = tlib;
+				if (!reload) reload = disguiseLib;
+				if (!Utils.checkPlugin("CrackShot")) Log.warning("[ZombieEscape] Does not exist CrackShot plugin.");
+				if (!Utils.checkPlugin("Multiverse-Core")) Log.warning("[ZombieEscape] Does not exist Multiverse-Core plugin.");
 				if (reload) {
 					Bukkit.getLogger().warning("[ZombieEscape] Some plugins were added to this server. Please restart server!");
 					Bukkit.shutdown();
@@ -206,6 +210,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 					return;
 				}
 				manager = Bukkit.getScoreboardManager();
+				disguise = getServer().getServicesManager().getRegistration(DisguiseAPI.class).getProvider();
 				Sponsor sponsor = null;
 				ZombieEscapeConfig zec = null;
 				ZombieEscapeGameUtil zegu = null;
@@ -359,10 +364,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 						player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100000, 0, false, false));
 						player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 100000, 0, false, false));
 						player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 100000, 100, false, false));
-						player.getInventory().setHelmet(Utils.createLeatherItemStack(Material.LEATHER_HELMET, 0, 100, 0));
-						player.getInventory().setChestplate(Utils.createLeatherItemStack(Material.LEATHER_CHESTPLATE, 0, 100, 0));
-						player.getInventory().setLeggings(Utils.createLeatherItemStack(Material.LEATHER_LEGGINGS, 0, 100, 0));
-						player.getInventory().setBoots(Utils.createLeatherItemStack(Material.LEATHER_BOOTS, 0, 100, 0));
+						player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 100000, 1, false, false));
 					} else {
 						player.getInventory().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
 						player.getInventory().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
@@ -438,10 +440,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 					player.teleport(location);
 					player.setGameMode(GameMode.ADVENTURE);
 					player.setPlayerListName(ChatColor.DARK_GREEN + player.getName());
-					player.getInventory().setHelmet(Utils.createLeatherItemStack(Material.LEATHER_HELMET, 0, 100, 0));
-					player.getInventory().setChestplate(Utils.createLeatherItemStack(Material.LEATHER_CHESTPLATE, 0, 100, 0));
-					player.getInventory().setLeggings(Utils.createLeatherItemStack(Material.LEATHER_LEGGINGS, 0, 100, 0));
-					player.getInventory().setBoots(Utils.createLeatherItemStack(Material.LEATHER_BOOTS, 0, 100, 0));
 					player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(150);
 					player.setHealth(150);
 					player.setHealthScale(40);
@@ -461,6 +459,11 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 							player.getInventory().setItem(0, item);
 							Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "give " + player.getName() + " minecraft:stone_axe 1 0 {CanDestroy:[\"minecraft:planks\"],HideFlags:1,Unbreakable:1,display:{Name:\"" + lang.get("rustedAxe") + "\"},ench:[{id:32,lvl:10}]}");
 							Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "give " + player.getName() + " minecraft:stone_pickaxe 1 0 {CanDestroy:[\"minecraft:gold_block\",\"minecraft:cobblestone\"],HideFlags:1,Unbreakable:1,display:{Name:\"" + lang.get("rustedPickaxe") + "\"},ench:[{id:32,lvl:10}]}");
+							ZombieVillagerDisguise d = (ZombieVillagerDisguise) DisguiseType.ZOMBIE_VILLAGER.newInstance();
+							d.setAdult(true);
+							d.setCustomNameVisible(true);
+							d.setCustomName(player.getName());
+							disguise.disguise(player, d);
 						}
 					}.runTaskLater(getInstance(), 40);
 					return;
@@ -588,14 +591,15 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 									player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(250);
 									player.setHealth(250);
 									player.setHealthScale(40);
-									player.getInventory().setHelmet(Utils.createLeatherItemStack(Material.LEATHER_HELMET, 0, 100, 0));
-									player.getInventory().setChestplate(Utils.createLeatherItemStack(Material.LEATHER_CHESTPLATE, 0, 100, 0));
-									player.getInventory().setLeggings(Utils.createLeatherItemStack(Material.LEATHER_LEGGINGS, 0, 100, 0));
-									player.getInventory().setBoots(Utils.createLeatherItemStack(Material.LEATHER_BOOTS, 0, 100, 0));
 									player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100000, 0, false, false));
 									player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 100000, 0, false, false));
 									player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 100000, 100, false, false));
 									player.setPlayerListName(ChatColor.DARK_GREEN + player.getName());
+									ZombieVillagerDisguise d = (ZombieVillagerDisguise) DisguiseType.ZOMBIE_VILLAGER.newInstance();
+									d.setAdult(true);
+									d.setCustomNameVisible(true);
+									d.setCustomName(player.getName());
+									disguise.disguise(player, d);
 								} else {
 									players = players+1;
 									hashMapTeam.put(player.getUniqueId(), PlayerTeam.PLAYER);
@@ -630,25 +634,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 							player.getWorld().setGameRuleValue("doFireTick", "false");
 							player.getWorld().setGameRuleValue("naturalRegeneration", "false");
 							player.getWorld().setTime(mapConfig.getInt("time", 6000));
-							if (zombies == 0) {
-								listZombies.add(player.getUniqueId().toString());
-								hashMapOriginZombie.put(player.getUniqueId(), true);
-								hashMapTeam.put(player.getUniqueId(), PlayerTeam.ZOMBIE);
-								zombies = zombies+1;
-								Score score6 = objective.getScore(ChatColor.GREEN + "    " + lang.get("team") + ": " + ChatColor.DARK_GREEN + lang.get("zombie"));
-								score6.setScore(6);
-								player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(250);
-								player.setHealth(250);
-								player.setHealthScale(40);
-								player.getInventory().setHelmet(Utils.createLeatherItemStack(Material.LEATHER_HELMET, 0, 100, 0));
-								player.getInventory().setChestplate(Utils.createLeatherItemStack(Material.LEATHER_CHESTPLATE, 0, 100, 0));
-								player.getInventory().setLeggings(Utils.createLeatherItemStack(Material.LEATHER_LEGGINGS, 0, 100, 0));
-								player.getInventory().setBoots(Utils.createLeatherItemStack(Material.LEATHER_BOOTS, 0, 100, 0));
-								player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100000, 0, false, false));
-								player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 100000, 0, false, false));
-								player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 100000, 100, false, false));
-								player.setPlayerListName(ChatColor.DARK_GREEN + player.getName());
-							}
 							player.playSound(player.getLocation(), Sound.BLOCK_NOTE_PLING, 100, 1);
 							player.sendTitle(ChatColor.AQUA + "4", ChatColor.YELLOW + lang.get("team") + ": " + hashMapTeam.get(player.getUniqueId()), 0, 25, 0);
 						} else if (timesLeft == 3) {
@@ -825,15 +810,16 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		event.setRespawnLocation(location);
 		event.getPlayer().setGameMode(GameMode.ADVENTURE);
 		event.getPlayer().setPlayerListName(ChatColor.DARK_GREEN + event.getPlayer().getName());
-		event.getPlayer().getInventory().setHelmet(Utils.createLeatherItemStack(Material.LEATHER_HELMET, 0, 100, 0));
-		event.getPlayer().getInventory().setChestplate(Utils.createLeatherItemStack(Material.LEATHER_CHESTPLATE, 0, 100, 0));
-		event.getPlayer().getInventory().setLeggings(Utils.createLeatherItemStack(Material.LEATHER_LEGGINGS, 0, 100, 0));
-		event.getPlayer().getInventory().setBoots(Utils.createLeatherItemStack(Material.LEATHER_BOOTS, 0, 100, 0));
 		event.getPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(150);
 		event.getPlayer().setHealth(150);
 		event.getPlayer().setHealthScale(40);
 		event.getPlayer().sendMessage(lang.get("respawn"));
 		respawnWait.put(event.getPlayer().getUniqueId(), true);
+		ZombieVillagerDisguise d = (ZombieVillagerDisguise) DisguiseType.ZOMBIE_VILLAGER.newInstance();
+		d.setAdult(true);
+		d.setCustomNameVisible(true);
+		d.setCustomName(event.getPlayer().getName());
+		disguise.disguise(event.getPlayer(), d);
 		new BukkitRunnable() {
 			public void run() {
 				respawnWait.remove(event.getPlayer().getUniqueId());
@@ -885,13 +871,14 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		score6.setScore(6);
 		player.setGameMode(GameMode.ADVENTURE);
 		player.setPlayerListName(ChatColor.DARK_GREEN + player.getName());
-		player.getInventory().setHelmet(Utils.createLeatherItemStack(Material.LEATHER_HELMET, 0, 100, 0));
-		player.getInventory().setChestplate(Utils.createLeatherItemStack(Material.LEATHER_CHESTPLATE, 0, 100, 0));
-		player.getInventory().setLeggings(Utils.createLeatherItemStack(Material.LEATHER_LEGGINGS, 0, 100, 0));
-		player.getInventory().setBoots(Utils.createLeatherItemStack(Material.LEATHER_BOOTS, 0, 100, 0));
 		player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(150);
 		player.setHealth(150);
 		player.setHealthScale(40);
+		ZombieVillagerDisguise d = (ZombieVillagerDisguise) DisguiseType.ZOMBIE_VILLAGER.newInstance();
+		d.setAdult(true);
+		d.setCustomNameVisible(true);
+		d.setCustomName(player.getName());
+		disguise.disguise(player, d);
 		new BukkitRunnable() {
 			public void run() {
 				player.addPotionEffect(PotionEffectType.HUNGER.createEffect(100000, 0));
