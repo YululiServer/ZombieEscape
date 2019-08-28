@@ -157,6 +157,17 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			logger.severe("Your current bukkit/minecraft version(" + Bukkit.getBukkitVersion() + ") is incompatible.");
 			logger.severe("Please use spigot 1.12.2 and restart your server.");
 			this.error = true;
+			logger.info("[ZombieEscape] Loading all plugins, you may see a lot of errors! (You can safely ignore it)");
+			Bukkit.getPluginManager().loadPlugins(new File("./plugins/"));
+			logger.info("[ZombieEscape] Checking for plugins");
+			boolean plib = Utils.downloadPlugin("ProtocolLib", "http://ci.dmulloy2.net/job/ProtocolLib/425/artifact/modules/ProtocolLib/target/ProtocolLib.jar");
+			boolean tlib = Utils.downloadPlugin("TomeitoLib", "https://ci.acrylicstyle.xyz/job/TomeitoLib/lastSuccessfulBuild/artifact/TomeitoLib.jar");
+			boolean disguiseLib = Utils.downloadPlugin("iDisguise", "https://um.acrylicstyle.xyz/16215811864/3010105970/idisguise-full-5.8.3-20181230.121050-1.jar");
+			if (!reload) reload = plib; // useless "if" statement tho
+			if (!reload) reload = tlib;
+			if (!reload) reload = disguiseLib;
+			if (!Utils.checkPlugin("CrackShot")) logger.warning("[ZombieEscape] Does not exist CrackShot plugin.");
+			if (!Utils.checkPlugin("Multiverse-Core")) logger.warning("[ZombieEscape] Does not exist Multiverse-Core plugin.");
 			return;
 		}
 	}
@@ -165,15 +176,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	public void onEnable() {
 		new BukkitRunnable() {
 			public void run() {
-				Log.info("[ZombieEscape] Checking for plugins");
-				boolean plib = Utils.downloadPlugin("ProtocolLib", "http://ci.dmulloy2.net/job/ProtocolLib/425/artifact/modules/ProtocolLib/target/ProtocolLib.jar");
-				boolean tlib = Utils.downloadPlugin("TomeitoLib", "https://ci.acrylicstyle.xyz/job/TomeitoLib/lastSuccessfulBuild/artifact/TomeitoLib.jar");
-				boolean disguiseLib = Utils.downloadPlugin("iDisguise", "https://um.acrylicstyle.xyz/16215811864/3010105970/idisguise-full-5.8.3-20181230.121050-1.jar");
-				if (!reload) reload = plib; // useless "if" statement tho
-				if (!reload) reload = tlib;
-				if (!reload) reload = disguiseLib;
-				if (!Utils.checkPlugin("CrackShot")) Log.warning("[ZombieEscape] Does not exist CrackShot plugin.");
-				if (!Utils.checkPlugin("Multiverse-Core")) Log.warning("[ZombieEscape] Does not exist Multiverse-Core plugin.");
 				if (reload) {
 					Bukkit.getLogger().warning("[ZombieEscape] Some plugins were added to this server. Please restart server!");
 					Bukkit.shutdown();
