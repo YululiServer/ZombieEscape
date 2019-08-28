@@ -164,19 +164,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	public void onEnable() {
 		new BukkitRunnable() {
 			public void run() {
-				Bukkit.getLogger().info("[ZombieEscape] Checking for plugins");
-				if (!Utils.checkPlugin("ProtocolLib")) {
-					Bukkit.getLogger().severe("[ZombieEscape] Does not exist ProtocolLib plugin, please download it from: http://ci.dmulloy2.net/job/ProtocolLib/425/artifact/modules/ProtocolLib/target/ProtocolLib.jar");
-					error = true;
-				}
-				if (!Utils.checkPlugin("TomeitoLib")) {
-					Bukkit.getLogger().severe("[ZombieEscape] Does not exist TomeitoLib plugin, please download it from: https://ci.acrylicstyle.xyz/job/TomeitoLib/lastSuccessfulBuild/artifact/TomeitoLib.jar");
-					error = true;
-				}
-				if (!Utils.checkPlugin("iDisguise")) {
-					Bukkit.getLogger().severe("[ZombieEscape] Does not exist iDisguise plugin, please download it from: https://um.acrylicstyle.xyz/16215811864/3010105970/idisguise-full-5.8.3-20181230.121050-1.jar");
-					error = true;
-				}
 				if (!Utils.checkPlugin("CrackShot")) Bukkit.getLogger().warning("[ZombieEscape]Does not exist CrackShot plugin.");
 				if (!Utils.checkPlugin("Multiverse-Core")) Bukkit.getLogger().warning("[ZombieEscape]Does not exist Multiverse-Core plugin.");
 				if (getInstance().error) {
