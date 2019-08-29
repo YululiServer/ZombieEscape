@@ -489,9 +489,9 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 						// team ----->
 						Scoreboard scoreboard = hashMapScoreboard.get(player.getUniqueId());
 						Objective objective3 = scoreboard.getObjective(DisplaySlot.SIDEBAR);
-						Objective hpobjective2 = scoreboard.getObjective(DisplaySlot.BELOW_NAME);
-						Score hp = hpobjective2.getScore(player.getName());
-						hp.setScore((int) player.getHealth());
+						//Objective hpobjective2 = scoreboard.getObjective(DisplaySlot.BELOW_NAME);
+						//Score hp = hpobjective2.getScore(player.getName());
+						//hp.setScore((int) player.getHealth());
 						String lastScore8 = hashMapLastScore8.get(player.getUniqueId());
 						scoreboard.resetScores(lastScore8);
 						lastScore8 = ChatColor.GREEN + "    " + lang.get("player") + ": " + Bukkit.getOnlinePlayers().size() + "/" + Bukkit.getMaxPlayers();
@@ -704,9 +704,9 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 					}
 					for (Player player : Bukkit.getOnlinePlayers()) {
 						final Scoreboard scoreboard = hashMapScoreboard.get(player.getUniqueId());
-						Objective hpobjective2 = scoreboard.getObjective(DisplaySlot.BELOW_NAME);
-						Score hp = hpobjective2.getScore(player.getName());
-						hp.setScore((int) player.getHealth());
+						//Objective hpobjective2 = scoreboard.getObjective(DisplaySlot.BELOW_NAME);
+						//Score hp = hpobjective2.getScore(player.getName());
+						//hp.setScore((int) player.getHealth());
 						if (playedTime <= 1) {
 							File maps = new File("./plugins/ZombieEscape/maps/");
 							File[] keys = maps.listFiles();
