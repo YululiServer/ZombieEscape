@@ -670,7 +670,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 						if (leftSecond.length() == 1) leftSecond = "0" + leftSecond;
 						String lastScore4 = hashMapLastScore4.get(event.getPlayer().getUniqueId());
 						scoreboard.resetScores(lastScore4);
-						lastScore4 = ChatColor.GREEN + "    " + Math.round(Math.nextDown(playedTime/60F)) + ":" + leftSecondPlayed + " / " + Math.round(Math.nextDown(gameTime/60F)) + ":" + leftSecond;
+						lastScore4 = ChatColor.GREEN + "    " + secondsToTime(playedTime) + " / " + secondsToTime(gameTime);
 						hashMapLastScore4.put(player.getUniqueId(), lastScore4);
 						Score score4 = objective3.getScore(lastScore4);
 						score4.setScore(4);
@@ -769,6 +769,12 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "give " + event.getPlayer().getName() + " minecraft:stone_pickaxe 1 0 {CanDestroy:[\"minecraft:gold_block\",\"minecraft:cobblestone\",\"lapis_block\"],HideFlags:1,Unbreakable:1,display:{Name:\"" + lang.get("rustedPickaxe") + "\"},ench:[{id:32,lvl:10}]}");
 			}
 		}.runTaskLater(this, 20*5);
+	}
+
+	public static String secondsToTime(int seconds) {
+		int minutes = (int) Math.floor((float) seconds / 60F);
+		String sec = Integer.toString(seconds % 60);
+		return minutes + ":" + (sec.length() == 1 ? "0" + sec : sec);
 	}
 
 	@EventHandler
