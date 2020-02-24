@@ -1,39 +1,19 @@
-// *Warning* Bugged string may be found while decompiling this source!
 package xyz.acrylicstyle.zombieescape;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.UUID;
-import java.util.logging.Logger;
-
-import org.apache.commons.io.FileUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.ProtocolManager;
+import de.robingrether.idisguise.api.DisguiseAPI;
+import de.robingrether.idisguise.disguise.DisguiseType;
+import de.robingrether.idisguise.disguise.ZombieVillagerDisguise;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarFlag;
 import org.bukkit.boss.BarStyle;
-import org.bukkit.command.BlockCommandSender;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.command.*;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
@@ -51,35 +31,16 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType.SlotType;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scoreboard.DisplaySlot;
-import org.bukkit.scoreboard.Objective;
-import org.bukkit.scoreboard.Score;
-import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.ScoreboardManager;
-
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.ProtocolManager;
-
-import de.robingrether.idisguise.api.DisguiseAPI;
-import de.robingrether.idisguise.disguise.DisguiseType;
-import de.robingrether.idisguise.disguise.ZombieVillagerDisguise;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.scoreboard.*;
+import util.ICollectionList;
 import xyz.acrylicstyle.tomeito_core.providers.ConfigProvider;
 import xyz.acrylicstyle.tomeito_core.providers.LanguageProvider;
 import xyz.acrylicstyle.tomeito_core.utils.Lang;
@@ -92,30 +53,34 @@ import xyz.acrylicstyle.zombieescape.commands.ZombieEscapeGameUtil.VoteGui;
 import xyz.acrylicstyle.zombieescape.data.Constants;
 import xyz.acrylicstyle.zombieescape.utils.Utils;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+import java.util.logging.Logger;
+
 public class ZombieEscape extends JavaPlugin implements Listener {
 	public static ConfigProvider finalMapConfig = null;
 	public static ConfigProvider config = null;
 	public static ConfigProvider mapConfig = null;
-	public static HashMap<UUID, Scoreboard> hashMapScoreboard = new HashMap<UUID, Scoreboard>();
-	public static HashMap<UUID, PlayerTeam> hashMapTeam = new HashMap<UUID, PlayerTeam>();
-	public static HashMap<UUID, String> hashMapLastScore4 = new HashMap<UUID, String>();
-	public static HashMap<UUID, String> hashMapLastScore8 = new HashMap<UUID, String>();
-	public static HashMap<String, Integer> hashMapBlockState = new HashMap<String, Integer>();
-	public static HashMap<String, Integer> hashMapVotes = new HashMap<String, Integer>();
-	public static HashMap<UUID, Boolean> lockActionBar = new HashMap<UUID, Boolean>();
+	public static HashMap<UUID, Scoreboard> hashMapScoreboard = new HashMap<>();
+	public static HashMap<UUID, PlayerTeam> hashMapTeam = new HashMap<>();
+	public static HashMap<UUID, String> hashMapLastScore4 = new HashMap<>();
+	public static HashMap<UUID, String> hashMapLastScore8 = new HashMap<>();
+	public static HashMap<String, Integer> hashMapBlockState = new HashMap<>();
+	public static HashMap<UUID, Boolean> lockActionBar = new HashMap<>();
 	/**
 	 * Not in use.
 	 */
-	public static HashMap<UUID, Boolean> hashMapOriginZombie = new HashMap<UUID, Boolean>();
+	public static HashMap<UUID, Boolean> hashMapOriginZombie = new HashMap<>();
 	/**
 	 * Player, Map name
 	 */
-	public static HashMap<UUID, String> hashMapVote = new HashMap<UUID, String>();
-	public static HashMap<String, Integer> votes = new HashMap<String, Integer>();
-	public static HashMap<UUID, Boolean> respawnWait = new HashMap<UUID, Boolean>();
+	public static HashMap<UUID, String> hashMapVote = new HashMap<>();
+	public static HashMap<String, Integer> votes = new HashMap<>();
+	public static HashMap<UUID, Boolean> respawnWait = new HashMap<>();
 	public static Map<String, Object> locationWall = null;
 	public static List<String> previousZombies = null;
-	public static List<String> listZombies = new ArrayList<String>();
+	public static List<String> listZombies = new ArrayList<>();
 	public static String mapName = null;
 	public static ScoreboardManager manager = null;
 	public static ProtocolManager protocol = null;
@@ -141,7 +106,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	public static String ongoingEvent = null;
 	public static String mostVotedMap = null;
 	public static String defmapString = null;
-	public static Map<String, String> ongoingEventMap = new HashMap<String, String>();
+	public static Map<String, String> ongoingEventMap = new HashMap<>();
 	public static Lang language = null;
 	public static LanguageProvider lang = null;
 	public static DisguiseAPI disguise = null;
@@ -151,13 +116,11 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 	@Override
 	public void onLoad() {
 		Logger logger = Bukkit.getLogger();
-		logger.info("This ZombieEscape is running at " + Constants.instanceIdentifier);
 		if (!Bukkit.getBukkitVersion().contains(Constants.requiredMinecraftVersion)) {
 			logger.severe("Your current bukkit/minecraft version(" + Bukkit.getBukkitVersion() + ") is incompatible.");
 			logger.severe("Please use spigot 1.12.2 and restart your server.");
 			this.error = true;
 		}
-		return;
 	}
 
 	@Override
@@ -199,9 +162,9 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				}
 				manager = Bukkit.getScoreboardManager();
 				disguise = Bukkit.getServicesManager().getRegistration(DisguiseAPI.class).getProvider();
-				Sponsor sponsor = null;
-				ZombieEscapeConfig zec = null;
-				ZombieEscapeGameUtil zegu = null;
+				Sponsor sponsor;
+				ZombieEscapeConfig zec;
+				ZombieEscapeGameUtil zegu;
 				try {
 					sponsor = new Sponsor();
 					zec = new ZombieEscapeConfig();
@@ -213,63 +176,42 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 					Bukkit.getPluginManager().disablePlugin(getInstance());
 					return;
 				}
-				VoteGui votegui = null;
-				if (sponsor != null && zec != null && zegu != null) {
-					votegui = zegu.new VoteGui();
-					votegui.initialize();
-					Bukkit.getPluginCommand("setsponsor").setExecutor(sponsor.new SetSponsor());
-					Bukkit.getPluginCommand("removesponsor").setExecutor(sponsor.new RemoveSponsor());
-					Bukkit.getPluginCommand("setspawn").setExecutor(zec.new SetSpawn());
-					Bukkit.getPluginCommand("removespawn").setExecutor(zec.new RemoveSpawn());
-					Bukkit.getPluginCommand("addwall").setExecutor(zec.new AddWall());
-					Bukkit.getPluginCommand("deletewall").setExecutor(zec.new DeleteWall());
-					Bukkit.getPluginCommand("setmapname").setExecutor(zec.new SetMapName());
-					Bukkit.getPluginCommand("setmap").setExecutor(zec.new SetMap());
-					Bukkit.getPluginCommand("setcp").setExecutor(zegu.new SetCheckpoint());
-					Bukkit.getPluginCommand("startgame").setExecutor(zegu.new StartGame());
-					Bukkit.getPluginCommand("endgame").setExecutor(new EndGame());
-					Bukkit.getPluginCommand("vote").setExecutor(zegu.new Vote());
-					Bukkit.getPluginCommand("votemap").setExecutor(votegui);
-					Bukkit.getPluginCommand("destroywall").setExecutor(zegu.new DestroyWall());
-					Bukkit.getPluginCommand("zombieescape").setExecutor(new ZombieEscapeCommand());
-					Bukkit.getPluginCommand("resourcepack").setExecutor(zegu.new ResourcePack());
-					Bukkit.getPluginCommand("ping").setExecutor(zegu.new Ping());
-					Bukkit.getPluginCommand("crash").setExecutor(new CommandExecutor() {
-						@Override
-						public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-							Log.warn(sender.getName() + " requested to crash itself, disabling plugin.");
-							Bukkit.getPluginManager().disablePlugin(getInstance());
-							return true;
-						}
-					});
-				} else {
-					Log.error("Unable to register some commands! Commands are disabled.");
-				}
+				VoteGui votegui = zegu.new VoteGui();
+				votegui.initialize();
+				Bukkit.getPluginCommand("setsponsor").setExecutor(sponsor.new SetSponsor());
+				Bukkit.getPluginCommand("removesponsor").setExecutor(sponsor.new RemoveSponsor());
+				Bukkit.getPluginCommand("setspawn").setExecutor(zec.new SetSpawn());
+				Bukkit.getPluginCommand("removespawn").setExecutor(zec.new RemoveSpawn());
+				Bukkit.getPluginCommand("addwall").setExecutor(zec.new AddWall());
+				Bukkit.getPluginCommand("deletewall").setExecutor(zec.new DeleteWall());
+				Bukkit.getPluginCommand("setmapname").setExecutor(zec.new SetMapName());
+				Bukkit.getPluginCommand("setmap").setExecutor(zec.new SetMap());
+				Bukkit.getPluginCommand("setcp").setExecutor(zegu.new SetCheckpoint());
+				Bukkit.getPluginCommand("startgame").setExecutor(zegu.new StartGame());
+				Bukkit.getPluginCommand("endgame").setExecutor(new EndGame());
+				Bukkit.getPluginCommand("vote").setExecutor(zegu.new Vote());
+				Bukkit.getPluginCommand("votemap").setExecutor(votegui);
+				Bukkit.getPluginCommand("destroywall").setExecutor(zegu.new DestroyWall());
+				Bukkit.getPluginCommand("zombieescape").setExecutor(new ZombieEscapeCommand());
+				Bukkit.getPluginCommand("resourcepack").setExecutor(zegu.new ResourcePack());
+				Bukkit.getPluginCommand("ping").setExecutor(new ZombieEscapeGameUtil.Ping());
+				Bukkit.getPluginCommand("crash").setExecutor((sender, command, label, args) -> {
+					Log.warn(sender.getName() + " requested to crash itself, disabling plugin.");
+					Bukkit.getPluginManager().disablePlugin(getInstance());
+					return true;
+				});
 				Bukkit.getPluginManager().registerEvents(getInstance(), getInstance());
-				if (votegui != null) Bukkit.getPluginManager().registerEvents(votegui, getInstance());
+				Bukkit.getPluginManager().registerEvents(votegui, getInstance());
 				Utils.checkConfig();
 				maxCheckpoints = Math.min(mapConfig.getStringList("spawnPoints.player").size(), mapConfig.getStringList("spawnPoints.zombie").size());
 				locationWall = ConfigProvider.getConfigSectionValue(mapConfig.get("locationWall", new HashMap<String, Object>()), true);
 				List<?> list = config.getList("previousZombies") != null ? config.getList("previousZombies") : new ArrayList<String>();
-				previousZombies = Arrays.asList(list.toArray(new String[0]));
+				previousZombies = ICollectionList.asList(list).map(o -> (String) o);
 				Constants.mininumPlayers = config.getInt("mininumPlayers", 2);
 				init = true;
 				Log.info("Enabled Zombie Escape");
 			}
 		}.runTaskLater(this, 1);
-	}
-
-	@Override
-	public void onDisable() {
-		File log = new File("./logs/latest.log");
-		File log2 = new File("./logs/" + Constants.intIdentifier + ".log");
-		try {
-			log2.createNewFile();
-			FileUtils.copyFile(log, log2);
-		} catch (IOException e) {
-			Log.error("Error while saving log file");
-			e.printStackTrace();
-		}
 	}
 
 	@EventHandler
@@ -302,7 +244,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				long time = System.currentTimeMillis();
 				if (mapConfig.getBoolean("worldborder.enable", false)) Utils.damageIfOutsideOfBorder();
 				for (Player player : Bukkit.getOnlinePlayers()) {
-					Set<Material> set = new HashSet<Material>();
+					Set<Material> set = new HashSet<>();
 					set.add(Material.AIR);
 					Block block = player.getTargetBlock(set, 15);
 					if (block == null) {
@@ -374,8 +316,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		event.getPlayer().setGameMode(GameMode.ADVENTURE);
 		event.getPlayer().setScoreboard(board);
 		final Objective objective = board.registerNewObjective("scoreboard", "dummy");
-		Score score9 = objective.getScore("                        " + ChatColor.GRAY + Constants.instanceIdentifier); // 24 spaces
-		score9.setScore(9);
 		Score score7 = objective.getScore(" ");
 		score7.setScore(7);
 		Score score5 = objective.getScore("  ");
@@ -395,6 +335,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		event.getPlayer().setHealth(100);
 		event.getPlayer().setHealthScale(20);
 		new BukkitRunnable() {
+			@SuppressWarnings("NonAtomicOperationOnVolatileField")
 			public void run() {
 				event.getPlayer().getInventory().clear();
 				event.getPlayer().teleport(world.getSpawnLocation());
@@ -423,7 +364,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 					Score score6 = objective.getScore("    " + ChatColor.GREEN + lang.get("team") + ": " + ChatColor.DARK_GREEN + lang.get("zombie"));
 					objective.getScoreboard().resetScores("    " + ChatColor.GREEN + lang.get("team") + ": " + ChatColor.AQUA + lang.get("player"));
 					score6.setScore(6);
-					String[] spawnLists = Arrays.asList(mapConfig.getList("spawnPoints.zombie", new ArrayList<String>()).toArray(new String[0])).get(zombieCheckpoint).split(",");
+					String[] spawnLists = ICollectionList.asList(mapConfig.getList("spawnPoints.zombie", new ArrayList<String>())).map(o -> (String) o).get(zombieCheckpoint).split(",");
 					Location location = new Location(Bukkit.getWorld(mapConfig.getString("spawnPoints.world")), Double.parseDouble(spawnLists[0]), Double.parseDouble(spawnLists[1]), Double.parseDouble(spawnLists[2]));
 					player.teleport(location);
 					player.setGameMode(GameMode.ADVENTURE);
@@ -454,7 +395,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 							disguise.disguise(player, d);
 						}
 					}.runTaskLater(getInstance(), 40);
-					return;
 				} else { // timesLeft < 16
 					event.getPlayer().getWorld().getWorldBorder().setSize(mapConfig.getInt("worldborder.initsize", 29999999)); // set border to max
 					event.getPlayer().getWorld().getWorldBorder().setDamageAmount(0);
@@ -475,6 +415,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		if (timerStarted) return;
 		timerStarted = true;
 		new BukkitRunnable() {
+			@SuppressWarnings("SuspiciousToArrayCall")
 			public synchronized void run() {
 				long time = System.currentTimeMillis();
 				for (final Player player : Bukkit.getOnlinePlayers()) {
@@ -505,7 +446,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 						String lastScore4 = hashMapLastScore4.get(player.getUniqueId());
 						scoreboard.resetScores(lastScore4);
 						if (hasEnoughPlayers && settingsCheck)
-							lastScore4 = "    " + Lang.format(lang.get("startingIn"), Math.round(Math.nextDown(timesLeft/60)) + ":" + leftSecond);
+							lastScore4 = "    " + Lang.format(lang.get("startingIn"), Math.round(Math.nextDown(timesLeft/60F)) + ":" + leftSecond);
 						else
 							lastScore4 = "    " + lang.get("waiting");
 						hashMapLastScore8.put(player.getUniqueId(), lastScore8);
@@ -524,34 +465,30 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 						// <----- team
 						// vote ----->
 						if (timesLeft >= 11) {
-							hashMapVote.values().forEach(vote -> {
-								votes.put(vote, votes.getOrDefault(vote, 0)+1);
-							});
+							hashMapVote.values().forEach(vote -> votes.put(vote, votes.getOrDefault(vote, 0)+1));
 							File maps = new File("./plugins/ZombieEscape/maps/");
 							File[] keys = maps.listFiles();
-							for (int i = 0; i < keys.length; i++) {
-								String key = keys[i].getName().replaceAll(".yml", "");
-								String thisMapName = key;
+							assert keys != null;
+							for (File file : keys) {
 								ConfigProvider map = null;
 								try {
-									map = new ConfigProvider("./plugins/ZombieEscape/maps/" + thisMapName + ".yml");
+									map = new ConfigProvider("./plugins/ZombieEscape/maps/" + file.getName().replaceAll(".yml", "") + ".yml");
 								} catch (IOException | InvalidConfigurationException e) {
 									e.printStackTrace();
 								}
+								assert map != null;
 								scoreboard.resetScores(ChatColor.GREEN + "    " + lang.get("mapVote") + ": " + map.getString("mapname", "???"));
 								Score score = objective3.getScore(ChatColor.GREEN + "    " + lang.get("mapVote") + ": " + map.getString("mapname", "???"));
-								score.setScore(-votes.getOrDefault(thisMapName, 0));
-							};
-							votes = new HashMap<String, Integer>(); // re-intialize this map because there's no HashMap#removeAll()
+								score.setScore(-votes.getOrDefault(file.getName().replaceAll(".yml", ""), 0));
+							}
+							votes = new HashMap<>(); // re-intialize this map because there's no HashMap#removeAll()
 						}
 						if (timesLeft == 10) {
 							player.getInventory().clear();
-							votes = new HashMap<String, Integer>();
+							votes = new HashMap<>();
 							scoreboard.resetScores(defmapString);
 							player.sendMessage(lang.get("closedMapVoting"));
-							hashMapVote.values().forEach(vote -> {
-								votes.put(vote, votes.getOrDefault(vote, 0)+1);
-							});
+							hashMapVote.values().forEach(vote -> votes.put(vote, votes.getOrDefault(vote, 0)+1));
 							votes.forEach((name, count) -> {
 								if (mostVotes < count) {
 									mostVotes = count;
@@ -699,7 +636,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 						}
 					}
 					if (hasEnoughPlayers && timesLeft >= 0 && settingsCheck) timesLeft--;
-				} else if (gameStarted) {
+				} else {
 					if (playedTime >= gameTime) {
 						endGame(lang.get("zombie"));
 						this.cancel();
@@ -713,17 +650,18 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 						if (playedTime <= 1) {
 							File maps = new File("./plugins/ZombieEscape/maps/");
 							File[] keys = maps.listFiles();
-							for (int i = 0; i < keys.length; i++) {
-								String key = keys[i].getName().replaceAll(".yml", "");
-								String thisMapName = key;
+							assert keys != null;
+							for (File file : keys) {
+								String thisMapName = file.getName().replaceAll(".yml", "");
 								ConfigProvider map = null;
 								try {
 									map = new ConfigProvider("./plugins/ZombieEscape/maps/" + thisMapName + ".yml");
 								} catch (IOException | InvalidConfigurationException e) {
 									e.printStackTrace();
 								}
+								assert map != null;
 								scoreboard.resetScores(ChatColor.GREEN + "    " + lang.get("mapVote") + ": " + map.getString("mapname", "???"));
-							};
+							}
 						}
 						Objective objective3 = scoreboard.getObjective(DisplaySlot.SIDEBAR);
 						String leftSecondPlayed = Integer.toString(playedTime % 60);
@@ -732,7 +670,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 						if (leftSecond.length() == 1) leftSecond = "0" + leftSecond;
 						String lastScore4 = hashMapLastScore4.get(event.getPlayer().getUniqueId());
 						scoreboard.resetScores(lastScore4);
-						lastScore4 = ChatColor.GREEN + "    " + Math.round(Math.nextDown(playedTime/60)) + ":" + leftSecondPlayed + " / " + Math.round(Math.nextDown(gameTime/60)) + ":" + leftSecond;
+						lastScore4 = ChatColor.GREEN + "    " + Math.round(Math.nextDown(playedTime/60F)) + ":" + leftSecondPlayed + " / " + Math.round(Math.nextDown(gameTime/60F)) + ":" + leftSecond;
 						hashMapLastScore4.put(player.getUniqueId(), lastScore4);
 						Score score4 = objective3.getScore(lastScore4);
 						score4.setScore(4);
@@ -755,10 +693,10 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 							scoreboard.resetScores(okString + ChatColor.AQUA + " <-" + ChatColor.DARK_GREEN + " [Z]");
 							scoreboard.resetScores(okString + ChatColor.AQUA + " <-" + ChatColor.DARK_GREEN + " [Z]" + ChatColor.AQUA + " [P]");
 							if (zombiePassedcp) {
-								Score score = objective3.getScore(okString + (status == "" ? "" : ChatColor.AQUA + " <-" + status));
+								Score score = objective3.getScore(okString + (status.equals("") ? "" : ChatColor.AQUA + " <-" + status));
 								score.setScore(-i);
 							} else {
-								Score score = objective3.getScore(koString + (status == "" ? "" : ChatColor.AQUA + " <-" + status));
+								Score score = objective3.getScore(koString + (status.equals("") ? "" : ChatColor.AQUA + " <-" + status));
 								score.setScore(-i);
 							}
 						}
@@ -794,6 +732,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		if (players <= 0 && gameStarted) endGame(lang.get("zombie"));
 	}
 
+	@SuppressWarnings("SuspiciousToArrayCall")
 	@EventHandler
 	public void onPlayerRespawn(PlayerRespawnEvent event) {
 		String[] spawnLists = Arrays.asList(mapConfig.getList("spawnPoints.zombie", new ArrayList<String>()).toArray(new String[0])).get(zombieCheckpoint).split(",");
@@ -837,6 +776,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		if (respawnWait.getOrDefault(event.getPlayer().getUniqueId(), false)) event.setCancelled(true);
 	}
 
+	@SuppressWarnings("NonAtomicOperationOnVolatileField")
 	@EventHandler(priority=EventPriority.LOWEST)
 	public void onPlayerHurt(EntityDamageByEntityEvent event) {
 		long time = System.currentTimeMillis();
@@ -991,6 +931,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		}
 	}
 
+	@SuppressWarnings("SuspiciousToArrayCall")
 	@EventHandler(priority=EventPriority.LOWEST)
 	public void onPlayerLogin(PlayerLoginEvent event) {
 		if (!init) {
@@ -1013,10 +954,10 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 				}
 			}.runTaskLater(this, timesLeft); // this is the BAD idea
 			return;
-		};
+		}
 		try {
 			List<String> sponsors = Arrays.asList(config.getList("sponsors", new ArrayList<String>()).toArray(new String[0]));
-			if (sponsors.contains(event.getPlayer().getUniqueId().toString()) == true) {
+			if (sponsors.contains(event.getPlayer().getUniqueId().toString())) {
 				if (timesLeft >= 15) {
 					event.allow();
 					return;
@@ -1026,8 +967,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 						event.allow();
 					}
 				}.runTaskLater(this, timesLeft);
-				return;
-			} else if (sponsors.contains(event.getPlayer().getUniqueId().toString()) == false) {
+			} else if (!sponsors.contains(event.getPlayer().getUniqueId().toString())) {
 				event.disallow(Result.KICK_OTHER, lang.get("loginFailed_gameFull"));
 			}
 		} catch (Exception e) {
@@ -1131,8 +1071,8 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			new BukkitRunnable() {
 				public void run() {
 					gameEnded = true;
-					Player nearestPlayer = null;
-					List<Player> players = null;
+					Player nearestPlayer;
+					List<Player> players;
 					if (sender instanceof BlockCommandSender) {
 						nearestPlayer = Utils.targetPFindPlayers(((BlockCommandSender)sender).getBlock().getLocation());
 						players = Utils.targetAFindPlayersWithRange(((BlockCommandSender)sender).getBlock().getLocation(), 10);
@@ -1145,14 +1085,12 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 					}
 					ZombieEscape.gameEnded = true;
 					String team = nearestPlayer == null ? lang.get("zombie") : lang.get("player");
+					assert players != null;
 					if (players.size() != 0) {
 						Bukkit.broadcastMessage(lang.get("followingPlayersWon"));
-						players.forEach(player -> {
-							Bukkit.broadcastMessage(ChatColor.GREEN + " - " + player.getName());
-						});
+						players.forEach(player -> Bukkit.broadcastMessage(ChatColor.GREEN + " - " + player.getName()));
 					}
 					endGame(team);
-					return;
 				}
 			}.runTaskLater(getInstance(), 20*10);
 			count = 10;

@@ -17,8 +17,7 @@ public class ZombieEscapeCommand implements CommandExecutor {
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if (args.length != 0) {
-			List<String> cmdArgsList = new ArrayList<String>();
-			cmdArgsList.addAll(Arrays.asList(args));
+			List<String> cmdArgsList = new ArrayList<>(Arrays.asList(args));
 			cmdArgsList.remove(0);
 			final String[] cmdArgs = cmdArgsList.toArray(new String[0]);
 			if (args[0].equalsIgnoreCase("reload")) {

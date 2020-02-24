@@ -1,6 +1,6 @@
 name: ZombieEscape
 main: xyz.acrylicstyle.zombieescape.ZombieEscape
-version: 1.0.0
+version: 1.2.0
 depend: [TomeitoLib, ProtocolLib, iDisguise]
 
 commands:

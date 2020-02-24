@@ -29,6 +29,7 @@ public final class Sponsor {
 	}
 
 	public final class SetSponsor implements CommandExecutor {
+		@SuppressWarnings("SuspiciousToArrayCall")
 		@Override
 		public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 			if (args.length == 0) {
@@ -48,8 +49,7 @@ public final class Sponsor {
 				sender.sendMessage(ChatColor.RED + lang.get("couldntFindPlayer") + ": " + args[0]);
 				return true;
 			}
-			List<String> sponsors = new ArrayList<String>();
-			sponsors.addAll(Arrays.asList(config.getList("sponsors", new ArrayList<String>()).toArray(new String[0])));
+			List<String> sponsors = new ArrayList<>(Arrays.asList(config.getList("sponsors", new ArrayList<String>()).toArray(new String[0])));
 			if (sponsors.contains(uuid.toString())) {
 				sender.sendMessage(lang.get("alreadySponsor"));
 				return true;
@@ -68,6 +68,7 @@ public final class Sponsor {
 	}
 
 	public final class RemoveSponsor implements CommandExecutor {
+		@SuppressWarnings("SuspiciousToArrayCall")
 		@Override
 		public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 			if (args.length == 0) {
@@ -87,8 +88,7 @@ public final class Sponsor {
 				sender.sendMessage(ChatColor.RED + lang.get("couldntFindPlayer") + ": " + args[0]);
 				return true;
 			}
-			List<String> sponsors = new ArrayList<String>();
-			sponsors.addAll(Arrays.asList(config.getList("sponsors", new ArrayList<String>()).toArray(new String[0])));
+			List<String> sponsors = new ArrayList<>(Arrays.asList(config.getList("sponsors", new ArrayList<String>()).toArray(new String[0])));
 			if (!sponsors.contains(uuid.toString())) {
 				sender.sendMessage(lang.get("notSponsor"));
 				return true;

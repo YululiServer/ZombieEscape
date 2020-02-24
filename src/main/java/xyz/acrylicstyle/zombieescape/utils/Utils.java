@@ -21,7 +21,6 @@ import org.bukkit.boss.BossBar;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
@@ -53,7 +52,6 @@ public final class Utils {
 	}
 
 	/**
-	 * @param <T>
 	 * @param sender CommandSender
 	 * @return false if they're not player, true if they're player
 	 */
@@ -71,12 +69,11 @@ public final class Utils {
 	public static void checkConfig() {
 		ZombieEscape.config.reloadWithoutException();
 		ZombieEscape.mapConfig.reloadWithoutException();
-		if (ZombieEscape.mapConfig.getList("spawnPoints.zombie") != null // check if zombie spawn points exists
+		ZombieEscape.settingsCheck = ZombieEscape.mapConfig.getList("spawnPoints.zombie") != null // check if zombie spawn points exists
 				&& ZombieEscape.mapConfig.getList("spawnPoints.zombie").size() != 0 // check if zombie spawn points are *actually* exists(0 isn't exist)
 				&& ZombieEscape.mapConfig.getList("spawnPoints.player") != null // check if player spawn points exists
 				&& ZombieEscape.mapConfig.getList("spawnPoints.player").size() != 0
-				&& ZombieEscape.mapConfig.get("locationWall") != null) ZombieEscape.settingsCheck = true; // if it's null, ProjectileHitEvent won't work!
-		else ZombieEscape.settingsCheck = false;
+				&& ZombieEscape.mapConfig.get("locationWall") != null; // if it's null, ProjectileHitEvent won't work!
 	}
 
 	/**
@@ -84,34 +81,11 @@ public final class Utils {
 	 *
 	 * This method is shorthand of <pre><code>return Bukkit.getPluginManager().getPlugin(plugin) != null;</code></pre>.
 	 *
-	 * @see #downloadPlugin(String, String)
 	 * @param plugin Target plugin name
-	 * @param url A url for download plugin if not exist
 	 * @return True if exist, otherwize returns false.
 	 */
 	public static boolean checkPlugin(String plugin) {
 		return Bukkit.getPluginManager().getPlugin(plugin) != null;
-	}
-
-	/**
-	 * Check a plugin if exists, if does not exist, it'll download fresh plugin from provided url.
-	 * <br>
-	 * Similar as {@link #checkPlugin(String, String)} but it returns false if exist.
-	 *
-	 * @see #checkPlugin(String, String)
-	 * @param plugin Target plugin name
-	 * @param url A url for download plugin if not exist
-	 * @return False if exist, true if it was does not exist and attempted to download plugin.
-	 */
-	public static boolean downloadPlugin(String plugin, String url) {
-		if (Bukkit.getPluginManager().getPlugin(plugin) == null) {
-			Bukkit.getLogger().warning("[ZombieEscape] Does not exist " + plugin + ", downloading from " + url);
-			AsyncDownload downloader = new AsyncDownload(plugin, url);
-			if (!downloader.download()) {
-				throw new IllegalArgumentException("Something is wrong with argument so we couldn't download file from specified URL.");
-			}
-			return true;
-		} else return false;
 	}
 
 	/**
@@ -133,7 +107,7 @@ public final class Utils {
 		try {
 			ZombieEscape.language.addLanguage("ja_JP");
 			ZombieEscape.language.addLanguage("en_US");
-		} catch (IOException | InvalidConfigurationException e) {} // ignore
+		} catch (IOException | InvalidConfigurationException ignored) {} // ignore
 		ZombieEscape.lang = ZombieEscape.language.get(ZombieEscape.config.getString("language", "en_US"));
 	}
 
@@ -157,8 +131,8 @@ public final class Utils {
 				public synchronized void run() {
 					if (ZombieEscape.fireworked >= 80) this.cancel();
 					player.playSound(player.getLocation(), Sound.ENTITY_FIREWORK_LAUNCH, 100, 1);
-					Entity tnt = player.getWorld().spawn(player.getLocation(), TNTPrimed.class);
-					((TNTPrimed)tnt).setFuseTicks(40);
+					TNTPrimed tnt = player.getWorld().spawn(player.getLocation(), TNTPrimed.class);
+					tnt.setFuseTicks(40);
 					ZombieEscape.fireworked++;
 				}
 			};
@@ -169,7 +143,7 @@ public final class Utils {
 
 	public static List<Player> targetAFindPlayersWithRange(Location loc, double range) {
 		if (ZombieEscape.players <= 0) return null;
-		List<Player> players = new ArrayList<Player>();
+		List<Player> players = new ArrayList<>();
 		for(Player p : loc.getWorld().getPlayers()){
 			if (ZombieEscape.hashMapTeam.get(p.getUniqueId()) != PlayerTeam.PLAYER) continue;
 			double distanceSqrd = loc.distance(p.getLocation());
@@ -240,7 +214,7 @@ public final class Utils {
 		}
 	}
 
-	private static Map<String, Double> progress = new HashMap<String, Double>();
+	private static Map<String, Double> progress = new HashMap<>();
 
 	public static void doBossBarTick(BossBar bossbar, double countdownInSecond, String eventId) {
 		Utils.doBossBarTick(bossbar, countdownInSecond, eventId, false);
@@ -279,10 +253,11 @@ public final class Utils {
 	public static Inventory initializeItems(Inventory inv) {
 		File maps = new File("./plugins/ZombieEscape/maps/");
 		File[] keys = maps.listFiles();
+		assert keys != null;
 		for (int i = 0; i < keys.length; i++) {
 			String key = keys[i].getName().replaceAll(".yml", "");
 			ItemStack item = new ItemStack(Material.DIAMOND);
-			List<String> lore = new ArrayList<String>();
+			List<String> lore = new ArrayList<>();
 			ConfigProvider map = null;
 			try {
 				map = new ConfigProvider("./plugins/ZombieEscape/maps/" + key + ".yml");
@@ -290,6 +265,7 @@ public final class Utils {
 				e.printStackTrace();
 			}
 			ItemMeta meta = item.getItemMeta();
+			assert map != null;
 			meta.setDisplayName(ChatColor.AQUA + map.getString("mapname", "???"));
 			lore.add(key);
 			meta.setLore(lore);
@@ -332,14 +308,12 @@ public final class Utils {
 		return ((x > size || (-x) > size) || (z > size || (-z) > size));
 	}
 
+	@SuppressWarnings("SuspiciousToArrayCall")
 	public static void teleport(Player player) {
 		String team = ZombieEscape.hashMapTeam.get(player.getUniqueId()).toString();
 		String[] spawnLists = Arrays.asList(ZombieEscape.mapConfig.getList("spawnPoints." + team, new ArrayList<String>()).toArray(new String[0])).get(0).split(",");
 		Location location = new Location(Bukkit.getWorld(ZombieEscape.mapConfig.getString("spawnPoints.world")), Double.parseDouble(spawnLists[0]), Double.parseDouble(spawnLists[1]), Double.parseDouble(spawnLists[2]));
-		if (!player.teleport(location)) {
-			player.sendMessage(ZombieEscape.lang.get("failedWarp"));
-			return;
-		}
+		if (!player.teleport(location)) player.sendMessage(ZombieEscape.lang.get("failedWarp"));
 	}
 
 	public static void teleportAllPlayers() {
@@ -351,6 +325,6 @@ public final class Utils {
 				}
 			}.runTaskLater(ZombieEscape.getProvidingPlugin(ZombieEscape.class), time);
 			time = time + 2;
-		};
+		}
 	}
 }

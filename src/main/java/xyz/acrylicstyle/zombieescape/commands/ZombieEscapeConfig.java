@@ -51,8 +51,7 @@ public class ZombieEscapeConfig {
 					return true;
 				}
 				ConfigProvider config = ConfigProvider.initWithoutException("./plugins/ZombieEscape/maps/" + ZombieEscape.mapName + ".yml");
-				List<String> spawns = new ArrayList<String>();
-				spawns.addAll(Arrays.asList(config.getList("spawnPoints.zombie", new ArrayList<String>()).toArray(new String[0])));
+				List<String> spawns = new ArrayList<>(Arrays.asList(config.getList("spawnPoints.zombie", new ArrayList<String>()).toArray(new String[0])));
 				spawns.add(Integer.parseInt(args[1]), ps.getLocation().getX() + "," + ps.getLocation().getY() + "," + ps.getLocation().getZ());
 				try {
 					config.setThenSave("spawnPoints.zombie", spawns);
@@ -67,8 +66,7 @@ public class ZombieEscapeConfig {
 					return true;
 				}
 				ConfigProvider config = ConfigProvider.initWithoutException("./plugins/ZombieEscape/maps/" + ZombieEscape.mapName + ".yml");
-				List<String> spawns = new ArrayList<String>();
-				spawns.addAll(Arrays.asList(config.getList("spawnPoints.player", new ArrayList<String>()).toArray(new String[0])));
+				List<String> spawns = new ArrayList<>(Arrays.asList(config.getList("spawnPoints.player", new ArrayList<String>()).toArray(new String[0])));
 				spawns.add(Integer.parseInt(args[1]), ps.getLocation().getX() + "," + ps.getLocation().getY() + "," + ps.getLocation().getZ());
 				try {
 					config.setThenSave("spawnPoints.player", spawns);
@@ -155,7 +153,7 @@ public class ZombieEscapeConfig {
 				sender.sendMessage(ChatColor.RED + lang.get("usage") + ": /addwall <Wall>");
 				return true;
 			}
-			Set<Material> set = new HashSet<Material>();
+			Set<Material> set = new HashSet<>();
 			set.add(Material.AIR);
 			Block block = ((Player)sender).getTargetBlock(set, 4);
 			if (block == null) {
@@ -202,7 +200,7 @@ public class ZombieEscapeConfig {
 				// Location, Wallname
 				Map<String, Object> locationWall = ConfigProvider.getConfigSectionValue(config.get("locationWall", new HashMap<String, Object>()), true);
 				locationWall.forEach((location, wall) -> {
-					if (wall.toString() == args[0]) locationWall.remove(location);
+					if (wall.toString().equals(args[0])) locationWall.remove(location);
 				});
 			} catch (IOException | InvalidConfigurationException e) {
 				e.printStackTrace();
@@ -232,8 +230,7 @@ public class ZombieEscapeConfig {
 					return true;
 				}
 				ConfigProvider config = ConfigProvider.initWithoutException("./plugins/ZombieEscape/maps/" + ZombieEscape.mapName + ".yml");
-				List<String> spawns = new ArrayList<String>();
-				spawns.addAll(Arrays.asList(config.getList("spawnPoints.zombie", new ArrayList<String>()).toArray(new String[0])));
+				List<String> spawns = new ArrayList<>(Arrays.asList(config.getList("spawnPoints.zombie", new ArrayList<String>()).toArray(new String[0])));
 				spawns.remove(Integer.parseInt(args[1]));
 				try {
 					config.setThenSave("spawnPoints.zombie", spawns.size() == 0 ? null : spawns);
@@ -248,8 +245,7 @@ public class ZombieEscapeConfig {
 					return true;
 				}
 				ConfigProvider config = ConfigProvider.initWithoutException("./plugins/ZombieEscape/maps/" + ZombieEscape.mapName + ".yml");
-				List<String> spawns = new ArrayList<String>();
-				spawns.addAll(Arrays.asList(config.getList("spawnPoints.player", new ArrayList<String>()).toArray(new String[0])));
+				List<String> spawns = new ArrayList<>(Arrays.asList(config.getList("spawnPoints.player", new ArrayList<String>()).toArray(new String[0])));
 				spawns.remove(Integer.parseInt(args[1]));
 				try {
 					config.setThenSave("spawnPoints.player", spawns.size() == 0 ? null : spawns);

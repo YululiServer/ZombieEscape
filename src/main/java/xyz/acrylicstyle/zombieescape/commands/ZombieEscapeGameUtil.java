@@ -2,10 +2,7 @@ package xyz.acrylicstyle.zombieescape.commands;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -21,7 +18,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
-import org.bukkit.craftbukkit.libs.jline.internal.Log;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -35,6 +31,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import xyz.acrylicstyle.tomeito_core.providers.ConfigProvider;
 import xyz.acrylicstyle.tomeito_core.providers.LanguageProvider;
 import xyz.acrylicstyle.tomeito_core.utils.Lang;
+import xyz.acrylicstyle.tomeito_core.utils.Log;
 import xyz.acrylicstyle.zombieescape.PlayerTeam;
 import xyz.acrylicstyle.zombieescape.ZombieEscape;
 import xyz.acrylicstyle.zombieescape.data.Constants;
@@ -48,7 +45,7 @@ public class ZombieEscapeGameUtil {
 	}
 
 	public final class SetCheckpoint implements CommandExecutor { // /setcp from command block or something
-		private Map<String, Integer> count = new HashMap<String, Integer>();
+		private Map<String, Integer> count = new HashMap<>();
 
 		@Override
 		public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -56,7 +53,7 @@ public class ZombieEscapeGameUtil {
 				sender.sendMessage(ChatColor.RED + lang.get("usage") + ": /setcp <0, 1, 2, 3, ...>");
 				return true;
 			}
-			Player nearestPlayer = null;
+			Player nearestPlayer;
 			if (sender instanceof BlockCommandSender) {
 				nearestPlayer = Utils.targetP(((BlockCommandSender)sender).getBlock().getLocation());
 			} else if (sender instanceof Player) {
@@ -66,7 +63,7 @@ public class ZombieEscapeGameUtil {
 				return false;
 			}
 			// op
-			if (sender instanceof Player && ((Player)sender).isOp()) {
+			if (sender instanceof Player && sender.isOp()) {
 				if (sender instanceof BlockCommandSender) {
 					if (ZombieEscape.zombieCheckpoint >= Integer.parseInt(args[0])) {
 						return false;
@@ -177,7 +174,7 @@ public class ZombieEscapeGameUtil {
 		public void onInventoryClick(InventoryClickEvent e) {
 			if (e.getCurrentItem() == null || e.getCurrentItem().getType() == Material.AIR) return;
 			if (!e.getView().getTopInventory().getTitle().equalsIgnoreCase(lang.get("mapVote"))) return;
-			Bukkit.dispatchCommand(((Player)e.getWhoClicked()), "vote " + e.getCurrentItem().getItemMeta().getLore().get(0));
+			Bukkit.dispatchCommand(e.getWhoClicked(), "vote " + e.getCurrentItem().getItemMeta().getLore().get(0));
 			e.setCancelled(true);
 			e.getWhoClicked().closeInventory();
 		}
@@ -216,8 +213,8 @@ public class ZombieEscapeGameUtil {
 				return true;
 			}
 			File maps = new File("./plugins/ZombieEscape/maps/");
-			List<String> files = new ArrayList<String>();
-			for (File file : maps.listFiles()) files.add(file.getName().replaceAll(".yml", ""));
+			List<String> files = new ArrayList<>();
+			for (File file : Objects.requireNonNull(maps.listFiles())) files.add(file.getName().replaceAll(".yml", ""));
 			if (!files.contains(args[0])) {
 				sender.sendMessage(lang.get("nomap"));
 				return true;
@@ -228,6 +225,7 @@ public class ZombieEscapeGameUtil {
 			} catch (IOException | InvalidConfigurationException e) {
 				e.printStackTrace();
 			}
+			assert mapConfig != null;
 			if (Bukkit.getWorld(mapConfig.getString("spawnPoints.world", "world")) == null) {
 				sender.sendMessage(lang.get("nonExistWorld"));
 				return true;
@@ -246,7 +244,7 @@ public class ZombieEscapeGameUtil {
 	}
 
 	public final class DestroyWall implements CommandExecutor {
-		private Map<String, Integer> count = new HashMap<String, Integer>();
+		private Map<String, Integer> count = new HashMap<>();
 
 		@Override
 		public boolean onCommand(final CommandSender sender, Command command, String label, String[] args) {
@@ -257,7 +255,7 @@ public class ZombieEscapeGameUtil {
 			if (sender instanceof BlockCommandSender) {
 				((BlockCommandSender)sender).getBlock().setType(Material.AIR);
 			}
-			int countdown = 0;
+			int countdown;
 			try {
 				countdown = Integer.parseInt(args[1]);
 			} catch(NumberFormatException e) {
@@ -311,7 +309,7 @@ public class ZombieEscapeGameUtil {
 		}
 	}
 
-	public final class Ping implements CommandExecutor {
+	public static final class Ping implements CommandExecutor {
 		@Override
 		public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 			if (!Utils.senderCheck(sender)) return true;
@@ -319,7 +317,7 @@ public class ZombieEscapeGameUtil {
 			try {
 				Object entityPlayer = player.getClass().getMethod("getHandle").invoke(player);
 				int ping = (int) entityPlayer.getClass().getField("ping").get(entityPlayer);
-				String pingmsg = "";
+				String pingmsg;
 				if (ping <= 100) {
 					pingmsg = "" + ChatColor.GREEN + ping;
 				} else if (ping <= 300) {
