@@ -1038,15 +1038,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 			}.runTaskTimer(getInstance(), 0, 5);
 		}
 		Bukkit.broadcastMessage(Lang.format(lang.get("gameEnd"), team));
-		Bukkit.broadcastMessage(lang.get("shutdownIn15"));
-		TimerTask task = new TimerTask() {
-			public void run() {
-				Bukkit.broadcastMessage(lang.get("shuttingdown"));
-				Bukkit.shutdown();
-			}
-		};
-		Timer timer = new Timer();
-		timer.schedule(task, 1000*15);
 		new BukkitRunnable() {
 			public void run() {
 				ZombieEscape.ongoingEvent = Lang.format(lang.get("shutdownIn"), Integer.toString(shutdownCount));
