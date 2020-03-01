@@ -117,15 +117,6 @@ public final class Utils {
 			player.sendTitle(Lang.format(ZombieEscape.lang.get("gameEnd"), team), "", 0, 60, 20);
 		}
 		Bukkit.broadcastMessage(Lang.format(ZombieEscape.lang.get("gameEnd"), team));
-		Bukkit.broadcastMessage(ZombieEscape.lang.get("shutdownIn15"));
-		TimerTask task = new TimerTask() {
-			public void run() {
-				Bukkit.broadcastMessage(ZombieEscape.lang.get("shuttingdown"));
-				Bukkit.shutdown();
-			}
-		};
-		Timer timer = new Timer();
-		timer.schedule(task, 1000*15);
 		for (Player player : Bukkit.getOnlinePlayers()) {
 			TimerTask task2 = new TimerTask() {
 				public synchronized void run() {
