@@ -239,6 +239,7 @@ public class ZombieEscape extends JavaPlugin implements Listener {
 		world.setGameRuleValue("announceAdvancements", "false");
 		hashMapTeam.put(event.getPlayer().getUniqueId(), PlayerTeam.PLAYER);
 		lockActionBar.put(event.getPlayer().getUniqueId(), false);
+		disguise.disguise(event.getPlayer(), DisguiseType.PLAYER.newInstance());
 		new BukkitRunnable() {
 			public void run() {
 				long time = System.currentTimeMillis();
