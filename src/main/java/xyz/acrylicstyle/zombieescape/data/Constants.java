@@ -7,29 +7,29 @@ import java.util.Set;
 import org.bukkit.Material;
 
 public class Constants {
-	/**
-	 * Represents material(block) durability
-	 */
-	public final static HashMap<Material, Integer> materialDurability = new HashMap<>();
-	public final static String version = "v1.2";
-	public final static Set<Material> breakableWall = new HashSet<>(); // applies to only players
-	public final static String requiredMinecraftVersion = "1.12.2";
-	public static int mininumPlayers = 2;
-	public final static char heart = '\u2764';
-	public final static char peace = '\u270c';
+    /**
+     * Represents material(block) durability
+     */
+    public final static HashMap<Material, Integer> materialDurability = new HashMap<>();
+    public final static String version = "v1.2";
+    public final static Set<Material> breakableWall = new HashSet<>(); // applies to only players
+    public final static String requiredMinecraftVersion = "1.12.2";
+    public static int mininumPlayers = 2;
+    public final static char heart = '\u2764';
+    public final static char peace = '\u270c';
 
-	static {
-		materialDurability.put(Material.DIRT, 120);
-		materialDurability.put(Material.GRASS, 120);
-		materialDurability.put(Material.WOOD, 150);
-		materialDurability.put(Material.LAPIS_BLOCK, 300);
-		materialDurability.put(Material.COBBLESTONE, 50000000);
-		materialDurability.put(Material.BEDROCK, 50000000);
-		materialDurability.put(Material.COMMAND, 50000000);
-		breakableWall.add(Material.WOOD);
-		breakableWall.add(Material.DIRT);
-		breakableWall.add(Material.GRASS);
-		breakableWall.add(Material.LAPIS_BLOCK);
-		breakableWall.add(Material.COBBLESTONE);
-	}
+    static {
+        materialDurability.put(Material.DIRT, 120);
+        materialDurability.put(Material.GRASS, 120);
+        materialDurability.put(Material.WOOD, 150);
+        materialDurability.put(Material.LAPIS_BLOCK, 300);
+        materialDurability.put(Material.COBBLESTONE, 50000000);
+        materialDurability.put(Material.BEDROCK, 50000000);
+        materialDurability.put(Material.COMMAND, 50000000);
+        breakableWall.add(Material.WOOD);
+        breakableWall.add(Material.DIRT);
+        breakableWall.add(Material.GRASS);
+        breakableWall.add(Material.LAPIS_BLOCK);
+        breakableWall.add(Material.COBBLESTONE);
+    }
 }
