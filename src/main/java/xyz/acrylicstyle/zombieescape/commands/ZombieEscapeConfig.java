@@ -20,9 +20,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
 
-import xyz.acrylicstyle.tomeito_core.providers.ConfigProvider;
-import xyz.acrylicstyle.tomeito_core.providers.LanguageProvider;
-import xyz.acrylicstyle.tomeito_core.utils.Lang;
+import xyz.acrylicstyle.tomeito_api.providers.ConfigProvider;
+import xyz.acrylicstyle.tomeito_api.providers.LanguageProvider;
+import xyz.acrylicstyle.tomeito_api.utils.Lang;
 import xyz.acrylicstyle.zombieescape.ZombieEscape;
 import xyz.acrylicstyle.zombieescape.utils.Utils;
 
@@ -51,7 +51,7 @@ public class ZombieEscapeConfig {
                     return true;
                 }
                 ConfigProvider config = ConfigProvider.initWithoutException("./plugins/ZombieEscape/maps/" + ZombieEscape.mapName + ".yml");
-                List<String> spawns = new ArrayList<>(Arrays.asList(config.getList("spawnPoints.zombie", new ArrayList<String>()).toArray(new String[0])));
+                List<String> spawns = config.getStringList("spawnPoints.zombie");
                 spawns.add(Integer.parseInt(args[1]), ps.getLocation().getX() + "," + ps.getLocation().getY() + "," + ps.getLocation().getZ());
                 try {
                     config.setThenSave("spawnPoints.zombie", spawns);
@@ -66,7 +66,7 @@ public class ZombieEscapeConfig {
                     return true;
                 }
                 ConfigProvider config = ConfigProvider.initWithoutException("./plugins/ZombieEscape/maps/" + ZombieEscape.mapName + ".yml");
-                List<String> spawns = new ArrayList<>(Arrays.asList(config.getList("spawnPoints.player", new ArrayList<String>()).toArray(new String[0])));
+                List<String> spawns = config.getStringList("spawnPoints.player");
                 spawns.add(Integer.parseInt(args[1]), ps.getLocation().getX() + "," + ps.getLocation().getY() + "," + ps.getLocation().getZ());
                 try {
                     config.setThenSave("spawnPoints.player", spawns);
@@ -230,7 +230,7 @@ public class ZombieEscapeConfig {
                     return true;
                 }
                 ConfigProvider config = ConfigProvider.initWithoutException("./plugins/ZombieEscape/maps/" + ZombieEscape.mapName + ".yml");
-                List<String> spawns = new ArrayList<>(Arrays.asList(config.getList("spawnPoints.zombie", new ArrayList<String>()).toArray(new String[0])));
+                List<String> spawns = config.getStringList("spawnPoints.zombie");
                 spawns.remove(Integer.parseInt(args[1]));
                 try {
                     config.setThenSave("spawnPoints.zombie", spawns.size() == 0 ? null : spawns);
@@ -245,7 +245,7 @@ public class ZombieEscapeConfig {
                     return true;
                 }
                 ConfigProvider config = ConfigProvider.initWithoutException("./plugins/ZombieEscape/maps/" + ZombieEscape.mapName + ".yml");
-                List<String> spawns = new ArrayList<>(Arrays.asList(config.getList("spawnPoints.player", new ArrayList<String>()).toArray(new String[0])));
+                List<String> spawns = config.getStringList("spawnPoints.player");
                 spawns.remove(Integer.parseInt(args[1]));
                 try {
                     config.setThenSave("spawnPoints.player", spawns.size() == 0 ? null : spawns);

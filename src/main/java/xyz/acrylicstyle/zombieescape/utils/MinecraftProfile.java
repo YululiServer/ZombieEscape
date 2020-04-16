@@ -45,7 +45,6 @@ public class MinecraftProfile {
         try {
             if (this.username == null) throw new IllegalArgumentException("Username must be set before call this method.");
             String url = "https://api.mojang.com/users/profiles/minecraft/" + this.username;
-            @SuppressWarnings("deprecation")
             String nameJson = IOUtils.toString(new URL(url).openStream());
             JSONObject nameValue = (JSONObject) JSONValue.parseWithException(nameJson);
             return UUID.fromString(nameValue.get("id").toString().replaceFirst("(\\p{XDigit}{8})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}+)", "$1-$2-$3-$4-$5"));
@@ -59,7 +58,6 @@ public class MinecraftProfile {
             if (this.uuid == null) throw new IllegalArgumentException("UUID must be set before call this method.");
             UUID.fromString(this.uuid); // Try parse
             String url = "https://api.mojang.com/user/profiles/" + this.uuid.replaceAll("-", "") + "/names";
-            @SuppressWarnings("deprecation")
             String nameJson = IOUtils.toString(new URL(url).openStream());
             JSONArray nameValue = (JSONArray) JSONValue.parseWithException(nameJson);
             String playerSlot = nameValue.get(nameValue.size()-1).toString();

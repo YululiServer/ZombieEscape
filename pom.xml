@@ -71,8 +71,8 @@
         </dependency>
         <dependency>
             <groupId>xyz.acrylicstyle</groupId>
-            <artifactId>tomeito_lib</artifactId>
-            <version>0.1.22</version>
+            <artifactId>api</artifactId>
+            <version>0.3.1</version>
         </dependency>
         <dependency>
             <groupId>de.robingrether.idisguise</groupId>

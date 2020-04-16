@@ -13,9 +13,9 @@ import org.bukkit.configuration.InvalidConfigurationException;
 import org.json.simple.parser.ParseException;
 
 import net.md_5.bungee.api.ChatColor;
-import xyz.acrylicstyle.tomeito_core.providers.ConfigProvider;
-import xyz.acrylicstyle.tomeito_core.providers.LanguageProvider;
-import xyz.acrylicstyle.tomeito_core.utils.Lang;
+import xyz.acrylicstyle.tomeito_api.providers.ConfigProvider;
+import xyz.acrylicstyle.tomeito_api.providers.LanguageProvider;
+import xyz.acrylicstyle.tomeito_api.utils.Lang;
 import xyz.acrylicstyle.zombieescape.ZombieEscape;
 import xyz.acrylicstyle.zombieescape.utils.PlayerUtils;
 
@@ -37,7 +37,7 @@ public final class Sponsor {
                 return true;
             }
             config.reloadWithoutException();
-            UUID uuid = null;
+            UUID uuid;
             try {
                 uuid = PlayerUtils.getByName(args[0]).toUUID();
             } catch (IllegalArgumentException | IOException | ParseException e) {

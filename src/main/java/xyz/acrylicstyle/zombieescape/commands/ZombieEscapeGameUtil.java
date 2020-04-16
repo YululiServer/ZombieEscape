@@ -28,10 +28,10 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import xyz.acrylicstyle.tomeito_core.providers.ConfigProvider;
-import xyz.acrylicstyle.tomeito_core.providers.LanguageProvider;
-import xyz.acrylicstyle.tomeito_core.utils.Lang;
-import xyz.acrylicstyle.tomeito_core.utils.Log;
+import xyz.acrylicstyle.tomeito_api.providers.ConfigProvider;
+import xyz.acrylicstyle.tomeito_api.providers.LanguageProvider;
+import xyz.acrylicstyle.tomeito_api.utils.Lang;
+import xyz.acrylicstyle.tomeito_api.utils.Log;
 import xyz.acrylicstyle.zombieescape.PlayerTeam;
 import xyz.acrylicstyle.zombieescape.ZombieEscape;
 import xyz.acrylicstyle.zombieescape.data.Constants;
@@ -45,7 +45,7 @@ public class ZombieEscapeGameUtil {
     }
 
     public final class SetCheckpoint implements CommandExecutor { // /setcp from command block or something
-        private Map<String, Integer> count = new HashMap<>();
+        private final Map<String, Integer> count = new HashMap<>();
 
         @Override
         public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -244,7 +244,7 @@ public class ZombieEscapeGameUtil {
     }
 
     public final class DestroyWall implements CommandExecutor {
-        private Map<String, Integer> count = new HashMap<>();
+        private final Map<String, Integer> count = new HashMap<>();
 
         @Override
         public boolean onCommand(final CommandSender sender, Command command, String label, String[] args) {

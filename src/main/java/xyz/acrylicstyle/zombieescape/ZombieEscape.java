@@ -41,10 +41,10 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.*;
 import util.ICollectionList;
-import xyz.acrylicstyle.tomeito_core.providers.ConfigProvider;
-import xyz.acrylicstyle.tomeito_core.providers.LanguageProvider;
-import xyz.acrylicstyle.tomeito_core.utils.Lang;
-import xyz.acrylicstyle.tomeito_core.utils.Log;
+import xyz.acrylicstyle.tomeito_api.providers.ConfigProvider;
+import xyz.acrylicstyle.tomeito_api.providers.LanguageProvider;
+import xyz.acrylicstyle.tomeito_api.utils.Lang;
+import xyz.acrylicstyle.tomeito_api.utils.Log;
 import xyz.acrylicstyle.zombieescape.commands.Sponsor;
 import xyz.acrylicstyle.zombieescape.commands.ZombieEscapeCommand;
 import xyz.acrylicstyle.zombieescape.commands.ZombieEscapeConfig;
@@ -665,10 +665,6 @@ public class ZombieEscape extends JavaPlugin implements Listener {
                             }
                         }
                         Objective objective3 = scoreboard.getObjective(DisplaySlot.SIDEBAR);
-                        String leftSecondPlayed = Integer.toString(playedTime % 60);
-                        if (leftSecondPlayed.length() == 1) leftSecondPlayed = "0" + leftSecondPlayed;
-                        String leftSecond = Integer.toString(gameTime % 60);
-                        if (leftSecond.length() == 1) leftSecond = "0" + leftSecond;
                         String lastScore4 = hashMapLastScore4.get(event.getPlayer().getUniqueId());
                         scoreboard.resetScores(lastScore4);
                         lastScore4 = ChatColor.GREEN + "    " + secondsToTime(playedTime) + " / " + secondsToTime(gameTime);
