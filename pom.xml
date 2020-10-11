@@ -72,7 +72,7 @@
         <dependency>
             <groupId>xyz.acrylicstyle</groupId>
             <artifactId>api</artifactId>
-            <version>0.3.1</version>
+            <version>0.5.19a</version>
         </dependency>
         <dependency>
             <groupId>de.robingrether.idisguise</groupId>

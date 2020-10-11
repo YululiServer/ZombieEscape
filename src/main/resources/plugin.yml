@@ -7,15 +7,6 @@ commands:
   zombieescape:
     description: "Zombie Escape"
     usage: /<command> [reload/page]
-  setsponsor:
-    description: "Add a new sponsored player."
-    usage: /<command> <player>
-    aliases: ["sponsor"]
-    permission: zombieescape.setsponsor
-  removesponsor:
-    description: "Remove a sponsored player."
-    usage: /<command> <player>
-    permission: zombieescape.removesponsor
   setspawn:
     description: "Sets spawn of zombie/player."
     usage: /<command> <zombie/player> <0, 1, 2, 3, ...>
@@ -34,6 +25,7 @@ commands:
     description: "Starts game."
     usage: /<command>
     permission: zombieescape.startgame
+    aliases: ["start"]
   endgame:
     description: "Ends ongoing game."
     usage: /<command>
@@ -67,13 +59,10 @@ commands:
     usage: /<command> <wall> <countdown in seconds>
     permission: zombieescape.destroywall
   crash:
-    description: "Crashes this plugin. Needs restart if you wish re-enable plugin."
+    description: "Crashes this plugin. Needs restart if you wish to re-enable plugin."
     usage: /<command>
     permission: zombieescape.danger
   resourcepack:
     description: "Send a resource pack to player."
     usage: /<command>
     aliases: ["resource", "texture", "textures", "resources", "texturepacks", "texturepack", "resourcepacks"]
-  ping:
-    description: "Ping"
-    usage: /<command>

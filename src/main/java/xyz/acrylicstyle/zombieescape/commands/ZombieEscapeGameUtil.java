@@ -1,9 +1,5 @@
 package xyz.acrylicstyle.zombieescape.commands;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -17,7 +13,6 @@ import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -27,7 +22,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.scheduler.BukkitRunnable;
-
 import xyz.acrylicstyle.tomeito_api.providers.ConfigProvider;
 import xyz.acrylicstyle.tomeito_api.providers.LanguageProvider;
 import xyz.acrylicstyle.tomeito_api.utils.Lang;
@@ -36,6 +30,13 @@ import xyz.acrylicstyle.zombieescape.PlayerTeam;
 import xyz.acrylicstyle.zombieescape.ZombieEscape;
 import xyz.acrylicstyle.zombieescape.data.Constants;
 import xyz.acrylicstyle.zombieescape.utils.Utils;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 public class ZombieEscapeGameUtil {
     public final LanguageProvider lang;
@@ -163,7 +164,7 @@ public class ZombieEscapeGameUtil {
 
         @Override
         public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-            if (!Utils.senderCheck(sender)) return true;
+            if (Utils.senderCheck(sender)) return true;
             if (!this.init) this.initialize();
             Player ps = (Player) sender;
             ps.openInventory(inventory);
@@ -202,7 +203,7 @@ public class ZombieEscapeGameUtil {
     public final class Vote implements CommandExecutor {
         @Override
         public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-            if (!Utils.senderCheck(sender)) return true;
+            if (Utils.senderCheck(sender)) return true;
             Player ps = (Player) sender;
             if (args.length == 0) {
                 sender.sendMessage(ChatColor.RED + lang.get("usage") + ": /vote <Map>");
@@ -219,13 +220,7 @@ public class ZombieEscapeGameUtil {
                 sender.sendMessage(lang.get("nomap"));
                 return true;
             }
-            ConfigProvider mapConfig = null;
-            try {
-                mapConfig = new ConfigProvider("./plugins/ZombieEscape/maps/" + args[0] + ".yml");
-            } catch (IOException | InvalidConfigurationException e) {
-                e.printStackTrace();
-            }
-            assert mapConfig != null;
+            ConfigProvider mapConfig = new ConfigProvider("./plugins/ZombieEscape/maps/" + args[0] + ".yml");
             if (Bukkit.getWorld(mapConfig.getString("spawnPoints.world", "world")) == null) {
                 sender.sendMessage(lang.get("nonExistWorld"));
                 return true;
@@ -298,41 +293,12 @@ public class ZombieEscapeGameUtil {
     public final class ResourcePack implements CommandExecutor {
         @Override
         public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-            if (!Utils.senderCheck(sender)) return true;
+            if (Utils.senderCheck(sender)) return true;
             if (ZombieEscape.config.getString("resourcepack") != null) {
                 sender.sendMessage(lang.get("sendingResourcePack"));
                 ((Player) sender).setResourcePack(ZombieEscape.config.getString("resourcepack"));
             } else {
                 sender.sendMessage(lang.get("resourcePackIsntSet"));
-            }
-            return true;
-        }
-    }
-
-    public static final class Ping implements CommandExecutor {
-        @Override
-        public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-            if (!Utils.senderCheck(sender)) return true;
-            Player player = (Player) sender;
-            try {
-                Object entityPlayer = player.getClass().getMethod("getHandle").invoke(player);
-                int ping = (int) entityPlayer.getClass().getField("ping").get(entityPlayer);
-                String pingmsg;
-                if (ping <= 100) {
-                    pingmsg = "" + ChatColor.GREEN + ping;
-                } else if (ping <= 300) {
-                    pingmsg = "" + ChatColor.GOLD + ping;
-                } else if (ping <= 500) {
-                    pingmsg = "" + ChatColor.RED + ping;
-                } else {
-                    pingmsg = "" + ChatColor.DARK_RED + ping;
-                }
-                sender.sendMessage(ChatColor.GREEN + "Ping: " + pingmsg + "ms");
-            } catch (Exception e) { // it shouldn't happen
-                Log.error("Error while getting player's ping:");
-                e.printStackTrace();
-                e.getCause().printStackTrace();
-                sender.sendMessage(ChatColor.RED + "An unknown error occurred while getting your ping");
             }
             return true;
         }

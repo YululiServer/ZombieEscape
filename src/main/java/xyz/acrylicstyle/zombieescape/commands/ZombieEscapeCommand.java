@@ -24,7 +24,7 @@ public class ZombieEscapeCommand implements CommandExecutor {
                 Utils.reload();
                 sender.sendMessage(ChatColor.GREEN + "✓ 設定を再読み込みしました。");
             } else {
-                if (!Utils.senderCheck(sender)) return true;
+                if (Utils.senderCheck(sender)) return true;
                 Command target = Bukkit.getPluginCommand(args[0]);
                 if (target == null) {
                     sender.sendMessage(ZombieEscape.lang.get("unknownCommand"));
